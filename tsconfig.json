@@ -1,0 +1,17 @@
+{
+	"ts-node": {
+		"transpileOnly": true,
+		"compilerOptions": {
+			"module": "commonjs"
+		}
+	},
+	"extends": "@marais/tsconfig",
+	"compilerOptions": {
+		"lib": ["DOM", "ESNext"],
+		"sourceMap": false,
+		"outDir": "./dist"
+	},
+	"include": [
+		"src/index.ts"
+	]
+}

@@ -1,0 +1,31 @@
+{
+	"name": "fmg",
+	"version": "0.1.0",
+	"scripts": {
+		"format": "prettier \"{*,tests/*,src/*}.ts\" --write",
+		"build": "tsc --noEmit false --declaration",
+		"test": "uvu tests -r ts-node/register"
+	},
+	"prettier": {
+		"bracketSpacing": true,
+		"printWidth": 80,
+		"proseWrap": "always",
+		"singleQuote": true,
+		"tabWidth": 4,
+		"trailingComma": "all",
+		"useTabs": true
+	},
+	"devDependencies": {
+		"@marais/tsconfig": "^0.0.1",
+		"@types/node": "^14.0.14",
+		"c8": "^7.2.0",
+		"prettier": "^2.0.5",
+		"ts-node": "^8.10.2",
+		"typescript": "^3.9.6",
+		"uvu": "^0.0.17"
+	},
+	"volta": {
+		"node": "14.5.0",
+		"yarn": "1.22.4"
+	}
+}
