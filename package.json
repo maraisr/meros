@@ -2,7 +2,7 @@
 	"name": "fmg",
 	"version": "0.1.0",
 	"scripts": {
-		"format": "prettier \"{*,tests/*,src/*,.github/**/*}.+(ts|yml)\" --write",
+		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|yml)\" --write",
 		"build": "tsc --noEmit false --declaration",
 		"test": "uvu tests -i util -i prelude -r ts-node/register",
 		"bench": "node -r ts-node/register bench/index.ts",

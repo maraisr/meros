@@ -12,27 +12,30 @@ global['fetch'] = mockFetch([{ part: 'a' }, { part: 'b' }].map(makePart));
 new Suite()
 	.add('fetchMulitpartGraphql', {
 		defer: true,
-		fn: async (deferred:any) => {
-			await fetchMulitpartGraphql('/test', {
-				onNext(_payload: any) {
-					// consume payload.
-				},
-				onError(_error: any) {
-				},
-				onComplete() {
-				},
-			});
-			deferred.resolve();
+		fn: (deferred: any) => {
+			(async function () {
+				await fetchMulitpartGraphql('/test', {
+					onNext(_payload: any) {},
+					onError(_error: any) {},
+					onComplete() {},
+				});
+				deferred.resolve();
+			})();
 		},
 	})
 	.add('fmg', {
 		defer: true,
-		fn: async (deferred: any) => {
-			for await (const _payload of fetchMultipart(() => global['fetch']('/test'))) {
-				// consume payload.
-			}
-			deferred.resolve();
+		fn: (deferred: any) => {
+			(async function () {
+				for await (const _payload of fetchMultipart(() =>
+					global['fetch']('/test'),
+				)) {
+				}
+				deferred.resolve();
+			})();
 		},
 	})
-	.on('cycle', e => console.log('  ' + e.target))
-	.run();
+	.on('cycle', (e) => console.log('  ' + e.target))
+	.run({
+		async: true,
+	});
