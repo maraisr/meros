@@ -8,7 +8,6 @@
 	"extends": "@marais/tsconfig",
 	"compilerOptions": {
 		"lib": ["DOM", "ESNext"],
-		"sourceMap": false,
 		"outDir": "./dist"
 	},
 	"include": [
