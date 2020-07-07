@@ -1,11 +1,32 @@
 {
-	"name": "fmg",
-	"version": "0.1.0",
+	"name": "meros",
+	"version": "0.0.1",
+	"description": "A fast multipart utility for reading streamed multipart responses",
+	"keywords": [
+		"multipart",
+		"multipart mixed",
+		"fetch",
+		"utility",
+		"reader"
+	],
+	"author": "Marais Rossouw <hi@marais.io>",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		}
+	},
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist/"
+	],
 	"scripts": {
-		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|yml)\" --write",
-		"build": "tsc --noEmit false --declaration",
-		"test": "uvu tests -i util -i prelude -r ts-node/register",
 		"bench": "node -r ts-node/register bench/index.ts",
+		"build": "tsc --noEmit false --declaration",
+		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|yml)\" --write",
+		"test": "uvu tests -i util -i prelude -r ts-node/register",
 		"test:coverage": "c8 yarn run test"
 	},
 	"prettier": {
