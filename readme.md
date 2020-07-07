@@ -30,7 +30,7 @@ from(meros(() => response)).pipe(
 
 ## 🔎 API
 
-### meros(fetcher: () => Promise<Response>): AsyncGenerator;
+### meros(fetcher: () => Promise\<Response\>): AsyncGenerator;
 
 Returns an async generator that yields on every part. Worth noting that if
 multiple parts are present in one chunk, each part will yield independently.
