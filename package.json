@@ -1,7 +1,7 @@
 {
 	"name": "meros",
 	"version": "0.0.1",
-	"description": "A fast multipart utility for reading streamed multipart responses",
+	"description": "A fast utility for reading streamed multipart responses.",
 	"keywords": [
 		"multipart",
 		"multipart mixed",
@@ -9,6 +9,7 @@
 		"utility",
 		"reader"
 	],
+	"license": "MIT",
 	"author": "Marais Rossouw <hi@marais.io>",
 	"exports": {
 		".": {
@@ -25,7 +26,7 @@
 	"scripts": {
 		"bench": "node -r ts-node/register bench/index.ts",
 		"build": "tsc --noEmit false --declaration",
-		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|yml)\" --write",
+		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|yml|md)\" --write",
 		"test": "uvu tests -i util -i prelude -r ts-node/register",
 		"test:coverage": "c8 yarn run test"
 	},
