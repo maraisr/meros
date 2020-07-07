@@ -2,13 +2,13 @@
 
 > A fast utility for reading streamed multipart responses.
 
-## Install
+## ⚙️ Install
 
 ```sh
 yarn add meros
 ```
 
-## Usage
+## 🚀 Usage
 
 ```ts
 import meros from 'meros';
@@ -28,7 +28,7 @@ from(meros(() => response)).pipe(
 );
 ```
 
-## API
+## 🔎 API
 
 ### meros(fetcher: () => Promise<Response>): AsyncGenerator;
 
