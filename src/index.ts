@@ -4,40 +4,44 @@ const CHUNK_DELIM = '\r\n\r\n';
 
 type PART = object; // The JSON part object
 
+const decoder = new TextDecoder();
+const encoder = new TextEncoder();
+
 export async function* fetchMultipart(
 	fetcher: () => Promise<Response>,
 ): AsyncGenerator {
 	const response = await fetcher();
 
-	if (!response || !response.body || !response.ok) throw response;
+	if (!response?.body || !response?.ok) throw response;
 
 	if (!response.headers.get('Content-Type').includes('multipart/mixed'))
 		return await response.json();
 
 	const reader = response.body.getReader();
 
-	const decoder = new TextDecoder();
-
 	try {
-		let trackingBuffer = '';
+		let nextChunk = '';
+		// Read initial values
+		let {value: currentValue, done} = await reader.read();
 
-		while (true) {
-			const { value, done } = await reader.read();
-			if (done) return;
+		while (!done) {
+			nextChunk += decoder.decode(currentValue);
 
-			const chunk = decoder.decode(value);
+			const parts = processChunk(nextChunk);
 
-			trackingBuffer += chunk;
-
-			const parts = processChunk(trackingBuffer);
+			// iterate and emit each processed part
 			let part;
 			while ((part = parts.next())) {
-				if (!part.done) yield part.value;
-				if (part.done && part.value !== undefined) {
-					trackingBuffer = part.value;
+				if (!part.done) {
+					yield part.value
+				} else {
+					nextChunk = part.value ?? nextChunk;
+					break;
 				}
-				if (part.done) break;
 			}
+
+			// Read next values
+			({value: currentValue, done} = await reader.read());
 		}
 	} finally {
 		reader.releaseLock();
@@ -78,13 +82,13 @@ function* processChunk(chunk: string): Generator<PART | string> {
 
 		if (textBufferInt.length < contentLength) return chunk;
 
-		const body = new TextDecoder().decode(
+		const body = decoder.decode(
 			textBufferInt.subarray(0, contentLength),
 		);
 
 		yield JSON.parse(body);
 
-		buffer = new TextDecoder().decode(
+		buffer = decoder.decode(
 			textBufferInt.subarray(contentLength),
 		);
 	}
@@ -92,6 +96,7 @@ function* processChunk(chunk: string): Generator<PART | string> {
 
 const shiftBuffer = (buffer: string, delim: string): [string, string] => {
 	const index = buffer.indexOf(delim);
-	if (index < 0) return [buffer, undefined];
-	return [buffer.substring(0, index), buffer.substring(index + delim.length)];
+	return index < 0
+		? [buffer, undefined]
+		: [buffer.substring(0, index), buffer.substring(index + delim.length)];
 };
