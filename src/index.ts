@@ -15,7 +15,7 @@ export async function* fetchMultipart(
 	if (!response?.body || !response?.ok) throw response;
 
 	if (!response.headers.get('Content-Type').includes('multipart/mixed'))
-		return await response.json();
+		return response.json();
 
 	const reader = response.body.getReader();
 
