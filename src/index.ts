@@ -64,19 +64,14 @@ function* processChunk(chunk: string): Generator<PART | string> {
 		if (!rest?.length) return buffer;
 
 		// Parse out the contentLength
-		const contentLengthHeader = headers
-			.split('\r\n')
-			.find((line) => line.toLowerCase().indexOf('content-length:') >= 0);
-		if (contentLengthHeader === undefined)
-			throw new Error('No Content-Length header found');
-		const contentLength = parseInt(
-			contentLengthHeader.split(':').pop(),
-			10,
-		);
-		if (isNaN(contentLength))
-			throw new Error('Failed parsing Content-Length');
+		const contentLengthHeader = headers.match(/content-length: ?(\d+)/i);
 
-		const textBufferInt = new TextEncoder().encode(
+		if (!contentLengthHeader)
+			throw new Error('No Content-Length header found');
+
+		const contentLength = parseInt(contentLengthHeader[1], 10);
+
+		const textBufferInt = encoder.encode(
 			rest.replace(TAIL_BOUNDARY, ''),
 		);
 
