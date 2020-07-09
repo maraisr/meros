@@ -9,8 +9,13 @@
 		"utility",
 		"reader"
 	],
+	"repository": "mariasr/meros",
 	"license": "MIT",
-	"author": "Marais Rossouw <hi@marais.io>",
+	"author": {
+		"name": "Marais Rossouw",
+		"email": "hi@marais.io",
+		"url": "https://marais.io"
+	},
 	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
@@ -18,17 +23,19 @@
 		}
 	},
 	"main": "dist/index.js",
+	"unpkg": "dist/index.min.js",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
 	"files": [
-		"dist/"
+		"dist",
+		"types"
 	],
 	"scripts": {
 		"bench": "node -r ts-node/register bench/index.ts",
-		"build": "tsc --noEmit false --declaration",
-		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|yml|md)\" --write",
-		"test": "uvu tests -i util -i prelude -r ts-node/register",
-		"test:coverage": "c8 yarn run test"
+		"build": "rollup -c",
+		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|js|yml|md)\" --write",
+		"prepublishOnly": "yarn build",
+		"test": "uvu -r ts-node/register -i util -i prelude tests"
 	},
 	"prettier": {
 		"bracketSpacing": true,
@@ -41,18 +48,23 @@
 	},
 	"devDependencies": {
 		"@marais/tsconfig": "^0.0.1",
+		"@rollup/plugin-node-resolve": "8.1.0",
 		"@types/benchmark": "^1.0.33",
-		"@types/node": "^14.0.14",
+		"@types/node": "^14.0.20",
 		"benchmark": "^2.1.4",
-		"c8": "^7.2.0",
 		"fetch-multipart-graphql": "^2.0.1",
 		"node-fetch": "^2.6.0",
 		"prettier": "^2.0.5",
-		"rxjs": "^7.0.0-beta.1",
+		"rollup": "2.21.0",
+		"rollup-plugin-terser": "6.1.0",
+		"rollup-plugin-typescript2": "0.27.1",
 		"ts-node": "^8.10.2",
 		"typescript": "^3.9.6",
-		"uvu": "^0.0.17",
+		"uvu": "^0.0.19",
 		"web-streams-polyfill": "^2.1.1"
+	},
+	"engines": {
+		"node": ">=10"
 	},
 	"volta": {
 		"node": "14.5.0",

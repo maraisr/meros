@@ -1,8 +1,12 @@
-dist/
-coverage/
+node_modules
+.DS_Store
+*-lock.*
+*.lock
+*.log
 
-# Node things
-node_modules/
+/dist
+/types
+/coverage
 
 # Yarn
 .yarn/
@@ -10,4 +14,5 @@ node_modules/
 
 # Editors
 *.iml
-.idea/
+/.idea
+/.vscode

@@ -3,14 +3,26 @@
 		"transpileOnly": true,
 		"compilerOptions": {
 			"module": "commonjs"
-		}
+		},
+		"include": [
+			"test/**/*"
+		]
 	},
 	"extends": "@marais/tsconfig",
 	"compilerOptions": {
-		"lib": ["DOM", "ESNext"],
+		"target": "ES2019",
+		"declaration": true,
+		"declarationDir": "types",
+		"lib": [
+			"DOM",
+			"ESNext"
+		],
 		"outDir": "./dist"
 	},
 	"include": [
-		"src/index.ts"
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules"
 	]
 }
