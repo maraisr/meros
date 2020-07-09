@@ -1,6 +1,9 @@
 # `meros` <sub>From Ancient Greek μέρος (méros, “part”).</sub>
 
-> A fast utility for reading streamed multipart responses.
+[![CI](https://img.shields.io/github/workflow/status/maraisr/meros/CI/main)](https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main)
+[![codecov](https://img.shields.io/codecov/c/gh/mariasr/meros/main?token=dAoRt2GoQn)](https://codecov.io/gh/maraisr/meros)
+
+> A fast utility for reading streamed multipart/mixed responses on the client.
 
 ## ⚙️ Install
 
@@ -30,7 +33,7 @@ from(meros(() => response)).pipe(
 
 ## 🔎 API
 
-### meros(fetcher: () => Promise<Response>): AsyncGenerator;
+### meros(fetcher: () => Promise\<Response\>): AsyncGenerator;
 
 Returns an async generator that yields on every part. Worth noting that if
 multiple parts are present in one chunk, each part will yield independently.
