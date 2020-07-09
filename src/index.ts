@@ -22,7 +22,7 @@ export async function* fetchMultipart(
 	try {
 		let nextChunk = '';
 		// Read initial values
-		let {value: currentValue, done} = await reader.read();
+		let { value: currentValue, done } = await reader.read();
 
 		while (!done) {
 			nextChunk += decoder.decode(currentValue);
@@ -33,7 +33,7 @@ export async function* fetchMultipart(
 			let part;
 			while ((part = parts.next())) {
 				if (!part.done) {
-					yield part.value
+					yield part.value;
 				} else {
 					nextChunk = part.value ?? nextChunk;
 					break;
@@ -41,7 +41,7 @@ export async function* fetchMultipart(
 			}
 
 			// Read next values
-			({value: currentValue, done} = await reader.read());
+			({ value: currentValue, done } = await reader.read());
 		}
 	} finally {
 		reader.releaseLock();
@@ -71,21 +71,15 @@ function* processChunk(chunk: string): Generator<PART | string> {
 
 		const contentLength = parseInt(contentLengthHeader[1], 10);
 
-		const textBufferInt = encoder.encode(
-			rest.replace(TAIL_BOUNDARY, ''),
-		);
+		const textBufferInt = encoder.encode(rest.replace(TAIL_BOUNDARY, ''));
 
 		if (textBufferInt.length < contentLength) return chunk;
 
-		const body = decoder.decode(
-			textBufferInt.subarray(0, contentLength),
-		);
+		const body = decoder.decode(textBufferInt.subarray(0, contentLength));
 
 		yield JSON.parse(body);
 
-		buffer = decoder.decode(
-			textBufferInt.subarray(contentLength),
-		);
+		buffer = decoder.decode(textBufferInt.subarray(contentLength));
 	}
 }
 
