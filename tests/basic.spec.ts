@@ -5,7 +5,7 @@ import * as assert from 'uvu/assert';
 
 import * as fmg from '../src';
 
-import { makePart, mockFetch } from './util';
+import { makePart, mockFetch, mockJsonFetch } from './util';
 
 const fetchMultipart = suite('fmg');
 
@@ -62,6 +62,19 @@ fetchMultipart('should work for 1 chunk multiple parts', async () => {
 	}
 
 	assert.equal(patches, payloads);
+});
+
+fetchMultipart('should just return json when its not multipart', async () => {
+	const payload = { first: 'test' };
+
+	const messages = await fmg.fetchMultipart(mockJsonFetch(payload));
+
+	const patches = [];
+	for await (let value of messages) {
+		patches.push(value);
+	}
+
+	assert.equal(patches, [payload]);
 });
 
 fetchMultipart.run();

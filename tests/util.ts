@@ -42,11 +42,24 @@ export const mockFetch = (parts: any[]) => {
 	};
 };
 
-class MockResponse {
-	constructor(private _body: ReadableStream, private _options: any) {}
+export const mockJsonFetch = (payload: object) => () =>
+	Promise.resolve<Response>(
+		// @ts-ignore
+		new MockResponse(JSON.stringify(payload), {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}),
+	);
 
-	get json() {
-		throw new Error('We dont have json in unit tests');
+class MockResponse {
+	constructor(
+		private _body: ReadableStream | string,
+		private _options: any,
+	) {}
+
+	json() {
+		return JSON.parse(this._body as string);
 	}
 
 	get status() {

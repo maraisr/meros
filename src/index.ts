@@ -12,8 +12,10 @@ export async function* fetchMultipart<Part extends object = {}>(
 
 	if (!response?.body || !response?.ok) throw response;
 
-	if (!response.headers.get('Content-Type').includes('multipart/mixed'))
-		return response.json();
+	if (!response.headers.get('Content-Type').includes('multipart/mixed')) {
+		yield response.json();
+		return;
+	}
 
 	const reader = response.body.getReader();
 
