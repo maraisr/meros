@@ -21,15 +21,15 @@ export async function* fetchMultipart<Part extends object = {}>(
 
 	try {
 		let nextChunk = '';
-		// Read initial values
-		let { value: currentValue, done } = await reader.read();
 
-		while (!done) {
-			nextChunk += decoder.decode(currentValue);
+		while (true) {
+			const { value, done } = await reader.read();
+			if (done) break;
+
+			nextChunk += decoder.decode(value);
 
 			const parts = processChunk(nextChunk);
 
-			// iterate and emit each processed part
 			let part;
 			while ((part = parts.next())) {
 				if (!part.done) {
@@ -39,9 +39,6 @@ export async function* fetchMultipart<Part extends object = {}>(
 					break;
 				}
 			}
-
-			// Read next values
-			({ value: currentValue, done } = await reader.read());
 		}
 	} finally {
 		reader.releaseLock();
