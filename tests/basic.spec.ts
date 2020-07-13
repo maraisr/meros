@@ -12,11 +12,11 @@ const fetchMultipart = suite('fmg');
 fetchMultipart('should work for perfect chunks', async () => {
 	const payloads = [{ first: 'test' }, { second: 'test' }];
 
-	const messages: any = await fmg.fetchMultipart(
+	const messages = await fmg.fetchMultipart<typeof payloads[number]>(
 		mockFetch(payloads.map(makePart)),
 	);
 
-	const patches: string[] = [];
+	const patches = [];
 	for await (let value of messages) {
 		patches.push(value);
 	}

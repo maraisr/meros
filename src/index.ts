@@ -2,14 +2,12 @@ const BOUNDARY = '\r\n---\r\n';
 const TAIL_BOUNDARY = '\r\n-----\r\n';
 const CHUNK_DELIM = '\r\n\r\n';
 
-type PART = object; // The JSON part object
-
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 
-export async function* fetchMultipart(
+export async function* fetchMultipart<Part extends object = {}>(
 	fetcher: () => Promise<Response>,
-): AsyncGenerator {
+): AsyncGenerator<Part> {
 	const response = await fetcher();
 
 	if (!response?.body || !response?.ok) throw response;
@@ -48,7 +46,7 @@ export async function* fetchMultipart(
 	}
 }
 
-function* processChunk(chunk: string): Generator<PART | string> {
+function* processChunk<T>(chunk: string): Generator<T | string> {
 	if (chunk === TAIL_BOUNDARY) return '';
 
 	let buffer = chunk;
