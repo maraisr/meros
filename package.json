@@ -25,7 +25,7 @@
 	"main": "dist/index.js",
 	"unpkg": "dist/index.min.js",
 	"module": "dist/index.mjs",
-	"types": "dist/index.d.ts",
+	"types": "types/index.d.ts",
 	"files": [
 		"dist",
 		"types"
