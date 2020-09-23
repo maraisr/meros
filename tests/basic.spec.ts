@@ -7,7 +7,7 @@ import * as fmg from '../src';
 
 import { makePart, mockFetch, mockJsonFetch } from './util';
 
-const fetchMultipart = suite('fmg');
+const fetchMultipart = suite('fetchMultipart');
 
 fetchMultipart('should work for perfect chunks', async () => {
 	const payloads = [{ first: 'test' }, { second: 'test' }];
