@@ -1,6 +1,6 @@
 {
 	"name": "meros",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "A fast utility for reading streamed multipart responses.",
 	"keywords": [
 		"multipart",
@@ -9,7 +9,7 @@
 		"utility",
 		"reader"
 	],
-	"repository": "mariasr/meros",
+	"repository": "maraisr/meros",
 	"license": "MIT",
 	"author": {
 		"name": "Marais Rossouw",
