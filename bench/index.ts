@@ -4,22 +4,15 @@ import { Suite } from 'benchmark';
 
 import { makePart, mockFetch } from '../tests/util';
 
-console.log('\nLoad times: ');
-
-console.time('fetch-multipart-graphql');
 const fetchMulitpartGraphql = require('fetch-multipart-graphql/dist/fetch')
 	.fetchImpl;
-console.timeEnd('fetch-multipart-graphql');
-
-console.time('meros');
 const meros = require('../dist/index.js').fetchMultipart;
-console.timeEnd('meros');
 
 global['fetch'] = mockFetch([{ part: 'a' }, { part: 'b' }].map(makePart));
 
 console.log('\nBenchmark:');
 new Suite()
-	.add('fetchMulitpartGraphql', {
+	.add('fetch-multipart-graphql', {
 		defer: true,
 		fn: (deferred: any) => {
 			(async function () {
@@ -32,7 +25,7 @@ new Suite()
 			})();
 		},
 	})
-	.add('fmg', {
+	.add('meros', {
 		defer: true,
 		fn: (deferred: any) => {
 			(async function () {
