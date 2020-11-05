@@ -17,17 +17,15 @@
 		"url": "https://marais.io"
 	},
 	"exports": {
-		".": [
-			{
-				"import": "./dist/index.mjs",
-				"require": "./dist/index.js"
-			},
-			"./dist/index.js"
-		]
+		".": {
+			"import": "./dist/node.mjs",
+			"browser": "./dist/browser.mjs",
+			"require": "./dist/node.js"
+		}
 	},
-	"main": "dist/index.js",
-	"unpkg": "dist/index.min.js",
-	"module": "dist/index.mjs",
+	"main": "dist/node.js",
+	"unpkg": "dist/browser.min.js",
+	"module": "dist/node.mjs",
 	"types": "types/index.d.ts",
 	"files": [
 		"dist",
@@ -36,9 +34,9 @@
 	"scripts": {
 		"bench": "node -r ts-node/register bench/index.ts",
 		"build": "rollup -c",
-		"format": "prettier \"{*,tests/*,src/*,bench/*,.github/**/*}.+(ts|js|yml|md)\" --write",
+		"format": "prettier \"{*,tests/*,src/**/*,bench/*,.github/**/*}.+(ts|js|yml|md)\" --write",
 		"prepublishOnly": "yarn build",
-		"test": "uvu -r ts-node/register -i util -i prelude tests"
+		"test": "uvu -r ts-node/register -i server tests"
 	},
 	"prettier": {
 		"bracketSpacing": true,
@@ -54,20 +52,18 @@
 		"@rollup/plugin-node-resolve": "10.0.0",
 		"@types/benchmark": "^2.1.0",
 		"@types/node": "^14.14.6",
+		"@types/node-fetch": "^2.5.7",
 		"benchmark": "^2.1.4",
 		"fetch-multipart-graphql": "^2.1.0",
 		"node-fetch": "^2.6.1",
+		"polka": "^0.5.2",
 		"prettier": "^2.1.2",
 		"rollup": "2.33.1",
 		"rollup-plugin-terser": "7.0.2",
 		"rollup-plugin-typescript2": "0.29.0",
 		"ts-node": "^9.0.0",
 		"typescript": "^4.0.5",
-		"uvu": "^0.4.0",
-		"web-streams-polyfill": "^3.0.0"
-	},
-	"engines": {
-		"node": ">=10"
+		"uvu": "^0.4.0"
 	},
 	"volta": {
 		"node": "15.0.1",
