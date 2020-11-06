@@ -56,6 +56,7 @@
 		"benchmark": "^2.1.4",
 		"fetch-multipart-graphql": "^2.1.0",
 		"node-fetch": "^2.6.1",
+		"playwright": "^1.5.2",
 		"polka": "^0.5.2",
 		"prettier": "^2.1.2",
 		"rollup": "2.33.1",
@@ -66,7 +67,7 @@
 		"uvu": "^0.4.0"
 	},
 	"volta": {
-		"node": "15.0.1",
+		"node": "15.1.0",
 		"yarn": "1.22.5"
 	}
 }
