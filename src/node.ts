@@ -1,27 +1,21 @@
-import type { IncomingMessage } from 'http';
 import { generate } from './lib/node';
 
+import type { IncomingMessage } from 'http';
+
 export async function meros<T>(res: IncomingMessage) {
-	if (!('content-type' in res.headers)) {
-		throw new Error('There was no content-type header');
-	}
+	const ctype = res.headers['content-type'];
 
-	if (!/multipart\/mixed/.test(res.headers['content-type'])) {
-		return res;
-	}
+	if (!ctype) throw new Error('There was no content-type header');
+	if (!/multipart\/mixed/.test(ctype)) return res;
 
-	const boundaryIndex = res.headers['content-type'].indexOf('boundary=');
+	const boundaryIndex = ctype.indexOf('boundary=');
 
 	return generate<T>(
 		res,
 		'--' +
 			(!!~boundaryIndex
-				? res.headers['content-type']
-						.substring(
-							// +9 for 'boundary='.length
-							boundaryIndex + 9,
-						)
-						.trim()
+				? // +9 for 'boundary='.length
+				  ctype.substring(boundaryIndex + 9).trim()
 				: '-'),
 	);
 }

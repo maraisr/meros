@@ -28,13 +28,13 @@ test('can make a call', async (context) => {
 	const response = await makeCall(context.port);
 	const parts = await meros.meros<object>(response);
 
-	let collection: Array<object> = [],
-		itt = 0;
+	let collection: Array<object> = [];
 
 	for await (let part of parts) {
-		++itt;
 		collection.push(part);
 	}
+
+	assert.is(collection.length, 5);
 
 	assert.equal(collection, [
 		{ hello: 'world' },
@@ -43,7 +43,6 @@ test('can make a call', async (context) => {
 		{ massive: { nested: { world: 'okay' } } },
 		'should be plain text',
 	]);
-	assert.equal(itt, 5);
 });
 
 test.run();

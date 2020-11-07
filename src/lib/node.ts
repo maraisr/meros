@@ -6,61 +6,63 @@ export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
 ): AsyncGenerator<T> {
+	let last_index = 0;
 	let buffer = Buffer.alloc(0);
 	let isPreamble = true;
 	let isJson = false;
 
 	for await (const chunk of stream) {
-		buffer = Buffer.concat([buffer, chunk], buffer.length + chunk.length);
-		const boundaryIndex = buffer.indexOf(boundary);
+		const idx_chunk = (chunk as Buffer).indexOf(boundary);
 
-		if (isPreamble && !!~boundaryIndex) {
+		let idx_boundary = buffer.length;
+		buffer = Buffer.concat([buffer, chunk]);
+
+		if (!!~idx_chunk) {
+			// chunk itself had `boundary` marker
+			idx_boundary += idx_chunk;
+		} else {
+			// search combined (boundary can be across chunks)
+			idx_boundary = buffer.indexOf(boundary, last_index);
+
+			if (!~idx_boundary) {
+				// rewind a bit for next `indexOf`
+				last_index = buffer.length - chunk.length;
+				continue;
+			}
+		}
+
+		const next = buffer.slice(idx_boundary + boundary.length);
+		const current = buffer.slice(0, idx_boundary);
+
+		if (isPreamble) {
+			buffer = next;
 			isPreamble = false;
-			buffer = buffer.slice(boundaryIndex + boundary.length);
 			continue;
 		}
 
-		if (!!~boundaryIndex) {
-			const payload = buffer.slice(0, boundaryIndex);
-			const headerSeparated = payload.indexOf(separator);
-			let data = payload.slice(headerSeparated);
+		let ctype = '', clength = '';
+		const idx_headers = current.indexOf(separator);
 
-			const headers: Map<string, string> = new Map();
-			for (let item of payload
-				.slice(0, headerSeparated)
-				.toString('utf8')
-				.trim()
-				.split(/\r\n/)) {
-				const idx = item.indexOf(':');
-				headers.set(
-					item.slice(0, idx).toLowerCase(),
-					item.slice(idx + 1).trim(),
-				);
-			}
+		// parse headers, only keeping relevant headers
+		buffer.slice(0, idx_headers).toString('utf8').trim().split(/\r\n/).forEach((str, idx) => {
+			idx = str.indexOf(':');
+			let key = str.substring(0, idx).toLowerCase();
+			if (key === 'content-type') ctype = str.substring(idx + 1).trim();
+			else if (key === 'content-length') clength = str.substring(idx + 1).trim();
+		});
 
-			data = data.slice(data.indexOf(separator) + separator.length);
+		let payload = current.slice(idx_headers + separator.length);
+		if (clength) payload = payload.slice(0, parseInt(clength, 10));
 
-			if (headers.has('content-length')) {
-				data = data.slice(
-					0,
-					parseInt(headers.get('content-length'), 10),
-				);
-			}
+		isJson = isJson || !!~ctype.indexOf('application/json');
 
-			if (!isJson)
-				isJson =
-					headers.has('content-type') &&
-					!!~headers.get('content-type').indexOf('application/json');
+		yield isJson
+			? JSON.parse(payload.toString('utf8'))
+			: payload.toString('utf8');
 
-			yield isJson
-				? JSON.parse(data.toString('utf8'))
-				: data.toString('utf8');
+		if (next.slice(0, 2).toString() === '--') break;
 
-			if (!!~buffer.indexOf(boundary + '--')) {
-				break;
-			}
-
-			buffer = buffer.slice(boundaryIndex + boundary.length);
-		}
+		buffer = next;
+		last_index = 0;
 	}
 }
