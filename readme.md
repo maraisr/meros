@@ -1,7 +1,6 @@
-# `meros` <small>From Ancient Greek μέρος (méros, “part”).</small>
+# `meros` &middot; <small>From Ancient Greek μέρος (méros, "part").</small>
 
-[![CI](https://img.shields.io/github/workflow/status/maraisr/meros/CI/main)](https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main)
-[![codecov](https://img.shields.io/codecov/c/gh/maraisr/meros/main?token=dAoRt2GoQn)](https://codecov.io/gh/maraisr/meros)
+[![CI](https://img.shields.io/github/workflow/status/maraisr/meros/CI/main)](https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main) [![codecov](https://img.shields.io/codecov/c/gh/maraisr/meros/main?token=dAoRt2GoQn)](https://codecov.io/gh/maraisr/meros)
 
 > A fast utility for reading streamed multipart/mixed responses.
 
