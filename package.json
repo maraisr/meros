@@ -42,10 +42,10 @@
 		"@marais/tsconfig": "^0.0.1",
 		"@rollup/plugin-node-resolve": "10.0.0",
 		"@types/benchmark": "^2.1.0",
-		"@types/node": "^14.14.6",
+		"@types/node": "^14.14.7",
 		"@types/node-fetch": "^2.5.7",
 		"benchmark": "^2.1.4",
-		"fetch-multipart-graphql": "^2.1.0",
+		"fetch-multipart-graphql": "^2.2.0",
 		"node-fetch": "^2.6.1",
 		"playwright": "^1.5.2",
 		"polka": "^0.5.2",
@@ -55,7 +55,7 @@
 		"rollup-plugin-typescript2": "0.29.0",
 		"ts-node": "^9.0.0",
 		"typescript": "^4.0.5",
-		"uvu": "^0.4.0"
+		"uvu": "^0.4.1"
 	},
 	"volta": {
 		"node": "15.1.0",
