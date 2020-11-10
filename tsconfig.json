@@ -14,6 +14,7 @@
 		"target": "ES2019",
 		"declaration": true,
 		"declarationDir": "types",
+		"removeComments": false,
 		"lib": [
 			"DOM",
 			"ESNext"

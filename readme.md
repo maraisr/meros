@@ -83,12 +83,15 @@ body.
 
 ## 🔎 API
 
-### _Browser_ ~ meros(stream: ReadableStream\<Uint8Array>): AsyncGenerator\<T>;
+### _Browser_ ~ function meros\<T=unknown\>(response: Response): Promise\<Response | AsyncGenerator\<T\>\>;
 
-### _Node_ ~ meros(stream: Readable): AsyncGenerator\<T>;
+### _Node_ ~ function meros\<T=unknown\>(response: IncomingMessage): Promise\<IncomingMessage | AsyncGenerator\<T\>\>;
 
 Returns an async generator that yields on every part. Worth noting that if
 multiple parts are present in one chunk, each part will yield independently.
+
+> If the `content-type` is a multipart, then it will resolve with the response
+> argument.
 
 ## 💨 Benchmark
 
