@@ -1,6 +1,5 @@
-const decoder = new TextDecoder();
-
 const separator = '\r\n\r\n';
+const decoder = new TextDecoder;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
@@ -15,10 +14,10 @@ export async function* generate<T>(
 	try {
 		outer: while (true) {
 			const result = await reader.read();
-			const chunk = decoder.decode(result.value);
-			if (result.done) break outer;
+			if (result.done) break outer; // undefined value
 
 			let idx_boundary = buffer.length;
+			const chunk = decoder.decode(result.value);
 			const idx_chunk = chunk.indexOf(boundary);
 			buffer += chunk;
 
