@@ -47,7 +47,7 @@ export async function* generate<T>(
 			const idx_headers = current.indexOf(separator);
 
 			// parse headers, only keeping relevant headers
-					buffer.substring(0, idx_headers).toString().trim().split(/\r\n/).forEach((str, idx) => {
+					buffer.substring(0, idx_headers).trim().split(/\r\n/).forEach((str, idx) => {
 				idx = str.indexOf(':');
 				let key = str.substring(0, idx).toLowerCase();
 				if (key === 'content-type') ctype = str.substring(idx + 1).trim();
@@ -59,9 +59,9 @@ export async function* generate<T>(
 					if (clength) payload = payload.substring(0, parseInt(clength, 10));
 
 			is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
-			yield is_json ? JSON.parse(payload.toString()) : payload.toString();
+					yield is_json ? JSON.parse(payload) : payload;
 
-					if (next.substring(0, 2).toString() === '--') break outer;
+					if (next.substring(0, 2) === '--') break outer;
 				}
 
 				buffer=next; last_index=0;
