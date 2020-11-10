@@ -18,7 +18,7 @@ export async function* generate<T>(
 			const chunk = decoder.decode(result.value);
 
 			let idx_boundary = buffer.length;
-			const idx_chunk = buffer.indexOf(boundary);
+			const idx_chunk = chunk.indexOf(boundary);
 			buffer += chunk;
 
 			if (!!~idx_chunk) {
