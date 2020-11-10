@@ -2,6 +2,19 @@
 
 import type { IncomingMessage } from 'http';
 
+// Mocks for Node@10
+global['TextDecoder'] =
+	global['TextDecoder '] ||
+	class {
+		decode(arr: Uint8Array) {
+			let str = '';
+			for (let i = 0; i < arr.length; i++) {
+				str += String.fromCharCode(arr[i]);
+			}
+			return str;
+		}
+	};
+
 export function makeChunk(
 	payload: any,
 	boundary: string,
@@ -20,10 +33,28 @@ export function makeChunk(
 	return returns.join('\r\n');
 }
 
-function* makePatches(parts: (string | object | (string | object)[])[], boundary: string) {
-	const patches = parts.map(part => {
-		if (Array.isArray(part)) return part.map(p => makeChunk(p, boundary, typeof p === 'string' ? 'text/plain' : 'application/json')).join('');
-		return makeChunk(part, boundary, typeof part === 'string' ? 'text/plain' : 'application/json');
+function* makePatches(
+	parts: (string | object | (string | object)[])[],
+	boundary: string,
+) {
+	const patches = parts.map((part) => {
+		if (Array.isArray(part))
+			return part
+				.map((p) =>
+					makeChunk(
+						p,
+						boundary,
+						typeof p === 'string'
+							? 'text/plain'
+							: 'application/json',
+					),
+				)
+				.join('');
+		return makeChunk(
+			part,
+			boundary,
+			typeof part === 'string' ? 'text/plain' : 'application/json',
+		);
 	});
 
 	yield Buffer.from('preamble');
@@ -42,16 +73,22 @@ function* makePatches(parts: (string | object | (string | object)[])[], boundary
 	yield Buffer.from(makeChunk({ shouldnt: 'work' }, boundary));
 }
 
-export async function mockResponseNode(parts: (string | object | (string | object)[])[], boundary: string): Promise<IncomingMessage> {
+export async function mockResponseNode(
+	parts: (string | object | (string | object)[])[],
+	boundary: string,
+): Promise<IncomingMessage> {
 	return {
 		headers: {
 			'content-type': `multipart/mixed; boundary=${boundary}`,
 		},
-		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary)
+		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary),
 	};
 }
 
-export async function mockResponseBrowser(parts: (string | object | (string | object)[])[], boundary: string): Promise<Response> {
+export async function mockResponseBrowser(
+	parts: (string | object | (string | object)[])[],
+	boundary: string,
+): Promise<Response> {
 	return {
 		headers: new Map([
 			['content-type', `multipart/mixed; boundary=${boundary}`],
@@ -67,11 +104,11 @@ export async function mockResponseBrowser(parts: (string | object | (string | ob
 					},
 					releaseLock() {
 						// nothing
-					}
-				}
-			}
+					},
+				};
+			},
 		},
 		ok: true,
-		bodyUsed: false
-	}
+		bodyUsed: false,
+	};
 }
