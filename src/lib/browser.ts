@@ -37,8 +37,8 @@ export async function* generate<T>(
 			}
 
 			while (!!~idx_boundary) {
-			const current = buffer.slice(0, idx_boundary);
-				const next = buffer.slice(idx_boundary + boundary.length);
+				const current = buffer.substring(0, idx_boundary);
+				const next = buffer.substring(idx_boundary + boundary.length);
 
 			if (is_preamble) {
 				is_preamble = false;
@@ -47,21 +47,21 @@ export async function* generate<T>(
 			const idx_headers = current.indexOf(separator);
 
 			// parse headers, only keeping relevant headers
-			buffer.slice(0, idx_headers).toString().trim().split(/\r\n/).forEach((str, idx) => {
+					buffer.substring(0, idx_headers).toString().trim().split(/\r\n/).forEach((str, idx) => {
 				idx = str.indexOf(':');
 				let key = str.substring(0, idx).toLowerCase();
 				if (key === 'content-type') ctype = str.substring(idx + 1).trim();
 				else if (key === 'content-length') clength = str.substring(idx + 1).trim();
 			});
 
-			let payload = current.slice(idx_headers + separator.length);
+					let payload = current.substring(idx_headers + separator.length);
 			// TODO: clength is in bytes which isnt the same as an index into array
-			if (clength) payload = payload.slice(0, parseInt(clength, 10));
+					if (clength) payload = payload.substring(0, parseInt(clength, 10));
 
 			is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 			yield is_json ? JSON.parse(payload.toString()) : payload.toString();
 
-					if (next.slice(0, 2).toString() === '--') break outer;
+					if (next.substring(0, 2).toString() === '--') break outer;
 				}
 
 				buffer=next; last_index=0;
