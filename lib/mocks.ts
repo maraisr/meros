@@ -1,19 +1,10 @@
 // @ts-nocheck
-
+import { TextDecoder, TextEncoder } from 'util';
 import type { IncomingMessage } from 'http';
 
 // Mocks for Node@10
-global['TextDecoder'] =
-	global['TextDecoder'] ||
-	class {
-		decode(arr: Uint8Array) {
-			let str = '';
-			for (let i = 0; i < arr.length; i++) {
-				str += String.fromCharCode(arr[i]);
-			}
-			return str;
-		}
-	};
+global['TextDecoder'] = global['TextDecoder'] || TextDecoder;
+global['TextEncoder'] = global['TextEncoder'] || TextEncoder;
 
 export function makeChunk(
 	payload: any,
