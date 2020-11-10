@@ -13,11 +13,8 @@ export async function* generate<T>(
 	let is_json = true;
 
 	try {
-		let done;
-
-		do {
+		while (true) {
 			const result = await reader.read();
-			done = result.done;
 			const chunk =  decoder.decode(result.value);
 
 			const idx_chunk = buffer.indexOf(boundary);
@@ -67,11 +64,11 @@ export async function* generate<T>(
 				? JSON.parse(payload.toString())
 				: payload.toString();
 
-			if (next.slice(0, 2).toString() === '--') break;
+			if (result.done || next.slice(0, 2).toString() === '--') break;
 
 			buffer = next;
 			last_index = 0;
-		} while (!done);
+		}
 	} finally {
 		reader.releaseLock();
 	}
