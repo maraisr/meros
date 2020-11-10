@@ -10,7 +10,7 @@ export async function* generate<T>(
 	let buffer = '';
 	let last_index = 0;
 	let is_preamble = true;
-	let is_json = true;
+	let is_json = false;
 
 	try {
 		while (true) {
@@ -58,7 +58,7 @@ export async function* generate<T>(
 			let payload = current.slice(idx_headers + separator.length);
 			if (clength) payload = payload.slice(0, parseInt(clength, 10));
 
-			is_json = ctype !== '' ? !!~ctype.indexOf('application/json') : is_json;
+			is_json = !!~ctype.indexOf('application/json') || is_json;
 
 			yield is_json
 				? JSON.parse(payload.toString())
