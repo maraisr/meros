@@ -3,7 +3,18 @@
 [![CI](https://img.shields.io/github/workflow/status/maraisr/meros/CI/main)](https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main)
 [![codecov](https://img.shields.io/codecov/c/gh/maraisr/meros/main?token=dAoRt2GoQn)](https://codecov.io/gh/maraisr/meros)
 
-> A fast utility for reading streamed multipart/mixed responses.
+> A fast (761B) utility for reading streamed multipart/mixed responses.
+
+## ⚡ Features
+
+-   ✅ No dependencies
+-   ✅ Super [performant](#-benchmark)
+-   ✅ Supports _any_<sup>1</sup> `content-type`
+-   ✅ Supports _fall through_<sup>2</sup> `content-type`'s
+-   ✅ Supports `content-length`<sup>3</sup>
+-   ✅ _preamble_ and _epilogue_ don't yield
+-   ✅ Browser-Compatible
+-   ✅ Plugs into existing libraries like Relay and rxjs
 
 ## ⚙️ Install
 
@@ -57,28 +68,23 @@ const parts = await meros(response);
 
 ## 🎒 Notes
 
-This library aims to implement [RFC1341] in its entirety, however there have
-been some types left out as we aim to be on the consuming side, than the server
-side (but we do support Node clients).
+This library aims to implement [RFC1341] in its entirety, however we aren't
+there yet. That being said, you may very well use this library in other
+scenarios like streaming in file form uploads.
 
--   `content-type` is assumed to stay consistent between parts, and therefore
-    the "fall through" approach is recommended and to only be given at the
-    start. Ie only give it `content-type` as a header once, and only for the
-    first chunk.
-
-Please note;
+Please note; be sure to define a boundary that can be guaranteed to never
+collide with things from the body:
 
 > _Because encapsulation boundaries must not appear in the body parts being
 > encapsulated, a user agent must exercise care to choose a unique boundary._
 >
 > <small>~ [RFC1341] 7.2.1</small>
 
-So be sure to calculate a boundary that can be guaranteed to never exist in the
-body.
+### _Caveats_
 
--   We do not support the `/alternative` , `/digest` _or_ `/parallel` subtype at
-    this time.
--   We also do not support
+-   No support the `/alternative` , `/digest` _or_ `/parallel` subtype at this
+    time.
+-   No support for
     [nested multiparts](https://tools.ietf.org/html/rfc1341#appendix-C)
 
 ## 🔎 API
@@ -128,7 +134,7 @@ Benchmark :: browser
 ```
 
 <details>
-<summary><i>Reference patch set</i> (Click to expand)</summary>
+<summary><i>Reference patch set</i></summary>
 
 ```
 content-type: "multipart/mixed; boundary=abc123"
@@ -179,5 +185,19 @@ guidance and high level api design.
 ## License
 
 MIT © [Marais Rossouw](https://marais.io)
+
+<details>
+<summary>Footnote</summary>
+
+> 1: By default, we'll look for JSON, and parse that for you. If not, we'll give
+> you the body as what was streamed.</small>
+>
+> 2: Unlike the spec assuming `application/octet-stream` for untyped chunks, we
+> assume whatever `content-type` we last encountered. See
+> [RFC1341 Section 4](https://tools.ietf.org/html/rfc1341#section-4)
+>
+> 3: If not given, everything from the body through boundary will yield
+
+</details>
 
 [rfc1341]: https://tools.ietf.org/html/rfc1341 'The Multipart Content-Type'
