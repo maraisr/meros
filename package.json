@@ -34,9 +34,18 @@
 	"scripts": {
 		"bench": "node -r ts-node/register bench/index.ts",
 		"build": "rollup -c",
-		"format": "prettier \"{*,tests/*,src/**/*,bench/*,.github/**/*}.+(yml|md)\" --write",
+		"format": "prettier \"{*,.github/**/*}.+(yml|md)\" --write",
 		"prepublishOnly": "yarn build",
 		"test": "uvu -r ts-node/register -i server tests"
+	},
+	"prettier": {
+		"bracketSpacing": true,
+		"printWidth": 80,
+		"proseWrap": "always",
+		"singleQuote": true,
+		"tabWidth": 4,
+		"trailingComma": "all",
+		"useTabs": true
 	},
 	"devDependencies": {
 		"@marais/tsconfig": "^0.0.1",

@@ -27,7 +27,7 @@ async function runner(name: string, candidates: Record<string, Function>) {
 		return [...result, item];
 	}, [] as any[]);
 
-	const bench = new Suite().on('cycle', e => {
+	const bench = new Suite().on('cycle', (e) => {
 		console.log('  ' + e.target);
 	});
 
@@ -54,16 +54,13 @@ async function runner(name: string, candidates: Record<string, Function>) {
 		});
 	}
 
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		bench.on('complete', resolve);
 		bench.run();
 	});
 }
 
-const mock_args = [
-	parts,
-	'abc123',
-];
+const mock_args = [parts, 'abc123'];
 
 const do_node_call = mockResponseNode.bind(null, ...mock_args);
 const do_browser_call = mockResponseBrowser.bind(null, ...mock_args);
@@ -122,7 +119,8 @@ global['fetch'] = async function (url, options) {
 				let collection: any[] = [];
 
 				fetchMultiPartGraphql('test', {
-					onNext: (parts: any) => collection = [...collection, ...parts],
+					onNext: (parts: any) =>
+						(collection = [...collection, ...parts]),
 					onError: (err: Error) => reject(err),
 					onComplete: () => resolve(collection),
 				});

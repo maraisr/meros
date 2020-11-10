@@ -1,6 +1,6 @@
 import { test } from 'uvu';
 import * as assert from 'uvu/assert';
-import {  mockResponseNode } from '../lib/mocks';
+import { mockResponseNode } from '../lib/mocks';
 
 import * as meros from '../src/node';
 
@@ -9,18 +9,21 @@ test('exports', () => {
 });
 
 test('can make a call', async () => {
-	const response = await mockResponseNode([
-		{ hello: 'world' },
-		[{ other: 'world' }, { another: 'world' }],
-		{
-			massive: {
-				nested: {
-					world: 'okay',
+	const response = await mockResponseNode(
+		[
+			{ hello: 'world' },
+			[{ other: 'world' }, { another: 'world' }],
+			{
+				massive: {
+					nested: {
+						world: 'okay',
+					},
 				},
 			},
-		},
-		'should be plain text'
-	], 'abc123');
+			'should be plain text',
+		],
+		'abc123',
+	);
 	const parts = await meros.meros<object>(response);
 
 	const collection: Array<object> = [];

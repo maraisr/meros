@@ -9,18 +9,21 @@ test('exports', () => {
 });
 
 test('can make a call', async () => {
-	const response = await mockResponseBrowser([
-		{ hello: 'world' },
-		[{ other: 'world' }, { another: 'world' }],
-		{
-			massive: {
-				nested: {
-					world: 'okay',
+	const response = await mockResponseBrowser(
+		[
+			{ hello: 'world' },
+			[{ other: 'world' }, { another: 'world' }],
+			{
+				massive: {
+					nested: {
+						world: 'okay',
+					},
 				},
 			},
-		},
-		'should be plain text',
-	], 'abc123');
+			'should be plain text',
+		],
+		'abc123',
+	);
 
 	const parts = await meros.meros<object>(response);
 
