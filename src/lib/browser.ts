@@ -13,7 +13,7 @@ export async function* generate<T>(
 	let is_json = false;
 
 	try {
-		while (true) {
+		outer: while (true) {
 			const result = await reader.read();
 			const chunk = decoder.decode(result.value);
 
@@ -35,15 +35,13 @@ export async function* generate<T>(
 				}
 			}
 
-			const next = buffer.slice(idx_boundary + boundary.length);
+			while (!!~idx_boundary) {
 			const current = buffer.slice(0, idx_boundary);
+				const next = buffer.slice(idx_boundary + boundary.length);
 
 			if (is_preamble) {
-				buffer = next;
 				is_preamble = false;
-				continue;
-			}
-
+				} else {
 			let ctype = '', clength = '';
 			const idx_headers = current.indexOf(separator);
 
@@ -62,10 +60,12 @@ export async function* generate<T>(
 			is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 			yield is_json ? JSON.parse(payload.toString()) : payload.toString();
 
-			if (result.done || next.slice(0, 2).toString() === '--') break;
+					if (result.done || next.slice(0, 2).toString() === '--') break outer;
+				}
 
-			buffer = next;
-			last_index = 0;
+				buffer=next; last_index=0;
+				idx_boundary = buffer.indexOf(boundary);
+			}
 		}
 	} finally {
 		reader.releaseLock();
