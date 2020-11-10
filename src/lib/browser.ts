@@ -1,6 +1,5 @@
-const decoder = new TextDecoder();
-
 const separator = '\r\n\r\n';
+const decoder = new TextDecoder;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
@@ -13,12 +12,13 @@ export async function* generate<T>(
 	let is_json = false;
 
 	try {
-		while (true) {
+		outer: while (true) {
 			const result = await reader.read();
-			const chunk = decoder.decode(result.value);
+			if (result.done) break outer; // undefined value
 
 			let idx_boundary = buffer.length;
-			const idx_chunk = buffer.indexOf(boundary);
+			const chunk = decoder.decode(result.value);
+			const idx_chunk = chunk.indexOf(boundary);
 			buffer += chunk;
 
 			if (!!~idx_chunk) {
@@ -35,37 +35,37 @@ export async function* generate<T>(
 				}
 			}
 
-			const next = buffer.slice(idx_boundary + boundary.length);
-			const current = buffer.slice(0, idx_boundary);
+			while (!!~idx_boundary) {
+				const current = buffer.substring(0, idx_boundary);
+				const next = buffer.substring(idx_boundary + boundary.length);
 
 			if (is_preamble) {
-				buffer = next;
 				is_preamble = false;
-				continue;
-			}
-
+				} else {
 			let ctype = '', clength = '';
 			const idx_headers = current.indexOf(separator);
 
 			// parse headers, only keeping relevant headers
-			buffer.slice(0, idx_headers).toString().trim().split(/\r\n/).forEach((str, idx) => {
+					buffer.substring(0, idx_headers).trim().split(/\r\n/).forEach((str, idx) => {
 				idx = str.indexOf(':');
 				let key = str.substring(0, idx).toLowerCase();
 				if (key === 'content-type') ctype = str.substring(idx + 1).trim();
 				else if (key === 'content-length') clength = str.substring(idx + 1).trim();
 			});
 
-			let payload = current.slice(idx_headers + separator.length);
+					let payload = current.substring(idx_headers + separator.length);
 			// TODO: clength is in bytes which isnt the same as an index into array
-			if (clength) payload = payload.slice(0, parseInt(clength, 10));
+					if (clength) payload = payload.substring(0, parseInt(clength, 10));
 
 			is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
-			yield is_json ? JSON.parse(payload.toString()) : payload.toString();
+					yield is_json ? JSON.parse(payload) : payload;
 
-			if (result.done || next.slice(0, 2).toString() === '--') break;
+					if (next.substring(0, 2) === '--') break outer;
+				}
 
-			buffer = next;
-			last_index = 0;
+				buffer=next; last_index=0;
+				idx_boundary = buffer.indexOf(boundary);
+			}
 		}
 	} finally {
 		reader.releaseLock();
