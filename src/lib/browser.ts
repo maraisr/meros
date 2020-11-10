@@ -74,10 +74,3 @@ export async function* generate<T>(
 		reader.releaseLock();
 	}
 }
-
-function getIntAt(arr, offs) {
-	return (arr[offs + 0] << 24) +
-		(arr[offs + 1] << 16) +
-		(arr[offs + 2] << 8) +
-		arr[offs + 3];
-}
