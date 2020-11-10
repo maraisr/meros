@@ -6,7 +6,8 @@ export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
 ): AsyncGenerator<T> {
-	const boundary_length = Buffer.from(boundary).length;
+	const len_boundary = Buffer.byteLength(boundary);
+
 	let last_index = 0;
 	let buffer = Buffer.alloc(0);
 	let is_preamble = true;
@@ -33,7 +34,7 @@ export async function* generate<T>(
 
 		while (!!~idx_boundary) {
 			const current = buffer.slice(0, idx_boundary);
-			const next = buffer.slice(idx_boundary + boundary_length);
+			const next = buffer.slice(idx_boundary + len_boundary);
 
 			if (is_preamble) {
 				is_preamble = false;
