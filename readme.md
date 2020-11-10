@@ -83,9 +83,21 @@ body.
 
 ## 🔎 API
 
-### _Browser_ ~ function meros\<T=unknown\>(response: Response): Promise\<Response | AsyncGenerator\<T\>\>;
+### _Browser_
 
-### _Node_ ~ function meros\<T=unknown\>(response: IncomingMessage): Promise\<IncomingMessage | AsyncGenerator\<T\>\>;
+```ts
+function meros<T = unknown>(
+	response: Response,
+): Promise<Response | AsyncGenerator<T>>;
+```
+
+### _Node_
+
+```ts
+function meros<T = unknown>(
+	response: IncomingMessage,
+): Promise<IncomingMessage | AsyncGenerator<T>>;
+```
 
 Returns an async generator that yields on every part. Worth noting that if
 multiple parts are present in one chunk, each part will yield independently.
@@ -103,20 +115,20 @@ Validation :: node
 ✘ it-multipart (FAILED @ "should match reference patch set")
 
 Benchmark :: node
-  meros                     x 8,021 ops/sec ±0.91% (75 runs sampled)
-  it-multipart              x 6,265 ops/sec ±1.54% (78 runs sampled)
+  meros                     x 7,892 ops/sec ±0.92% (72 runs sampled)
+  it-multipart              x 6,161 ops/sec ±1.77% (76 runs sampled)
 
 Validation :: browser
 ✔ meros
 ✘ fetch-multipart-graphql (FAILED @ "should match reference patch set")
 
 Benchmark :: browser
-  meros                     x 14,535 ops/sec ±2.10% (75 runs sampled)
-  fetch-multipart-graphql   x 8,646 ops/sec ±1.34% (77 runs sampled)
+  meros                     x 13,641 ops/sec ±2.42% (74 runs sampled)
+  fetch-multipart-graphql   x 8,406 ops/sec ±1.88% (74 runs sampled)
 ```
 
 <details>
-<summary>Reference patch set</summary>
+<summary><i>Reference patch set</i> (Click to expand)</summary>
 
 ```
 content-type: "multipart/mixed; boundary=abc123"

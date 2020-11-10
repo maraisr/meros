@@ -1,6 +1,6 @@
 {
 	"name": "meros",
-	"version": "0.0.3",
+	"version": "1.0.0-beta.3",
 	"description": "A fast utility for reading streamed multipart responses.",
 	"keywords": [
 		"multipart",
@@ -18,24 +18,45 @@
 	},
 	"exports": {
 		".": {
-			"import": "./dist/node.mjs",
-			"browser": "./dist/browser.mjs",
-			"require": "./dist/node.js"
+			"import": "./node/index.mjs",
+			"browser": "./browser/index.mjs",
+			"require": "./node/index.js"
+		},
+		"./node": {
+			"import": "./node/index.mjs",
+			"require": "./node/index.js"
+		},
+		"./browser": {
+			"import": "./browser/index.mjs",
+			"require": "./browser/index.js"
 		}
 	},
-	"main": "dist/node.js",
-	"unpkg": "dist/browser.min.js",
-	"module": "dist/node.mjs",
-	"types": "index.d.ts",
+	"unpkg": "browser/index.min.js",
+	"browser": "browser/index.mjs",
+	"module": "node/index.mjs",
+	"main": "node/index.js",
+	"types": "types/index.d.ts",
+	"typesVersions": {
+		"*": {
+			"*": [
+				"./types/*"
+			]
+		}
+	},
 	"files": [
-		"dist"
+		"*.d.ts",
+		"types",
+		"browser",
+		"node"
 	],
 	"scripts": {
 		"bench": "node -r ts-node/register bench/index.ts",
+		"typecheck": "tsc --noEmit",
 		"build": "rollup -c",
 		"format": "prettier \"{*,.github/**/*}.+(yml|md)\" --write",
 		"prepublishOnly": "yarn build",
-		"test": "uvu -r ts-node/register -i server tests"
+		"pretest": "yarn typecheck",
+		"test": "uvu -r ts-node/register tests"
 	},
 	"prettier": {
 		"bracketSpacing": true,
@@ -47,23 +68,22 @@
 		"useTabs": true
 	},
 	"devDependencies": {
-		"@marais/tsconfig": "^0.0.1",
+		"@marais/tsconfig": "0.0.1",
 		"@rollup/plugin-node-resolve": "10.0.0",
-		"@types/benchmark": "^2.1.0",
-		"@types/node": "^14.14.7",
-		"@types/node-fetch": "^2.5.7",
-		"benchmark": "^2.1.4",
-		"fetch-multipart-graphql": "^2.2.0",
-		"it-multipart": "^1.0.5",
-		"node-fetch": "^2.6.1",
-		"polka": "^0.5.2",
-		"prettier": "^2.1.2",
+		"@types/benchmark": "2.1.0",
+		"@types/node": "14.14.7",
+		"benchmark": "2.1.4",
+		"fetch-multipart-graphql": "2.2.0",
+		"it-multipart": "1.0.5",
+		"polka": "0.5.2",
+		"prettier": "2.1.2",
 		"rollup": "2.33.1",
 		"rollup-plugin-terser": "7.0.2",
 		"rollup-plugin-typescript2": "0.29.0",
-		"ts-node": "^9.0.0",
-		"typescript": "^4.0.5",
-		"uvu": "^0.4.1"
+		"ts-node": "9.0.0",
+		"tslib": "^2.0.3",
+		"typescript": "4.0.5",
+		"uvu": "0.4.1"
 	},
 	"volta": {
 		"node": "15.1.0",

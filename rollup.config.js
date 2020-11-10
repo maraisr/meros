@@ -10,43 +10,49 @@ const shared = () => ({
 		...Object.keys(pkg.peerDependencies || {}),
 	},
 	plugins: [
-		resolve(),
-		typescript(),
+		resolve({ extensions: ['.js', '.ts'] }),
+		typescript({
+			useTsconfigDeclarationDir: true,
+		}),
 	],
 });
 
 export default [
 	{
-		input: ['src/browser.ts', 'src/node.ts'],
+		input: 'src/browser.ts',
 		output: [
 			{
 				format: 'esm',
-				dir: 'dist',
+				file: 'browser/index.mjs',
 				sourcemap: false,
-				entryFileNames: '[name].mjs',
-				chunkFileNames: '[name].mjs',
-				preserveModules: true,
 			},
 			{
 				format: 'cjs',
-				dir: 'dist',
+				file: 'browser/index.js',
 				sourcemap: false,
-				entryFileNames: '[name].js',
-				chunkFileNames: '[name].js',
-				preserveModules: true,
+			},
+			{
+				name: pkg.name,
+				format: 'umd',
+				file: 'browser/index.min.js',
+				sourcemap: false,
+				plugins: [terser()],
 			},
 		],
 		...shared(),
 	},
 	{
-		input: 'src/browser.ts',
+		input: 'src/node.ts',
 		output: [
 			{
-				name: pkg.name,
-				format: 'umd',
-				file: pkg.unpkg,
+				format: 'esm',
+				file: 'node/index.mjs',
 				sourcemap: false,
-				plugins: [terser()],
+			},
+			{
+				format: 'cjs',
+				file: 'node/index.js',
+				sourcemap: false,
 			},
 		],
 		...shared(),

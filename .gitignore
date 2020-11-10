@@ -4,7 +4,8 @@ node_modules
 *.lock
 *.log
 
-/dist
+/browser
+/node
 /types
 /coverage
 
