@@ -82,7 +82,7 @@ So be sure to calculate a boundary that can be guaranteed to never exist in the 
 Returns an async generator that yields on every part. Worth noting that if multiple parts are present in one chunk, each
 part will yield independently.
 
-## Benchmark
+## 💨 Benchmark
 
 > Ran with Node v15.1.0
 
