@@ -82,6 +82,78 @@ So be sure to calculate a boundary that can be guaranteed to never exist in the 
 Returns an async generator that yields on every part. Worth noting that if multiple parts are present in one chunk, each
 part will yield independently.
 
+## Benchmark
+
+> Ran with Node v15.1.0
+
+```
+Validation :: node
+✔ meros
+✘ it-multipart (FAILED @ "should match reference patch set")
+
+Benchmark :: node
+  meros                     x 7,872 ops/sec ±1.05% (72 runs sampled)
+  it-multipart              x 6,079 ops/sec ±1.61% (74 runs sampled)
+
+Validation :: browser
+✔ meros
+✘ fetch-multipart-graphql (FAILED @ "should match reference patch set")
+
+Benchmark :: browser
+  meros                     x 6,241 ops/sec ±1.00% (79 runs sampled)
+  fetch-multipart-graphql   x 4,127 ops/sec ±0.83% (76 runs sampled)
+```
+
+<details>
+<summary>Reference patch set</summary>
+
+```
+content-type: "multipart/mixed; boundary=abc123"
+```
+
+```
+preamble
+--abc123
+Content-Type: application/json
+Content-Length: 17
+
+{"hello":"world"}
+
+--abc123
+Content-Type: application/json
+Content-Length: 17
+
+{"other":"world"}
+
+--abc123
+Content-Type: application/json
+Content-Length: 19
+
+{"another":"world"}
+
+--abc123
+Content-Type: application/json
+Content-Length: 39
+
+{"massive":{"nested":{"world":"okay"}}}
+
+--abc123
+Content-Type: text/plain
+Content-Length: 22
+
+"should be plain text"
+
+--abc123--
+epilogue
+--abc123
+Content-Type: application/json
+Content-Length: 19
+
+{"shouldnt":"work"}
+```
+
+</details>
+
 ## ❤ Thanks
 
 Special thanks to [Luke Edwards](https://github.com/lukeed) for performance guidance and high level api design.

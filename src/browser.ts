@@ -6,28 +6,19 @@ export async function meros<T>(res: Response) {
 		return;
 	}
 
-	if (!res.headers.has('content-type')) {
-		throw new Error('There was no content-type header');
-	}
+	const ctype = res.headers.get('content-type');
 
-	const contentType = res.headers.get('content-type');
+	if (!ctype) throw new Error('There was no content-type header');
+	if (!/multipart\/mixed/.test(ctype)) return res;
 
-	if (!/multipart\/mixed/.test(contentType)) {
-		return res;
-	}
-
-	const boundaryIndex = contentType.indexOf('boundary=');
+	const idx_boundary = ctype.indexOf('boundary=');
 
 	return generate<T>(
 		res.body,
 		'--' +
-			(!!~boundaryIndex
-				? contentType
-						.substring(
-							// +9 for 'boundary='.length
-							boundaryIndex + 9,
-						)
-						.trim()
+			(!!~idx_boundary
+				? // +9 for 'boundary='.length
+				ctype.substring(idx_boundary + 9).trim()
 				: '-'),
 	);
 }
