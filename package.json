@@ -55,7 +55,6 @@
 		"build": "rollup -c",
 		"format": "prettier \"{*,.github/**/*}.+(yml|md)\" --write",
 		"prepublishOnly": "yarn build",
-		"pretest": "yarn typecheck",
 		"test": "uvu -r ts-node/register tests"
 	},
 	"prettier": {

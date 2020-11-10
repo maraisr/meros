@@ -28,6 +28,9 @@ jobs:
             - name: Compile
               run: yarn build
 
+            - name: Type Check
+              run: yarn typecheck
+
             - name: Test
               run: nyc --include=src yarn test
 
