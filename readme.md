@@ -56,8 +56,8 @@ const parts = await meros(response);
 
 ## 🎒 Notes
 
-This library aims to implements [RFC1341] in its entireity, however there have been some types left out as we aim to be
-on the consuming side, than the server side (but we do support Node clients).
+This library aims to implement [RFC1341] in its entirety, however there have been some types left out as we aim to be on
+the consuming side, than the server side (but we do support Node clients).
 
 -   `content-type` is assumed to stay consistent between parts, and therefore the "fall through" approach is recommended
     and to only be given at the start. Ie only give it `content-type` as a header once, and only for the first chunk.
@@ -72,6 +72,7 @@ Please note;
 So be sure to calculate a boundary that can be guaranteed to never exist in the body.
 
 -   We do not support the `/alternative` , `/digest` _or_ `/parallel` subtype at this time.
+-   We also do not support [nested multiparts](https://tools.ietf.org/html/rfc1341#appendix-C)
 
 ## 🔎 API
 
@@ -162,4 +163,4 @@ Special thanks to [Luke Edwards](https://github.com/lukeed) for performance guid
 
 MIT © [Marais Rossouw](https://marais.io)
 
-[rfc1341]: https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html "The Multipart Content-Type"
+[rfc1341]: https://tools.ietf.org/html/rfc1341 "The Multipart Content-Type"
