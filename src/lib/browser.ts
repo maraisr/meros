@@ -16,6 +16,7 @@ export async function* generate<T>(
 		outer: while (true) {
 			const result = await reader.read();
 			const chunk = decoder.decode(result.value);
+			if (result.done) break outer;
 
 			let idx_boundary = buffer.length;
 			const idx_chunk = chunk.indexOf(boundary);
@@ -60,7 +61,7 @@ export async function* generate<T>(
 			is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 			yield is_json ? JSON.parse(payload.toString()) : payload.toString();
 
-					if (result.done || next.slice(0, 2).toString() === '--') break outer;
+					if (next.slice(0, 2).toString() === '--') break outer;
 				}
 
 				buffer=next; last_index=0;
