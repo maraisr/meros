@@ -1,5 +1,6 @@
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
+const encoder = new TextEncoder;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
@@ -16,9 +17,9 @@ export async function* generate<T>(
 			const result = await reader.read();
 			if (result.done) break outer; // undefined value
 
-			let idx_boundary = buffer.length;
 			const chunk = decoder.decode(result.value);
 			const idx_chunk = chunk.indexOf(boundary);
+			let idx_boundary = buffer.length;
 			buffer += chunk;
 
 			if (!!~idx_chunk) {
@@ -54,8 +55,13 @@ export async function* generate<T>(
 					});
 
 					let payload = current.substring(idx_headers + separator.length);
-					// TODO: clength is in bytes which isnt the same as an index into array
-					if (clength) payload = payload.substring(0, parseInt(clength, 10));
+
+					if (clength) {
+						const arr = encoder.encode(payload);
+						payload = decoder.decode(
+							arr.subarray(0, parseInt(clength, 10))
+						);
+					}
 
 					is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 					yield is_json ? JSON.parse(payload) : payload;
