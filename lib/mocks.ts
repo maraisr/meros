@@ -28,7 +28,7 @@ export function makeChunk(
 		'Content-Length: ' + String(chunk.length),
 		'',
 		chunk + '                                          ',
-		'extra epilogue'
+		'',
 	];
 
 	return returns.join('\r\n');
