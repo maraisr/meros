@@ -18,7 +18,7 @@ import { meros } from "meros";
 
 const parts = await fetch("/fetch-multipart").then(meros);
 
-// As a simple AsyncGenerator
+// As a simple Async Generator
 for await (const part of parts) {
 	// Do something with this part
 }
@@ -45,7 +45,7 @@ import http from "http";
 import { meros } from "meros/node";
 
 const response = await new Promise((resolve) => {
-	const request = http.get(`http://localhost:${port}/mock-ep`, (response) => {
+	const request = http.get(`http://my-domain/mock-ep`, (response) => {
 		resolve(response);
 	});
 	request.end();
