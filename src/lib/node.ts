@@ -8,8 +8,8 @@ export async function* generate<T>(
 ): AsyncGenerator<T> {
 	let last_index = 0;
 	let buffer = Buffer.alloc(0);
-	let isPreamble = true;
-	let isJson = false;
+	let is_preamble = true;
+	let is_json = false;
 
 	for await (const chunk of stream) {
 		const idx_chunk = (chunk as Buffer).indexOf(boundary);
@@ -34,9 +34,9 @@ export async function* generate<T>(
 		const next = buffer.slice(idx_boundary + boundary.length);
 		const current = buffer.slice(0, idx_boundary);
 
-		if (isPreamble) {
+		if (is_preamble) {
 			buffer = next;
-			isPreamble = false;
+			is_preamble = false;
 			continue;
 		}
 
@@ -54,9 +54,9 @@ export async function* generate<T>(
 		let payload = current.slice(idx_headers + separator.length);
 		if (clength) payload = payload.slice(0, parseInt(clength, 10));
 
-		isJson = isJson || !!~ctype.indexOf('application/json');
+		is_json = is_json || !!~ctype.indexOf('application/json');
 
-		yield isJson
+		yield is_json
 			? JSON.parse(payload.toString('utf8'))
 			: payload.toString('utf8');
 

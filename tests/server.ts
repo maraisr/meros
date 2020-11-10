@@ -59,7 +59,7 @@ const server: Callback = async (context) => {
 					const toSend = Math.ceil(patch.length / 9);
 					for (let i = 0, o = 0; i < toSend; ++i, o += 9) {
 						const ct = patch.substr(o, 9);
-						if (process.env.DEBUG) console.log('~> writing ct', ct);
+						if (process.env.DEBUG) console.log('~> writing ct ::', ct);
 						res.write(ct);
 						await wait(1);
 					}

@@ -1,3 +1,4 @@
+import {EventEmitter} from 'events';
 import { ServerResponse } from 'http';
 import { join } from 'path';
 import { chromium, Page } from 'playwright';
@@ -51,6 +52,11 @@ test('exports', () => {
 });
 
 test('can make a call', async (context) => {
+	const e = new EventEmitter();
+
+	await (context.page as Page).exposeFunction('COMPLETE', (tests: any[]) => {
+		e.emit("done", tests);
+	});
 	await (context.page as Page).setContent(`
 	<html>
 	<body></body>
@@ -60,15 +66,31 @@ test('can make a call', async (context) => {
 	(async function() {
 		const parts = await fetch("http://localhost:${context.port}/mock-ep").then(meros);
 
+		const tests = [];
 		for await (let part of parts) {
-			debugger;
+			tests.push(part);
 		}
+
+		window.COMPLETE(tests);
 	})();
 
 </script>
 	</html>
 	`);
-	debugger;
+
+	const collection: any[] = await new Promise(async (resolve) => {
+		e.on('done', resolve);
+	})
+
+	assert.is(collection.length, 5);
+
+	assert.equal(collection, [
+		{ hello: 'world' },
+		{ other: 'world' },
+		{ another: 'world' },
+		{ massive: { nested: { world: 'okay' } } },
+		'should be plain text',
+	]);
 });
 
 test.run();
