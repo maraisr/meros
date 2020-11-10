@@ -59,11 +59,8 @@ export async function* generate<T>(
 			// TODO: clength is in bytes which isnt the same as an index into array
 			if (clength) payload = payload.slice(0, parseInt(clength, 10));
 
-			is_json = ctype === '' ? is_json : !!~ctype.indexOf('application/json');
-
-			yield is_json
-				? JSON.parse(payload.toString())
-				: payload.toString();
+			is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
+			yield is_json ? JSON.parse(payload.toString()) : payload.toString();
 
 			if (result.done || next.slice(0, 2).toString() === '--') break;
 
