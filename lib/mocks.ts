@@ -20,7 +20,7 @@ export function makeChunk(
 	boundary: string,
 	contentType: string = 'application/json',
 ) {
-	const chunk = Buffer.from(JSON.stringify(payload), 'utf8');
+	const chunk = Buffer.from(contentType === 'text/plain' ? payload : JSON.stringify(payload), 'utf8');
 	const returns = [
 		'',
 		`--${boundary}`,

@@ -115,16 +115,16 @@ Validation :: node
 ✘ it-multipart (FAILED @ "should match reference patch set")
 
 Benchmark :: node
-  meros                     x 7,892 ops/sec ±0.92% (72 runs sampled)
-  it-multipart              x 6,161 ops/sec ±1.77% (76 runs sampled)
+  meros                     x 9,926 ops/sec ±1.09% (76 runs sampled)
+  it-multipart              x 7,416 ops/sec ±1.51% (77 runs sampled)
 
 Validation :: browser
 ✔ meros
 ✘ fetch-multipart-graphql (FAILED @ "should match reference patch set")
 
 Benchmark :: browser
-  meros                     x 13,641 ops/sec ±2.42% (74 runs sampled)
-  fetch-multipart-graphql   x 8,406 ops/sec ±1.88% (74 runs sampled)
+  meros                     x 17,377 ops/sec ±2.46% (75 runs sampled)
+  fetch-multipart-graphql   x 10,481 ops/sec ±1.73% (79 runs sampled)
 ```
 
 <details>
@@ -159,12 +159,6 @@ Content-Type: application/json
 Content-Length: 39
 
 {"massive":{"nested":{"world":"okay"}}}
-
---abc123
-Content-Type: text/plain
-Content-Length: 22
-
-"should be plain text"
 
 --abc123--
 epilogue

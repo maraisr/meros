@@ -15,8 +15,7 @@ const parts = [
 				world: 'okay',
 			},
 		},
-	},
-	'should be plain text',
+	}
 ];
 
 async function runner(name: string, candidates: Record<string, Function>) {
@@ -33,7 +32,6 @@ async function runner(name: string, candidates: Record<string, Function>) {
 
 	console.log('\nValidation :: %s', name);
 	for (const [name, fn] of Object.entries(candidates)) {
-		// Validate
 		const result = await fn();
 		try {
 			equal(result, n_parts, 'should match reference patch set');
@@ -94,7 +92,11 @@ global['fetch'] = async function (url, options) {
 				for await (const chunk of part.body) {
 					data += chunk.toString();
 				}
-				collection.push(JSON.parse(data));
+				collection.push(
+					!!~part.headers['content-type'].indexOf('application/json')
+						? JSON.parse(data)
+						: data,
+				);
 			}
 
 			return collection;
