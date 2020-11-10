@@ -4,7 +4,7 @@ import type { IncomingMessage } from 'http';
 
 // Mocks for Node@10
 global['TextDecoder'] =
-	global['TextDecoder '] ||
+	global['TextDecoder'] ||
 	class {
 		decode(arr: Uint8Array) {
 			let str = '';
@@ -28,6 +28,7 @@ export function makeChunk(
 		'Content-Length: ' + String(chunk.length),
 		'',
 		chunk + '                                          ',
+		'extra epilogue'
 	];
 
 	return returns.join('\r\n');
@@ -36,6 +37,7 @@ export function makeChunk(
 function* makePatches(
 	parts: (string | object | (string | object)[])[],
 	boundary: string,
+	rambo: true
 ) {
 	const patches = parts.map((part) => {
 		if (Array.isArray(part))
@@ -60,10 +62,14 @@ function* makePatches(
 	yield Buffer.from('preamble');
 
 	for (const patch of patches) {
-		const toSend = Math.ceil(patch.length / 9);
-		for (let i = 0, o = 0; i < toSend; ++i, o += 9) {
-			const ct = patch.substr(o, 9);
-			yield Buffer.from(ct);
+		if (rambo) {
+			const toSend = Math.ceil(patch.length / 9);
+			for (let i = 0, o = 0; i < toSend; ++i, o += 9) {
+				const ct = patch.substr(o, 9);
+				yield Buffer.from(ct);
+			}
+		} else {
+			yield Buffer.from(patch);
 		}
 	}
 
@@ -76,18 +82,20 @@ function* makePatches(
 export async function mockResponseNode(
 	parts: (string | object | (string | object)[])[],
 	boundary: string,
+	rambo: boolean = true
 ): Promise<IncomingMessage> {
 	return {
 		headers: {
 			'content-type': `multipart/mixed; boundary=${boundary}`,
 		},
-		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary),
+		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary, rambo),
 	};
 }
 
 export async function mockResponseBrowser(
 	parts: (string | object | (string | object)[])[],
 	boundary: string,
+	rambo: boolean = true
 ): Promise<Response> {
 	return {
 		headers: new Map([
@@ -97,7 +105,7 @@ export async function mockResponseBrowser(
 		status: 200,
 		body: {
 			getReader() {
-				const patches = makePatches(parts, boundary);
+				const patches = makePatches(parts, boundary, rambo);
 				return {
 					async read() {
 						return patches.next();

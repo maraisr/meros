@@ -32,10 +32,9 @@ export async function meros<T = unknown>(response: IncomingMessage) {
 
 	return generate<T>(
 		response,
-		'--' +
-		(!!~idx_boundary
+		`--${!!~idx_boundary
 			? // +9 for 'boundary='.length
 			ctype.substring(idx_boundary + 9).trim()
-			: '-'),
+			: '-'}`,
 	);
 }

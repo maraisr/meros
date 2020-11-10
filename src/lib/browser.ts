@@ -15,10 +15,10 @@ export async function* generate<T>(
 	try {
 		while (true) {
 			const result = await reader.read();
-			const chunk =  decoder.decode(result.value);
+			const chunk = decoder.decode(result.value);
 
+			let idx_boundary = buffer.length;
 			const idx_chunk = buffer.indexOf(boundary);
-			let  idx_boundary = buffer.length;
 			buffer += chunk;
 
 			if (!!~idx_chunk) {
@@ -56,6 +56,7 @@ export async function* generate<T>(
 			});
 
 			let payload = current.slice(idx_headers + separator.length);
+			// TODO: clength is in bytes which isnt the same as an index into array
 			if (clength) payload = payload.slice(0, parseInt(clength, 10));
 
 			is_json = ctype === '' ? is_json : !!~ctype.indexOf('application/json');
@@ -72,4 +73,11 @@ export async function* generate<T>(
 	} finally {
 		reader.releaseLock();
 	}
+}
+
+function getIntAt(arr, offs) {
+	return (arr[offs + 0] << 24) +
+		(arr[offs + 1] << 16) +
+		(arr[offs + 2] << 8) +
+		arr[offs + 3];
 }
