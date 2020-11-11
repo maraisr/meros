@@ -4,11 +4,11 @@ import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 const shared = () => ({
-	external: {
+	external: [
 		...require('module').builtinModules,
 		...Object.keys(pkg.dependencies || {}),
 		...Object.keys(pkg.peerDependencies || {}),
-	},
+	],
 	plugins: [
 		resolve({ extensions: ['.js', '.ts'] }),
 		typescript({
