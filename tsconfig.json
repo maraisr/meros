@@ -5,9 +5,7 @@
 			"module": "commonjs",
 			"sourceMap": true
 		},
-		"include": [
-			"test/**/*"
-		]
+		"include": ["test/**/*"]
 	},
 	"extends": "@marais/tsconfig",
 	"compilerOptions": {
@@ -17,16 +15,8 @@
 		"declaration": true,
 		"declarationDir": "types",
 		"removeComments": false,
-		"lib": [
-			"DOM",
-			"ESNext"
-		],
+		"lib": ["DOM", "ESNext"]
 	},
-	"files": [
-		"src/node.ts",
-		"src/browser.ts"
-	],
-	"exclude": [
-		"node_modules"
-	]
+	"files": ["src/node.ts", "src/browser.ts"],
+	"exclude": ["node_modules"]
 }
