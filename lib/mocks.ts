@@ -79,7 +79,7 @@ export async function mockResponseNode(
 		headers: {
 			'content-type': `multipart/mixed; boundary=${boundary}`,
 		},
-		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary, rambo),
+		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary.replace(/['"]/g, ''), rambo),
 	};
 }
 
@@ -96,7 +96,7 @@ export async function mockResponseBrowser(
 		status: 200,
 		body: {
 			getReader() {
-				const patches = makePatches(parts, boundary, rambo);
+				const patches = makePatches(parts, boundary.replace(/['"]/g, ''), rambo);
 				return {
 					async read() {
 						return patches.next();

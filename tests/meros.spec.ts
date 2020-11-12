@@ -104,7 +104,27 @@ function test(
 	That would make unicode like emoji... fairly robust?
 	 */
 	tester('should allow unicode boundary', async () => {
-		const response = await responder(['howdy', 'teddy bear'], '😘');
+		const response = await responder(
+			['howdy', 'teddy bear'],
+			'😘'
+		);
+
+		const parts = await mod(response);
+		const collection = [];
+
+		for await (let part of parts) {
+			collection.push(part);
+		}
+
+		assert.is(collection.length, 2, "it should have yield'd twice");
+		assert.equal(collection, ['howdy', 'teddy bear']);
+	});
+
+	tester('should handle quoted boundaries', async () => {
+		const response = await responder(
+			['howdy', 'teddy bear'],
+			'"test-boundary"',
+		);
 
 		const parts = await mod(response);
 		const collection = [];
