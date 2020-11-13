@@ -108,8 +108,28 @@ function meros<T = unknown>(
 Returns an async generator that yields on every part. Worth noting that if
 multiple parts are present in one chunk, each part will yield independently.
 
-> If the `content-type` is a multipart, then it will resolve with the response
-> argument.
+> If the `content-type` is **NOT** a multipart, then it will resolve with the
+> response argument.
+
+<details>
+<summary>Example on how to handle this case</summary>
+
+```ts
+import { meros } from 'meros';
+
+const response = await fetch('/fetch-multipart'); // Assume this returns json
+const parts = await meros(response);
+
+if (parts[Symbol.asyncIterator] < 'u') {
+	for await (const part of parts) {
+		// Do something with this part
+	}
+} else {
+	const data = await parts.json();
+}
+```
+
+</details>
 
 ## 💨 Benchmark
 

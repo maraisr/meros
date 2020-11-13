@@ -35,7 +35,7 @@
 	"browser": "browser/index.mjs",
 	"module": "node/index.mjs",
 	"main": "node/index.js",
-	"types": "types/index.d.ts",
+	"types": "index.d.ts",
 	"typesVersions": {
 		"*": {
 			"*": [
@@ -55,7 +55,7 @@
 		"build": "rollup -c",
 		"format": "prettier \"{*,.github/**/*}.+(json|yml|md)\" --write",
 		"prepublishOnly": "yarn build",
-		"test": "uvu -r ts-node/register tests"
+		"test": "uvu -r ts-node/register -i mocks test"
 	},
 	"prettier": {
 		"bracketSpacing": true,

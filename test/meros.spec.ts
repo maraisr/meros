@@ -2,7 +2,7 @@
 
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { mockResponseBrowser, mockResponseNode } from '../lib/mocks';
+import { mockResponseBrowser, mockResponseNode } from './mocks';
 import { meros as merosBrowser } from '../src/browser';
 import { meros as merosNode } from '../src/node';
 

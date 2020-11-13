@@ -1,8 +1,10 @@
+// @ts-nocheck
+
 import { Suite } from 'benchmark';
 import { fetchImpl as fetchMultiPartGraphql } from 'fetch-multipart-graphql/dist/fetch';
 import ItMultipart from 'it-multipart';
 import { equal } from 'uvu/assert';
-import { mockResponseBrowser, mockResponseNode } from '../lib/mocks';
+import { mockResponseBrowser, mockResponseNode } from '../test/mocks';
 import { meros as merosBrowser } from '../src/browser';
 import { meros as merosNode } from '../src/node';
 
