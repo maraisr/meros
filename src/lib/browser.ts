@@ -1,6 +1,5 @@
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
-const encoder = new TextEncoder;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
@@ -43,7 +42,7 @@ export async function* generate<T>(
 				if (is_preamble) {
 					is_preamble = false;
 				} else {
-					let ctype = '', clength = '';
+					let ctype = '';
 					const idx_headers = current.indexOf(separator);
 
 					// parse headers, only keeping relevant headers
@@ -51,17 +50,9 @@ export async function* generate<T>(
 						idx = str.indexOf(':');
 						let key = str.substring(0, idx).toLowerCase();
 						if (key === 'content-type') ctype = str.substring(idx + 1).trim();
-						else if (key === 'content-length') clength = str.substring(idx + 1).trim();
 					});
 
-					let payload = current.substring(idx_headers + separator.length);
-
-					if (clength) {
-						const num = parseInt(clength, 10);
-						const arr = encoder.encode(payload);
-						if (arr.byteLength < num) continue outer; // too short
-						payload = decoder.decode(arr.subarray(0, num));
-					}
+					let payload = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 
 					is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 					yield is_json ? JSON.parse(payload) : payload;

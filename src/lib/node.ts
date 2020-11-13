@@ -39,7 +39,7 @@ export async function* generate<T>(
 			if (is_preamble) {
 				is_preamble = false;
 			} else {
-				let ctype = '', clength = '';
+				let ctype = '';
 				const idx_headers = current.indexOf(separator);
 
 				// parse headers, only keeping relevant headers
@@ -47,16 +47,9 @@ export async function* generate<T>(
 					idx = str.indexOf(':');
 					let key = str.substring(0, idx).toLowerCase();
 					if (key === 'content-type') ctype = str.substring(idx + 1).trim();
-					else if (key === 'content-length') clength = str.substring(idx + 1).trim();
 				});
 
-				let payload = current.slice(idx_headers + separator.length);
-
-				if (clength) {
-					const num = parseInt(clength, 10);
-					if (payload.byteLength < num) continue outer; // too short
-					payload = payload.slice(0,num);
-				}
+				let payload = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 
 				is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 				yield is_json ? JSON.parse(payload.toString()) : payload.toString();

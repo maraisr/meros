@@ -11,15 +11,17 @@ export function makeChunk(
 	boundary: string,
 	contentType: string = 'application/json',
 ) {
-	const chunk = Buffer.from(contentType === 'text/plain' ? payload : JSON.stringify(payload), 'utf8');
+	const chunk = Buffer.from(
+		contentType === 'text/plain' ? payload : JSON.stringify(payload),
+		'utf8',
+	);
 	const returns = [
 		'',
 		`--${boundary}`,
 		`Content-Type: ${contentType}`,
 		'Content-Length: ' + String(chunk.length),
 		'',
-		chunk + '                                          ',
-		'',
+		chunk,
 	];
 
 	return returns.join('\r\n');
@@ -28,7 +30,7 @@ export function makeChunk(
 function* makePatches(
 	parts: (string | object | (string | object)[])[],
 	boundary: string,
-	rambo: true
+	rambo: true,
 ) {
 	const patches = parts.map((part) => {
 		if (Array.isArray(part))
@@ -73,20 +75,25 @@ function* makePatches(
 export async function mockResponseNode(
 	parts: (string | object | (string | object)[])[],
 	boundary: string,
-	rambo: boolean = true
+	rambo: boolean = true,
 ): Promise<IncomingMessage> {
 	return {
 		headers: {
 			'content-type': `multipart/mixed; boundary=${boundary}`,
 		},
-		[Symbol.asyncIterator]: makePatches.bind(null, parts, boundary.replace(/['"]/g, ''), rambo),
+		[Symbol.asyncIterator]: makePatches.bind(
+			null,
+			parts,
+			boundary.replace(/['"]/g, ''),
+			rambo,
+		),
 	};
 }
 
 export async function mockResponseBrowser(
 	parts: (string | object | (string | object)[])[],
 	boundary: string,
-	rambo: boolean = true
+	rambo: boolean = true,
 ): Promise<Response> {
 	return {
 		headers: new Map([
@@ -96,7 +103,11 @@ export async function mockResponseBrowser(
 		status: 200,
 		body: {
 			getReader() {
-				const patches = makePatches(parts, boundary.replace(/['"]/g, ''), rambo);
+				const patches = makePatches(
+					parts,
+					boundary.replace(/['"]/g, ''),
+					rambo,
+				);
 				return {
 					async read() {
 						return patches.next();
