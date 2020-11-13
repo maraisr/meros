@@ -57,10 +57,10 @@ export async function* generate<T>(
 					let payload = current.substring(idx_headers + separator.length);
 
 					if (clength) {
+						const num = parseInt(clength, 10);
 						const arr = encoder.encode(payload);
-						payload = decoder.decode(
-							arr.subarray(0, parseInt(clength, 10))
-						);
+						if (arr.byteLength < num) continue outer; // too short
+						payload = decoder.decode(arr.subarray(0, num));
 					}
 
 					is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;

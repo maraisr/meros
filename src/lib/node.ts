@@ -51,7 +51,12 @@ export async function* generate<T>(
 				});
 
 				let payload = current.slice(idx_headers + separator.length);
-				if (clength) payload = payload.slice(0, parseInt(clength, 10));
+
+				if (clength) {
+					const num = parseInt(clength, 10);
+					if (payload.byteLength < num) continue outer; // too short
+					payload = payload.slice(0,num);
+				}
 
 				is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
 				yield is_json ? JSON.parse(payload.toString()) : payload.toString();
