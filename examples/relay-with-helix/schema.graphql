@@ -1,0 +1,15 @@
+schema {
+	query: Query
+}
+
+type Query {
+	alphabet: [String]
+	song: Song
+}
+
+type Song {
+	firstVerse: String
+	secondVerse: String
+}
+
+directive @defer(label: String, if: Boolean = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT

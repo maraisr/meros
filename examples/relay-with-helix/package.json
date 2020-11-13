@@ -1,0 +1,50 @@
+{
+	"name": "meros-relay-with-helix",
+	"private": true,
+	"version": "0.0.1",
+	"scripts": {
+		"relay": "relay-compiler --src ./app --schema ./schema.graphql --extensions js jsx",
+		"dev2": "concurrently -k \"parcel -p 8080 app/index.html\" \"node server.js\"",
+		"dev": "yarn build && node server.js",
+		"build": "parcel build app/index.html"
+	},
+	"browserslist": [
+		"defaults",
+		"not IE 11",
+		"not IE_Mob 11",
+		"maintained node versions"
+	],
+	"dependencies": {
+		"@polka/parse": "^1.0.0-next.8",
+		"body-parser": "^1.19.0",
+		"core-js": "^3.7.0",
+		"cors": "^2.8.5",
+		"graphql": "15.4.0-experimental-stream-defer.1",
+		"graphql-helix": "^0.3.0",
+		"meros": "^1.0.0-beta.4",
+		"morgan": "^1.10.0",
+		"polka": "^1.0.0-next.11",
+		"react": "^0.0.0-experimental-4ead6b530",
+		"react-dom": "^0.0.0-experimental-4ead6b530",
+		"react-relay": "0.0.0-experimental-183bdd28",
+		"relay-compiler": "0.0.0-master-c45f540f",
+		"relay-runtime": "0.0.0-master-817590d4",
+		"rxjs": "^7.0.0-beta.8",
+		"sirv": "^1.0.7"
+	},
+	"resolutions": {
+		"react-relay": "0.0.0-experimental-183bdd28",
+		"relay-runtime": "0.0.0-master-817590d4"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.12.3",
+		"@babel/plugin-transform-runtime": "^7.12.1",
+		"@babel/preset-env": "^7.12.1",
+		"@babel/preset-react": "^7.12.5",
+		"@types/react-relay": "^7.0.17",
+		"@types/relay-runtime": "^10.0.10",
+		"babel-plugin-relay": "^0.0.0-master-c45f540f",
+		"concurrently": "^5.3.0",
+		"parcel-bundler": "^1.12.4"
+	}
+}
