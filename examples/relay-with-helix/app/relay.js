@@ -1,5 +1,5 @@
 import { Environment, Network, Observable, RecordSource, Store } from 'relay-runtime';
-import { meros } from 'meros/browser';
+import { meros } from '../meros/browser';
 
 const STORE_ENTRIES = 150;
 const STORE_CACHE_RELEASE_TIME = 2 * 60 * 1000; // 2 mins

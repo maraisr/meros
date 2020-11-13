@@ -7,6 +7,7 @@ export async function* generate<T>(
 	boundary: string,
 ): AsyncGenerator<T> {
 	const reader = stream.getReader();
+
 	let buffer = '';
 	let last_index = 0;
 	let is_preamble = true;
@@ -16,6 +17,7 @@ export async function* generate<T>(
 		outer: while (true) {
 			const result = await reader.read();
 			if (result.done) break outer; // undefined value
+			console.log('NEW CHUNK');
 
 			const chunk = decoder.decode(result.value);
 			const idx_chunk = chunk.indexOf(boundary);
@@ -47,8 +49,15 @@ export async function* generate<T>(
 			}
 
 			while (!!~idx_boundary) {
-				const current = buffer.substring(0, idx_boundary);
-				const next = buffer.substring(idx_boundary + boundary.length);
+				console.log('~>> LOOP', idx_boundary);
+				let current = buffer.substring(0, idx_boundary);
+				let next = buffer.substring(idx_boundary + boundary.length);
+				if (current === '\r\n') {
+					console.log('>> SWAP');
+					idx_boundary = next.indexOf(boundary),
+					current = next.substring(0, idx_boundary);
+					next = next.substring(idx_boundary + boundary.length);
+				}
 
 				console.log(
 					JSON.stringify({
@@ -61,14 +70,17 @@ export async function* generate<T>(
 				);
 
 				if (is_preamble) {
-					is_preamble = false;
 					console.log('>> SKIP PREAMBLE');
+					//
 				} else {
 					let ctype = '', clength = '';
+
 					const idx_headers = current.indexOf(separator);
+					console.log('>> ', { idx_headers });
+					if (!~idx_headers) continue outer;
 
 					// parse headers, only keeping relevant headers
-					buffer.substring(0, idx_headers).trim().split(/\r\n/).forEach((str, idx) => {
+					buffer.substring(0, idx_headers).trim().split('\r\n').forEach((str, idx) => {
 						idx = str.indexOf(':');
 						let key = str.substring(0, idx).toLowerCase();
 						if (key === 'content-type') ctype = str.substring(idx + 1).trim();
@@ -77,15 +89,15 @@ export async function* generate<T>(
 
 					let payload = current.substring(idx_headers + separator.length);
 
+					is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
+
 					if (clength) {
+						const num = parseInt(clength, 10);
 						const arr = encoder.encode(payload);
-						payload = decoder.decode(
-							arr.subarray(0, parseInt(clength, 10))
-						);
+						payload = decoder.decode(arr.subarray(0, num));
 					}
 
-					is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
-					console.log('>> YIELD');
+					console.log('>> YIELD :: ', is_json, payload);
 					yield is_json ? JSON.parse(payload) : payload;
 
 					if (next.substring(0, 2) === '--') break outer;
@@ -93,7 +105,16 @@ export async function* generate<T>(
 
 				buffer = next;
 				last_index = 0;
-				idx_boundary = buffer.indexOf(boundary);
+				idx_boundary = is_preamble ? buffer.length : buffer.indexOf(boundary);
+				is_preamble = false;
+
+				console.log('>> LOOP END',
+					JSON.stringify({
+						buffer: buffer.toString(),
+						idx_boundary: idx_boundary,
+					}, null, 2)
+				);
+
 			}
 		}
 	} finally {

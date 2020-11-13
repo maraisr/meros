@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Suspense, useState } from 'react';
 import { unstable_createRoot } from 'react-dom';
-import {meros} from 'meros';
 import { RelayEnvironmentProvider, useFragment, useLazyLoadQuery, graphql } from 'react-relay/hooks';
 import { environment } from './relay';
 
