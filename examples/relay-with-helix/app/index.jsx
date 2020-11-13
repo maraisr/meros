@@ -45,44 +45,6 @@ const App = () => {
 		</div>
 	</RelayEnvironmentProvider>;
 };
-(async () => {
-	const response = await fetch('/graphql',
-		{
-			body: JSON.stringify({
-				operationName: 'appIndex_Query',
-				query: `query appIndex_Query {
-  song {
-    firstVerse
-    ...appIndex_SecondLyric @defer(label: "appIndex_Query$defer$appIndex_SecondLyric")
-  }
-}
 
-fragment appIndex_SecondLyric on Song {
-  secondVerse
-}`,
-				variables: {},
-			}),
-			credentials: "include",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			method: "POST",
-		});
-	const parts = await meros(response);
-
-	for await (const part of parts) {
-		const { data, path, hasNext, label } = part;
-		console.log({
-			data,
-			path,
-			label,
-			extensions: {
-				is_final: !hasNext,
-			},
-		});
-	}
-})()
-/*
 unstable_createRoot(document.body)
-	.render(<App/>);*/
+	.render(<App/>);
