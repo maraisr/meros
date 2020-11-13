@@ -94,6 +94,7 @@ export async function* generate<T>(
 					if (clength) {
 						const num = parseInt(clength, 10);
 						const arr = encoder.encode(payload);
+						if (arr.byteLength < num) continue outer; // too short
 						payload = decoder.decode(arr.subarray(0, num));
 					}
 
