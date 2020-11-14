@@ -1,0 +1,15 @@
+{
+	"presets": [
+		"@babel/preset-react",
+		[
+			"@babel/preset-env",
+			{
+				"useBuiltIns": "usage",
+				"targets": "defaults, not ie 11, not ie_mob 11"
+			}
+		]
+	],
+	"plugins": [
+		"relay"
+	]
+}
