@@ -1,10 +1,6 @@
 // @ts-nocheck
-import { TextDecoder, TextEncoder } from 'util';
-import type { IncomingMessage } from 'http';
 
-// Mocks for Node@10
-global['TextDecoder'] = global['TextDecoder'] || TextDecoder;
-global['TextEncoder'] = global['TextEncoder'] || TextEncoder;
+import type { IncomingMessage } from 'http';
 
 export function makeChunk(
 	payload: any,

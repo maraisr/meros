@@ -50,12 +50,12 @@
 		"node"
 	],
 	"scripts": {
-		"bench": "node -r ts-node/register bench/index.ts",
+		"bench": "node -r ts-node/register -r ./test/_polyfill.js bench/index.ts",
 		"typecheck": "tsc --noEmit",
 		"build": "rollup -c",
 		"format": "prettier \"{*,.github/**/*}.+(json|yml|md)\" --write",
 		"prepublishOnly": "yarn build",
-		"test": "uvu -r ts-node/register -i mocks test"
+		"test": "uvu -r ts-node/register -r ./test/_polyfill.js -i _polyfill -i mocks test"
 	},
 	"prettier": {
 		"bracketSpacing": true,

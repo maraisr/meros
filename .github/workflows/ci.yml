@@ -18,7 +18,18 @@ jobs:
               with:
                   node-version: ${{ matrix.nodejs }}
 
-            - run: echo "::add-path::$(yarn global bin)"
+            - name: (env) yarn global
+              run: |-
+                  yarn global bin >> $GITHUB_PATH
+                  echo "YARN_CACHE_DIR=$(yarn cache dir)" >> $GITHUB_ENV
+
+            - name: (env) cache
+              uses: actions/cache@main
+              with:
+                  path: ${{ env.YARN_CACHE_DIR }}
+                  key:
+                      ${{ runner.os }}-node${{ matrix.nodejs }}-${{
+                      hashFiles('./package.json', './yarn.lock') }}
 
             - name: Install
               run: |-
@@ -31,7 +42,7 @@ jobs:
             - name: Type Check
               run: yarn typecheck
 
-            - name: Test
+            - name: Test w/ Coverage
               run: nyc --include=src yarn test
 
             - name: Benchmark
