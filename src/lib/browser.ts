@@ -1,15 +1,18 @@
+type Part<T> =
+	| { json: true, headers: Record<string, string>, body: T }
+	| { json: false, headers: Record<string, string>, body: string };
+
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
-): AsyncGenerator<T> {
+): AsyncGenerator<Part<T>> {
 	const reader = stream.getReader();
 	let buffer = '';
 	let last_index = 0;
 	let is_preamble = true;
-	let is_json = false;
 
 	try {
 		outer: while (true) {
@@ -42,20 +45,31 @@ export async function* generate<T>(
 				if (is_preamble) {
 					is_preamble = false;
 				} else {
-					let ctype = '';
+					const headers: Record<string, string> = {};
 					const idx_headers = current.indexOf(separator);
+					const arr_headers = buffer.slice(0, idx_headers).toString().trim().split(/\r\n/);
 
-					// parse headers, only keeping relevant headers
-					buffer.substring(0, idx_headers).trim().split(/\r\n/).forEach((str, idx) => {
-						idx = str.indexOf(':');
-						let key = str.substring(0, idx).toLowerCase();
-						if (key === 'content-type') ctype = str.substring(idx + 1).trim();
-					});
+					// parse headers
+					let tmp;
+					while (tmp = arr_headers.shift()) {
+						tmp = tmp.split(': ');
+						headers[tmp.shift().toLowerCase()] = tmp.join(': ');
+					}
 
-					let payload = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+					let body = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+					let is_json = false;
 
-					is_json = ctype ? !!~ctype.indexOf('application/json') : is_json;
-					yield is_json ? JSON.parse(payload) : payload;
+					tmp = headers['content-type'];
+					if (tmp && !!~tmp.indexOf('application/json')) {
+						try {
+							body = JSON.parse(body);
+							is_json = true;
+						} catch (_) {
+						}
+					}
+
+					// @ts-ignore
+					yield { headers, body, json: is_json };
 
 					if (next.substring(0, 2) === '--') break outer;
 				}

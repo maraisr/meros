@@ -7,14 +7,13 @@
 
 ## ⚡ Features
 
--   ✅ No dependencies
--   ✅ Super [performant](#-benchmark)
--   ✅ Supports _any_<sup>1</sup> `content-type`
--   ✅ Supports _fall through_<sup>2</sup> `content-type`'s
--   ✅ Supports `content-length`<sup>3</sup>
--   ✅ _preamble_ and _epilogue_ don't yield
--   ✅ Browser-Compatible
--   ✅ Plugs into existing libraries like Relay and rxjs
+-   No dependencies
+-   Super [performant](#-benchmark)
+-   Supports _any_<sup>1</sup> `content-type`
+-   Supports `content-length`<sup>2</sup>
+-   _preamble_ and _epilogue_ don't yield
+-   Browser-Compatible
+-   Plugs into existing libraries like Relay and rxjs
 
 ## ⚙️ Install
 
@@ -92,17 +91,29 @@ collide with things from the body:
 ### _Browser_
 
 ```ts
-function meros<T = unknown>(
+function meros<T = object>(
 	response: Response,
-): Promise<Response | AsyncGenerator<T>>;
+): Promise<
+	| Response
+	| AsyncGenerator<
+			| { json: true; headers: Record<string, string>; body: T }
+			| { json: false; headers: Record<string, string>; body: string }
+	  >
+>;
 ```
 
 ### _Node_
 
 ```ts
-function meros<T = unknown>(
+function meros<T = object>(
 	response: IncomingMessage,
-): Promise<IncomingMessage | AsyncGenerator<T>>;
+): Promise<
+	| IncomingMessage
+	| AsyncGenerator<
+			| { json: true; headers: Record<string, string>; body: T }
+			| { json: false; headers: Record<string, string>; body: Buffer }
+	  >
+>;
 ```
 
 Returns an async generator that yields on every part. Worth noting that if
@@ -133,69 +144,25 @@ if (parts[Symbol.asyncIterator] < 'u') {
 
 ## 💨 Benchmark
 
-> Ran with Node v15.1.0
-
 ```
 Validation :: node
 ✔ meros
 ✘ it-multipart (FAILED @ "should match reference patch set")
 
 Benchmark :: node
-  meros                     x 32,900 ops/sec ±0.89% (78 runs sampled)
-  it-multipart              x 16,033 ops/sec ±0.98% (77 runs sampled)
+  meros                     x 27,045 ops/sec ±0.94% (81 runs sampled)
+  it-multipart              x 14,840 ops/sec ±0.93% (81 runs sampled)
 
 Validation :: browser
 ✔ meros
 ✘ fetch-multipart-graphql (FAILED @ "should match reference patch set")
 
 Benchmark :: browser
-  meros                     x 28,226 ops/sec ±1.20% (80 runs sampled)
-  fetch-multipart-graphql   x 14,835 ops/sec ±0.90% (78 runs sampled)
+  meros                     x 29,548 ops/sec ±0.56% (76 runs sampled)
+  fetch-multipart-graphql   x 13,613 ops/sec ±0.54% (78 runs sampled)
 ```
 
-<details>
-<summary><i>Reference patch set</i></summary>
-
-```
-content-type: "multipart/mixed; boundary=abc123"
-```
-
-```
-preamble
---abc123
-Content-Type: application/json
-Content-Length: 17
-
-{"hello":"world"}
-
---abc123
-Content-Type: application/json
-Content-Length: 17
-
-{"other":"world"}
-
---abc123
-Content-Type: application/json
-Content-Length: 19
-
-{"another":"world"}
-
---abc123
-Content-Type: application/json
-Content-Length: 39
-
-{"massive":{"nested":{"world":"okay"}}}
-
---abc123--
-epilogue
---abc123
-Content-Type: application/json
-Content-Length: 19
-
-{"shouldnt":"work"}
-```
-
-</details>
+> Ran with Node v15.1.0
 
 ## ❤ Thanks
 
@@ -212,11 +179,7 @@ MIT © [Marais Rossouw](https://marais.io)
 > 1: By default, we'll look for JSON, and parse that for you. If not, we'll give
 > you the body as what was streamed.</small>
 >
-> 2: Unlike the spec assuming `application/octet-stream` for untyped chunks, we
-> assume whatever `content-type` we last encountered. See
-> [RFC1341 Section 4](https://tools.ietf.org/html/rfc1341#section-4)
->
-> 3: If not given, everything from the body through boundary will yield
+> 2: If not given, everything from the body through boundary will yield
 
 </details>
 

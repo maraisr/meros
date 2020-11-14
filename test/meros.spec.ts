@@ -23,11 +23,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 1, "it should have yield'd once");
+		assert.is(collection.length, 1, 'it should have yield\'d once');
 		assert.equal(collection, [{ foo: 'bar' }]);
 	});
 
@@ -40,11 +40,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 2, "it should have yield'd twice");
+		assert.is(collection.length, 2, 'it should have yield\'d twice');
 		assert.equal(collection, [{ foo: 'bar' }, { bar: 'baz' }]);
 	});
 
@@ -58,11 +58,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 2, "it should have yield'd twice");
+		assert.is(collection.length, 2, 'it should have yield\'d twice');
 		assert.equal(collection, [{ foo: 'bar' }, { bar: 'baz' }]);
 	});
 
@@ -75,11 +75,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 3, "it should have yield'd three times");
+		assert.is(collection.length, 3, 'it should have yield\'d three times');
 		assert.equal(collection, [{ foo: 'bar' }, 'baz', { baz: 'foo' }]);
 	});
 
@@ -89,11 +89,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 1, "it should have yield'd once");
+		assert.is(collection.length, 1, 'it should have yield\'d once');
 		assert.equal(collection[0], '👀');
 	});
 
@@ -109,11 +109,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 2, "it should have yield'd twice");
+		assert.is(collection.length, 2, 'it should have yield\'d twice');
 		assert.equal(collection, ['howdy', 'teddy bear']);
 	});
 
@@ -126,11 +126,11 @@ function test(
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
-		assert.is(collection.length, 2, "it should have yield'd twice");
+		assert.is(collection.length, 2, 'it should have yield\'d twice');
 		assert.equal(collection, ['howdy', 'teddy bear']);
 	});
 
@@ -147,8 +147,8 @@ world
 		const parts = await mod(response);
 		const collection = [];
 
-		for await (let part of parts) {
-			collection.push(part);
+		for await (let { body: part } of parts) {
+			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
 		}
 
 		assert.equal(collection.length, 1);

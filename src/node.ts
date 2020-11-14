@@ -22,7 +22,7 @@ import { generate } from './lib/node';
  * }
  * ```
  */
-export async function meros<T = unknown>(response: IncomingMessage) {
+export async function meros<T=object>(response: IncomingMessage) {
 	const ctype = response.headers['content-type'];
 
 	if (!ctype) throw new Error('There was no content-type header');

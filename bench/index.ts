@@ -4,9 +4,9 @@ import { Suite } from 'benchmark';
 import { fetchImpl as fetchMultiPartGraphql } from 'fetch-multipart-graphql/dist/fetch';
 import ItMultipart from 'it-multipart';
 import { equal } from 'uvu/assert';
-import { mockResponseBrowser, mockResponseNode } from '../test/mocks';
 import { meros as merosBrowser } from '../src/browser';
 import { meros as merosNode } from '../src/node';
+import { mockResponseBrowser, mockResponseNode } from '../test/mocks';
 
 const parts = [
 	{ hello: 'world' },
@@ -17,7 +17,7 @@ const parts = [
 				world: 'okay',
 			},
 		},
-	}
+	},
 ];
 
 async function runner(name: string, candidates: Record<string, Function>) {
@@ -77,8 +77,8 @@ global['fetch'] = async function (url, options) {
 
 			const collection = [];
 
-			for await (let part of parts) {
-				collection.push(part);
+			for await (let { body } of parts) {
+				collection.push(body);
 			}
 
 			return collection;
@@ -112,8 +112,8 @@ global['fetch'] = async function (url, options) {
 
 			const collection = [];
 
-			for await (let part of parts) {
-				collection.push(part);
+			for await (let { body } of parts) {
+				collection.push(body);
 			}
 
 			return collection;

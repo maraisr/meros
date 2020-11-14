@@ -17,7 +17,7 @@ import { generate } from './lib/browser';
  * }
  * ```
  */
-export async function meros<T=unknown>(response: Response) {
+export async function meros<T=object>(response: Response) {
 	if (!response.ok || !response.body || response.bodyUsed) {
 		// @ts-ignore
 		return;
