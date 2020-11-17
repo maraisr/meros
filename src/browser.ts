@@ -18,15 +18,10 @@ import { generate } from './lib/browser';
  * ```
  */
 export async function meros<T=object>(response: Response) {
-	if (!response.ok || !response.body || response.bodyUsed) {
-		// @ts-ignore
-		return;
-	}
+	if (!response.ok || !response.body || response.bodyUsed) return response;
 
 	const ctype = response.headers.get('content-type');
-
-	if (!ctype) throw new Error('There was no content-type header');
-	if (!/multipart\/mixed/.test(ctype)) return response;
+	if (ctype && !~ctype.indexOf('multipart/mixed')) return response;
 
 	const idx_boundary = ctype.indexOf('boundary=');
 

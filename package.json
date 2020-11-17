@@ -53,7 +53,7 @@
 		"bench": "node -r ts-node/register -r ./test/_polyfill.js bench/index.ts",
 		"typecheck": "tsc --noEmit",
 		"build": "rollup -c",
-		"format": "prettier \"{*,.github/**/*}.+(json|yml|md)\" --write",
+		"format": "prettier  --write --list-different \"{*,.github/**/*}.+(json|yml|md)\"",
 		"prepublishOnly": "yarn build",
 		"test": "uvu -r ts-node/register -r ./test/_polyfill.js -i _polyfill -i mocks test"
 	},
@@ -64,7 +64,18 @@
 		"singleQuote": true,
 		"tabWidth": 4,
 		"trailingComma": "all",
-		"useTabs": true
+		"useTabs": true,
+		"overrides": [
+			{
+				"files": [
+					"*.md"
+				],
+				"options": {
+					"useTabs": false,
+					"tabWidth": 2
+				}
+			}
+		]
 	},
 	"devDependencies": {
 		"@marais/tsconfig": "0.0.1",

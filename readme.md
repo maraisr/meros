@@ -7,13 +7,13 @@
 
 ## ⚡ Features
 
--   No dependencies
--   Super [performant](#-benchmark)
--   Supports _any_<sup>1</sup> `content-type`
--   Supports `content-length`<sup>2</sup>
--   _preamble_ and _epilogue_ don't yield
--   Browser-Compatible
--   Plugs into existing libraries like Relay and rxjs
+- No dependencies
+- Super [performant](#-benchmark)
+- Supports _any_<sup>1</sup> `content-type`
+- Supports `content-length`<sup>2</sup>
+- _preamble_ and _epilogue_ don't yield
+- Browser-Compatible
+- Plugs into existing libraries like Relay and rxjs
 
 ## ⚙️ Install
 
@@ -31,14 +31,14 @@ const parts = await fetch('/fetch-multipart').then(meros);
 
 // As a simple Async Generator
 for await (const part of parts) {
-	// Do something with this part
+  // Do something with this part
 }
 
 // Used with rxjs streams
 from(parts).pipe(
-	tap((part) => {
-		// Do something with it
-	}),
+  tap((part) => {
+    // Do something with it
+  }),
 );
 ```
 
@@ -56,10 +56,10 @@ import http from 'http';
 import { meros } from 'meros/node';
 
 const response = await new Promise((resolve) => {
-	const request = http.get(`http://my-domain/mock-ep`, (response) => {
-		resolve(response);
-	});
-	request.end();
+  const request = http.get(`http://my-domain/mock-ep`, (response) => {
+    resolve(response);
+  });
+  request.end();
 });
 
 const parts = await meros(response);
@@ -81,10 +81,10 @@ collide with things from the body:
 
 ### _Caveats_
 
--   No support the `/alternative` , `/digest` _or_ `/parallel` subtype at this
-    time.
--   No support for
-    [nested multiparts](https://tools.ietf.org/html/rfc1341#appendix-C)
+- No support the `/alternative` , `/digest` _or_ `/parallel` subtype at this
+  time.
+- No support for
+  [nested multiparts](https://tools.ietf.org/html/rfc1341#appendix-C)
 
 ## 🔎 API
 
@@ -92,13 +92,13 @@ collide with things from the body:
 
 ```ts
 function meros<T = object>(
-	response: Response,
+  response: Response,
 ): Promise<
-	| Response
-	| AsyncGenerator<
-			| { json: true; headers: Record<string, string>; body: T }
-			| { json: false; headers: Record<string, string>; body: string }
-	  >
+  | Response
+  | AsyncGenerator<
+      | { json: true; headers: Record<string, string>; body: T }
+      | { json: false; headers: Record<string, string>; body: string }
+    >
 >;
 ```
 
@@ -106,13 +106,13 @@ function meros<T = object>(
 
 ```ts
 function meros<T = object>(
-	response: IncomingMessage,
+  response: IncomingMessage,
 ): Promise<
-	| IncomingMessage
-	| AsyncGenerator<
-			| { json: true; headers: Record<string, string>; body: T }
-			| { json: false; headers: Record<string, string>; body: Buffer }
-	  >
+  | IncomingMessage
+  | AsyncGenerator<
+      | { json: true; headers: Record<string, string>; body: T }
+      | { json: false; headers: Record<string, string>; body: Buffer }
+    >
 >;
 ```
 
@@ -120,7 +120,8 @@ Returns an async generator that yields on every part. Worth noting that if
 multiple parts are present in one chunk, each part will yield independently.
 
 > If the `content-type` is **NOT** a multipart, then it will resolve with the
-> response argument.
+> response argument. Or really any unhandled cases, we'll resolve with the
+> response.
 >
 > <details>
 > <summary>Example on how to handle this case</summary>
@@ -132,11 +133,11 @@ multiple parts are present in one chunk, each part will yield independently.
 > const parts = await meros(response);
 >
 > if (parts[Symbol.asyncIterator] < 'u') {
-> 	for await (const part of parts) {
-> 		// Do something with this part
-> 	}
+>   for await (const part of parts) {
+>     // Do something with this part
+>   }
 > } else {
-> 	const data = await parts.json();
+>   const data = await parts.json();
 > }
 > ```
 >
