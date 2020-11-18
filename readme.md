@@ -1,9 +1,19 @@
-# `meros` &middot; <small>From Ancient Greek μέρος (méros, "part").</small>
-
-[![CI](https://img.shields.io/github/workflow/status/maraisr/meros/CI/main)](https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main)
-[![codecov](https://img.shields.io/codecov/c/gh/maraisr/meros/main?token=dAoRt2GoQn)](https://codecov.io/gh/maraisr/meros)
-
-> A fast (761B) utility for reading streamed multipart/mixed responses.
+<div align="center">
+	<h1 align="center">meros</h1>
+	<p align="center"><code>yarn add meros</code> makes reading multipart responses simple</p>
+	<hr />
+	<span>
+		<a href="https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main">
+			<img src="https://github.com/maraisr/meros/workflows/CI/badge.svg?query=branch:main"/>
+		</a>
+		<a href="https://npm.im/meros">
+			<img src="https://img.shields.io/npm/dm/meros" alt="downloads"/>
+		</a>
+		<a href="https://bundlephobia.com/result?p=meros">
+			<img src="https://badgen.net/bundlephobia/minzip/meros" alt="size"/>
+		</a>
+	</span>
+</div>
 
 ## ⚡ Features
 
@@ -78,6 +88,8 @@ collide with things from the body:
 > encapsulated, a user agent must exercise care to choose a unique boundary._
 >
 > <small>~ [RFC1341] 7.2.1</small>
+
+- `meros` comes from Ancient Greek μέρος méros, meaing "part".
 
 ### _Caveats_
 
