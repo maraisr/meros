@@ -10,8 +10,6 @@ import { generate } from './lib/browser';
  * const parts = await fetch('/fetch-multipart')
  *      .then(meros);
  *
- * const parts = await meros(response);
- *
  * for await (const part of parts) {
  *     // do something with this part
  * }

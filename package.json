@@ -1,6 +1,6 @@
 {
 	"name": "meros",
-	"version": "1.0.0-beta.7",
+	"version": "1.0.0-beta.9",
 	"description": "A fast utility for reading streamed multipart responses.",
 	"keywords": [
 		"multipart",
@@ -36,13 +36,6 @@
 	"module": "node/index.mjs",
 	"main": "node/index.js",
 	"types": "index.d.ts",
-	"typesVersions": {
-		"*": {
-			"*": [
-				"./types/*"
-			]
-		}
-	},
 	"files": [
 		"*.d.ts",
 		"types",
@@ -87,6 +80,7 @@
 		"it-multipart": "1.0.5",
 		"prettier": "2.1.2",
 		"rollup": "2.33.1",
+		"rollup-plugin-dts": "^1.4.14",
 		"rollup-plugin-terser": "7.0.2",
 		"rollup-plugin-typescript2": "0.29.0",
 		"ts-node": "9.0.0",

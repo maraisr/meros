@@ -12,8 +12,7 @@
 		"rootDir": "src",
 		"outDir": "dist",
 		"target": "ES2019",
-		"declaration": true,
-		"declarationDir": "types",
+		"declaration": false,
 		"removeComments": false,
 		"lib": ["DOM", "ESNext"]
 	},

@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import type { IncomingMessage } from 'http';
+import { IncomingMessage } from 'http';
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
@@ -11,14 +11,12 @@ import type { IncomingMessage } from 'http';
  * const parts = await fetch('/fetch-multipart')
  *      .then(meros);
  *
- * const parts = await meros(response);
- *
  * for await (const part of parts) {
  *     // do something with this part
  * }
  * ```
  */
-export declare function meros<T = object>(response: Response): Promise<Response | AsyncGenerator<{
+declare function meros<T = object>(response: Response): Promise<Response | AsyncGenerator<{
 	json: false;
 	headers: Record<string, string>;
 	body: string;
@@ -27,6 +25,7 @@ export declare function meros<T = object>(response: Response): Promise<Response 
 	headers: Record<string, string>;
 	body: T;
 }>>;
+
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
  * multipart body, then we'll resolve with {@link IncomingMessage}.
@@ -48,7 +47,7 @@ export declare function meros<T = object>(response: Response): Promise<Response 
  * }
  * ```
  */
-export declare function meros<T = object>(response: IncomingMessage): Promise<IncomingMessage | AsyncGenerator<{
+declare function meros<T = object>(response: IncomingMessage): Promise<IncomingMessage | AsyncGenerator<{
 	json: false;
 	headers: Record<string, string>;
 	body: Buffer;
@@ -58,3 +57,4 @@ export declare function meros<T = object>(response: IncomingMessage): Promise<In
 	body: T;
 }>>;
 
+export { meros };
