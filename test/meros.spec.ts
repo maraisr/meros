@@ -17,8 +17,8 @@ function test(
 		assert.type(mod, 'function');
 	});
 
-	tester('should yield single chunk', async () => {
-		const response = await responder([{ foo: 'bar' }], 'abc123');
+	tester.only('should yield single chunk', async () => {
+		const response = await responder([{ foo: 'bar' }], 'abc123', false);
 
 		const parts = await mod(response);
 		const collection = [];
