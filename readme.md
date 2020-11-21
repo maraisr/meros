@@ -20,7 +20,6 @@
 - No dependencies
 - Super [performant](#-benchmark)
 - Supports _any_<sup>1</sup> `content-type`
-- Supports `content-length`<sup>2</sup>
 - _preamble_ and _epilogue_ don't yield
 - Browser-Compatible
 - Plugs into existing libraries like Relay and rxjs
@@ -190,9 +189,7 @@ MIT © [Marais Rossouw](https://marais.io)
 <summary>Footnote</summary>
 
 > 1: By default, we'll look for JSON, and parse that for you. If not, we'll give
-> you the body as what was streamed.</small>
->
-> 2: If not given, everything from the body through boundary will yield
+> you the body as what was streamed.
 
 </details>
 
