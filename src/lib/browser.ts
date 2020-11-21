@@ -15,10 +15,8 @@ export async function* generate<T>(
 	let is_preamble = true;
 
 	try {
-		outer: while (true) {
-			const result = await reader.read();
-			if (result.done) break outer; // undefined value
-
+		let result: ReadableStreamReadResult<Uint8Array>;
+		outer: while (!(result = await reader.read()).done) {
 			const chunk = decoder.decode(result.value);
 			const idx_chunk = chunk.indexOf(boundary);
 			let idx_boundary = buffer.length;
