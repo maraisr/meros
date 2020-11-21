@@ -47,6 +47,7 @@
 		"build": "rollup -c",
 		"format": "prettier  --write --list-different \"{*,.github/**/*}.+(json|yml|md)\"",
 		"prepublishOnly": "yarn build",
+		"size": "bundlesize -f \"{node,browser}/*.js\"",
 		"test": "uvu -r ts-node/register -r ./test/_polyfill.js -i _polyfill -i mocks test",
 		"typecheck": "tsc --noEmit"
 	},
@@ -76,6 +77,7 @@
 		"@types/benchmark": "2.1.0",
 		"@types/node": "14.14.9",
 		"benchmark": "2.1.4",
+		"bundlesize": "^0.18.0",
 		"fetch-multipart-graphql": "2.2.0",
 		"it-multipart": "1.0.5",
 		"prettier": "2.2.0",
