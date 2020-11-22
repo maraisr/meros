@@ -24,7 +24,7 @@ import { generate } from './lib/node';
  */
 export async function meros<T=object>(response: IncomingMessage) {
 	const ctype = response.headers['content-type'];
-	if (ctype && !~ctype.indexOf('multipart/mixed')) return response;
+	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
 
 	const idx_boundary = ctype.indexOf('boundary=');
 
