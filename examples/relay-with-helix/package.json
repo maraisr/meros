@@ -18,7 +18,7 @@
 		"cors": "^2.8.5",
 		"graphql": "15.4.0-experimental-stream-defer.1",
 		"graphql-helix": "^0.3.0",
-		"meros": "^1.0.0-beta.9",
+		"meros": "^1.0.0-beta.10",
 		"morgan": "^1.10.0",
 		"polka": "^1.0.0-next.11",
 		"react": "0.0.0-experimental-4ead6b530",
