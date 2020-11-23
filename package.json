@@ -1,13 +1,16 @@
 {
 	"name": "meros",
-	"version": "1.0.0-beta.10",
-	"description": "A fast utility for reading streamed multipart responses.",
+	"version": "1.0.0-beta.11",
+	"description": "A fast 699B utility that makes reading multipart responses simple",
 	"keywords": [
-		"multipart",
-		"multipart mixed",
+		"defer",
 		"fetch",
-		"utility",
-		"reader"
+		"graphql",
+		"multipart mixed",
+		"multipart",
+		"reader",
+		"stream",
+		"utility"
 	],
 	"repository": "maraisr/meros",
 	"license": "MIT",
@@ -16,6 +19,7 @@
 		"email": "me@marais.dev",
 		"url": "https://marais.io"
 	},
+	"sideEffects": false,
 	"exports": {
 		".": {
 			"import": "./node/index.mjs",
