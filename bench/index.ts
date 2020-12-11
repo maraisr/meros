@@ -60,7 +60,7 @@ async function runner(name: string, candidates: Record<string, Function>) {
 	});
 }
 
-const mock_args = [parts, 'abc123', false];
+const mock_args = [parts, '-', false];
 
 const do_node_call = mockResponseNode.bind(null, ...mock_args);
 const do_browser_call = mockResponseBrowser.bind(null, ...mock_args);

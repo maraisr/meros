@@ -12,10 +12,7 @@ export function makeChunk(
 		'utf8',
 	);
 	const returns = [
-		'',
-		`--${boundary}`,
 		`Content-Type: ${contentType}`,
-		'Content-Length: ' + String(chunk.length),
 		'',
 		chunk,
 	];
@@ -28,6 +25,7 @@ function* makePatches(
 	boundary: string,
 	rambo: true,
 ) {
+	const boundary_wrap = `\r\n--${boundary}\r\n`;
 	const patches = parts.map((part) => {
 		if (Array.isArray(part))
 			return part
@@ -40,7 +38,7 @@ function* makePatches(
 							: 'application/json',
 					),
 				)
-				.join('');
+				.join(boundary_wrap);
 		return makeChunk(
 			part,
 			boundary,
@@ -49,7 +47,10 @@ function* makePatches(
 	});
 
 	yield Buffer.from('preamble');
+	yield Buffer.from(boundary_wrap);
 
+	const len = patches.length;
+	let c = 0;
 	for (const patch of patches) {
 		if (rambo) {
 			const toSend = Math.ceil(patch.length / 9);
@@ -60,11 +61,15 @@ function* makePatches(
 		} else {
 			yield Buffer.from(patch);
 		}
+		if (c < len-1) {
+			yield Buffer.from(boundary_wrap);
+		}
+		++c;
 	}
 
 	yield Buffer.from(`\r\n--${boundary}--\r\n`);
 
-	yield Buffer.from('epilogue');
+	yield Buffer.from('epilogue\r\n');
 	yield Buffer.from(makeChunk({ shouldnt: 'work' }, boundary));
 }
 

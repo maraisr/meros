@@ -162,8 +162,8 @@ Validation :: node
 ✘ it-multipart (FAILED @ "should match reference patch set")
 
 Benchmark :: node
-  meros                     x 27,354 ops/sec ±0.83% (83 runs sampled)
-  it-multipart              x 14,956 ops/sec ±1.18% (78 runs sampled)
+  meros                     x 27,567 ops/sec ±2.04% (77 runs sampled)
+  it-multipart              x 16,064 ops/sec ±1.20% (79 runs sampled)
 
 Validation :: browser
 ✔ meros
@@ -171,7 +171,7 @@ Validation :: browser
 
 Benchmark :: browser
   meros                     x 30,077 ops/sec ±0.92% (80 runs sampled)
-  fetch-multipart-graphql   x 14,089 ops/sec ±0.65% (80 runs sampled)
+  fetch-multipart-graphql   x 25,551 ops/sec ±1.44% (81 runs sampled)
 ```
 
 > Ran with Node v15.1.0
