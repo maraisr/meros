@@ -88,7 +88,7 @@ collide with things from the body:
 >
 > <small>~ [RFC1341] 7.2.1</small>
 
-- `meros` comes from Ancient Greek μέρος méros, meaing "part".
+- `meros` comes from Ancient Greek μέρος méros, meaning "part".
 
 ### _Caveats_
 
