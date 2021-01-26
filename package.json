@@ -1,6 +1,6 @@
 {
 	"name": "meros",
-	"version": "1.0.0-beta.11",
+	"version": "1.0.0",
 	"description": "A fast 699B utility that makes reading multipart responses simple",
 	"keywords": [
 		"defer",
@@ -33,7 +33,8 @@
 		"./node": {
 			"import": "./node/index.mjs",
 			"require": "./node/index.js"
-		}
+		},
+		"./package.json": "./package.json"
 	},
 	"main": "node/index.js",
 	"unpkg": "browser/index.min.js",
