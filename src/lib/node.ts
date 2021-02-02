@@ -3,10 +3,6 @@ import type { Options, Part, Arrayable } from './types';
 
 const separator = '\r\n\r\n';
 
-export function generate<T>(stream: Readable, boundary: string, options: { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>;
-export function generate<T>(stream: Readable, boundary: string, options?: { multiple: false }): AsyncGenerator<Part<T, Buffer>>;
-export function generate<T>(stream: Readable, boundary: string, options?: Options): AsyncGenerator<Arrayable<Part<T, Buffer>>>;
-
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,

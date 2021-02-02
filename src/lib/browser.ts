@@ -3,10 +3,6 @@ import type { Options, Part, Arrayable } from './types';
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
 
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, string>>>;
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options?: { multiple: false }): AsyncGenerator<Part<T, string>>;
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options?: Options): AsyncGenerator<Arrayable<Part<T, string>>>;
-
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,

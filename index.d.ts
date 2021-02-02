@@ -2,6 +2,12 @@
 import { IncomingMessage } from 'http';
 
 interface Options {
+	/**
+	 * Setting this to true will yield an array. In other words; instead of yielding once for every payload—we collect
+	 * all complete payloads for a chunk and then yield.
+	 *
+	 * @default false
+	 */
 	multiple: boolean;
 }
 
@@ -12,6 +18,14 @@ type Part<Body, Fallback> =
 
 type Arrayable<T> = T | ReadonlyArray<T>;
 
+// Browser~
+
+declare function meros<T = object>(response: Response, options: {
+	multiple: true;
+}): Promise<Response | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
+declare function meros<T = object>(response: Response, options?: {
+	multiple: false;
+}): Promise<Response | AsyncGenerator<Part<T, Buffer>>>;
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
  * multipart body, then we'll resolve with {@link Response}.
@@ -27,8 +41,16 @@ type Arrayable<T> = T | ReadonlyArray<T>;
  * }
  * ```
  */
-declare function meros<T = object>(response: Response, options?: Options): Promise<Response | AsyncGenerator<Arrayable<Part<T, string>>, any, unknown>>;
+declare function meros<T = object>(response: Response, options?: Options): Promise<Response | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
 
+// Node~
+
+declare function meros<T = object>(response: IncomingMessage, options: {
+	multiple: true;
+}): Promise<IncomingMessage | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
+declare function meros<T = object>(response: IncomingMessage, options?: {
+	multiple: false;
+}): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
  * multipart body, then we'll resolve with {@link IncomingMessage}.
@@ -50,6 +72,6 @@ declare function meros<T = object>(response: Response, options?: Options): Promi
  * }
  * ```
  */
-declare function meros<T = object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>, any, unknown>>;
+declare function meros<T = object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
 
 export { meros };
