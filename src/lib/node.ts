@@ -11,7 +11,7 @@ export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
 	options?: Options
-): AsyncGenerator<ReadonlyArray<Part<T, Buffer>> | Part<T, Buffer>> {
+): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
 	const len_boundary = Buffer.byteLength(boundary),
 		is_eager = !options || !options.multiple;
 
@@ -58,24 +58,20 @@ export async function* generate<T>(
 					headers[tmp.shift().toLowerCase()] = tmp.join(': ');
 				}
 
-				let body = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+				let body: Buffer | T = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 				let is_json = false;
 
 				tmp = headers['content-type'];
 				if (tmp && !!~tmp.indexOf('application/json')) {
 					try {
-						body = JSON.parse(body.toString());
+						body = JSON.parse(body.toString()) as T;
 						is_json = true;
 					} catch (_) {
 					}
 				}
 
 				tmp = { headers, body, json: is_json };
-
-				is_eager
-					// @ts-expect-error
-					? yield tmp
-					: payloads.push(tmp);
+				is_eager ? yield tmp : payloads.push(tmp);
 
 				// hit a tail boundary, break
 				if (next.slice(0, 2).toString() === '--') break outer;
@@ -86,8 +82,8 @@ export async function* generate<T>(
 			idx_boundary = buffer.indexOf(boundary);
 		}
 
-		if (payloads.length)
-			// @ts-expect-error
+		if (payloads.length) {
 			yield payloads;
+		}
 	}
 }

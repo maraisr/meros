@@ -12,7 +12,7 @@ export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
 	options?: Options
-): AsyncGenerator<ReadonlyArray<Part<T, string>> | Part<T, string>> {
+): AsyncGenerator<Arrayable<Part<T, string>>> {
 	const reader = stream.getReader();
 	let buffer = '',
 		last_index = 0,
@@ -61,24 +61,20 @@ export async function* generate<T>(
 						headers[tmp.shift().toLowerCase()] = tmp.join(': ');
 					}
 
-					let body = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+					let body: T | string = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 					let is_json = false;
 
 					tmp = headers['content-type'];
 					if (tmp && !!~tmp.indexOf('application/json')) {
 						try {
-							body = JSON.parse(body);
+							body = JSON.parse(body) as T;
 							is_json = true;
 						} catch (_) {
 						}
 					}
 
 					tmp = { headers, body, json: is_json };
-
-					is_eager
-						// @ts-expect-error
-						? yield tmp
-						: payloads.push(tmp);
+					is_eager ? yield tmp : payloads.push(tmp);
 
 					// hit a tail boundary, break
 					if (next.substring(0, 2) === '--') break outer;
@@ -89,9 +85,9 @@ export async function* generate<T>(
 				idx_boundary = buffer.indexOf(boundary);
 			}
 
-			if (payloads.length)
-				// @ts-expect-error
+			if (payloads.length) {
 				yield payloads;
+			}
 		}
 	} finally {
 		reader.releaseLock();
