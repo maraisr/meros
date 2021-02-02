@@ -1,21 +1,23 @@
-import type { Options, Part } from './types';
+import type { Options, Part, Arrayable } from './types';
+
 
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
 
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: Options & { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, string>>>;
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: Options & { multiple: false }): AsyncGenerator<Part<T, string>>;
+export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, string>>>;
+export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options?: { multiple: false }): AsyncGenerator<Part<T, string>>;
+export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options?: Options): AsyncGenerator<Arrayable<Part<T, string>>>;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
-	options: Options
+	options?: Options
 ): AsyncGenerator<ReadonlyArray<Part<T, string>> | Part<T, string>> {
 	const reader = stream.getReader();
 	let buffer = '',
 		last_index = 0,
 		is_preamble = true,
-		is_eager = !options.multiple;
+		is_eager = !options || !options.multiple;
 
 	try {
 		let result: ReadableStreamReadResult<Uint8Array>;

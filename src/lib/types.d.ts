@@ -5,3 +5,5 @@ export type Part<Body, Fallback> =
 export interface Options {
 	multiple: boolean;
 }
+
+export type Arrayable<T> = T | ReadonlyArray<T>;

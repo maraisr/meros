@@ -1,18 +1,19 @@
 import type { Readable } from 'stream';
-import type { Options, Part } from './types';
+import type { Options, Part, Arrayable } from './types';
 
 const separator = '\r\n\r\n';
 
-export function generate<T>(stream: Readable, boundary: string, options: Options & { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>;
-export function generate<T>(stream: Readable, boundary: string, options: Options & { multiple: false }): AsyncGenerator<Part<T, Buffer>>;
+export function generate<T>(stream: Readable, boundary: string, options: { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>;
+export function generate<T>(stream: Readable, boundary: string, options?: { multiple: false }): AsyncGenerator<Part<T, Buffer>>;
+export function generate<T>(stream: Readable, boundary: string, options?: Options): AsyncGenerator<Arrayable<Part<T, Buffer>>>;
 
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
-	options: Options
+	options?: Options
 ): AsyncGenerator<ReadonlyArray<Part<T, Buffer>> | Part<T, Buffer>> {
 	const len_boundary = Buffer.byteLength(boundary),
-		is_eager = !options.multiple;
+		is_eager = !options || !options.multiple;
 
 	let last_index = 0;
 	let buffer = Buffer.alloc(0);
