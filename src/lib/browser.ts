@@ -1,21 +1,23 @@
-import type { Options, Part } from './types';
+import type { Options, Part, Arrayable } from './types';
+
 
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
 
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: Options & { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, string>>>;
-export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: Options & { multiple: false }): AsyncGenerator<Part<T, string>>;
+export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options: { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, string>>>;
+export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options?: { multiple: false }): AsyncGenerator<Part<T, string>>;
+export function generate<T>(stream: ReadableStream<Uint8Array>, boundary: string, options?: Options): AsyncGenerator<Arrayable<Part<T, string>>>;
 
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
-	options: Options
-): AsyncGenerator<ReadonlyArray<Part<T, string>> | Part<T, string>> {
+	options?: Options
+): AsyncGenerator<Arrayable<Part<T, string>>> {
 	const reader = stream.getReader();
 	let buffer = '',
 		last_index = 0,
 		is_preamble = true,
-		is_eager = !options.multiple;
+		is_eager = !options || !options.multiple;
 
 	try {
 		let result: ReadableStreamReadResult<Uint8Array>;
@@ -59,24 +61,20 @@ export async function* generate<T>(
 						headers[tmp.shift().toLowerCase()] = tmp.join(': ');
 					}
 
-					let body = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+					let body: T | string = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 					let is_json = false;
 
 					tmp = headers['content-type'];
 					if (tmp && !!~tmp.indexOf('application/json')) {
 						try {
-							body = JSON.parse(body);
+							body = JSON.parse(body) as T;
 							is_json = true;
 						} catch (_) {
 						}
 					}
 
 					tmp = { headers, body, json: is_json };
-
-					is_eager
-						// @ts-expect-error
-						? yield tmp
-						: payloads.push(tmp);
+					is_eager ? yield tmp : payloads.push(tmp);
 
 					// hit a tail boundary, break
 					if (next.substring(0, 2) === '--') break outer;
@@ -87,9 +85,9 @@ export async function* generate<T>(
 				idx_boundary = buffer.indexOf(boundary);
 			}
 
-			if (payloads.length)
-				// @ts-expect-error
+			if (payloads.length) {
 				yield payloads;
+			}
 		}
 	} finally {
 		reader.releaseLock();

@@ -16,7 +16,7 @@ import type { Options } from './lib/types';
  * }
  * ```
  */
-export async function meros<T=object>(response: Response, options: Options = { multiple: false }) {
+export async function meros<T=object>(response: Response, options?: Options) {
 	if (!response.ok || !response.body || response.bodyUsed) return response;
 
 	const ctype = response.headers.get('content-type');

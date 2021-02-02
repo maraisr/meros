@@ -23,7 +23,7 @@ import type { Options } from './lib/types';
  * }
  * ```
  */
-export async function meros<T=object>(response: IncomingMessage, options: Options = { multiple: false }) {
+export async function meros<T=object>(response: IncomingMessage, options?: Options) {
 	const ctype = response.headers['content-type'];
 	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
 
