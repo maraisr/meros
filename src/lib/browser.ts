@@ -1,6 +1,5 @@
 import type { Options, Part, Arrayable } from './types';
 
-
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
 
