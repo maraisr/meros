@@ -1,15 +1,12 @@
 import type { Readable } from 'stream';
-
-type Part<T> =
-	| { json: true, headers: Record<string, string>, body: T }
-	| { json: false, headers: Record<string, string>, body: Buffer };
+import type { Part } from './types';
 
 const separator = '\r\n\r\n';
 
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
-): AsyncGenerator<Part<T>> {
+): AsyncGenerator<Part<T, Buffer>> {
 	const len_boundary = Buffer.byteLength(boundary);
 
 	let last_index = 0;

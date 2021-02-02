@@ -1,6 +1,10 @@
 /// <reference types="node" />
 import { IncomingMessage } from 'http';
 
+type Part<Body, Fallback> =
+	| { json: true, headers: Record<string, string>, body: Body }
+	| { json: false, headers: Record<string, string>, body: Fallback };
+
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
  * multipart body, then we'll resolve with {@link Response}.
@@ -16,15 +20,7 @@ import { IncomingMessage } from 'http';
  * }
  * ```
  */
-declare function meros<T = object>(response: Response): Promise<Response | AsyncGenerator<{
-	json: false;
-	headers: Record<string, string>;
-	body: string;
-} | {
-	json: true;
-	headers: Record<string, string>;
-	body: T;
-}>>;
+declare function meros<T = object>(response: Response): Promise<Response | AsyncGenerator<Part<T, string>>>;
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
@@ -47,14 +43,6 @@ declare function meros<T = object>(response: Response): Promise<Response | Async
  * }
  * ```
  */
-declare function meros<T = object>(response: IncomingMessage): Promise<IncomingMessage | AsyncGenerator<{
-	json: false;
-	headers: Record<string, string>;
-	body: Buffer;
-} | {
-	json: true;
-	headers: Record<string, string>;
-	body: T;
-}>>;
+declare function meros<T = object>(response: IncomingMessage): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
 
 export { meros };

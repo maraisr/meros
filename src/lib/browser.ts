@@ -1,6 +1,4 @@
-type Part<T> =
-	| { json: true, headers: Record<string, string>, body: T }
-	| { json: false, headers: Record<string, string>, body: string };
+import type { Part } from './types';
 
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
@@ -8,7 +6,7 @@ const decoder = new TextDecoder;
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
-): AsyncGenerator<Part<T>> {
+): AsyncGenerator<Part<T, string>> {
 	const reader = stream.getReader();
 	let buffer = '';
 	let last_index = 0;
