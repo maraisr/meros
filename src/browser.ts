@@ -1,4 +1,5 @@
 import { generate } from './lib/browser';
+import type { Options } from './lib/types';
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
@@ -15,7 +16,7 @@ import { generate } from './lib/browser';
  * }
  * ```
  */
-export async function meros<T=object>(response: Response) {
+export async function meros<T=object>(response: Response, options: Options = { multiple: false }) {
 	if (!response.ok || !response.body || response.bodyUsed) return response;
 
 	const ctype = response.headers.get('content-type');
@@ -29,5 +30,6 @@ export async function meros<T=object>(response: Response) {
 			? // +9 for 'boundary='.length
 			ctype.substring(idx_boundary + 9).trim().replace(/['"]/g, '')
 			: '-'}`,
+		options
 	);
 }
