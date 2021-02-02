@@ -1,13 +1,18 @@
 import type { Readable } from 'stream';
-import type { Part } from './types';
+import type { Options, Part } from './types';
 
 const separator = '\r\n\r\n';
+
+export function generate<T>(stream: Readable, boundary: string, options: Options & { multiple: true }): AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>;
+export function generate<T>(stream: Readable, boundary: string, options: Options & { multiple: false }): AsyncGenerator<Part<T, Buffer>>;
 
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
-): AsyncGenerator<Part<T, Buffer>> {
-	const len_boundary = Buffer.byteLength(boundary);
+	options: Options
+): AsyncGenerator<ReadonlyArray<Part<T, Buffer>> | Part<T, Buffer>> {
+	const len_boundary = Buffer.byteLength(boundary),
+		is_eager = !options.multiple;
 
 	let last_index = 0;
 	let buffer = Buffer.alloc(0);
@@ -31,6 +36,8 @@ export async function* generate<T>(
 				continue;
 			}
 		}
+
+		const payloads = [];
 
 		while (!!~idx_boundary) {
 			const current = buffer.slice(0, idx_boundary);
@@ -62,9 +69,14 @@ export async function* generate<T>(
 					}
 				}
 
-				// @ts-ignore
-				yield { headers, body, json: is_json };
+				tmp = { headers, body, json: is_json };
 
+				is_eager
+					// @ts-expect-error
+					? yield tmp
+					: payloads.push(tmp);
+
+				// hit a tail boundary, break
 				if (next.slice(0, 2).toString() === '--') break outer;
 			}
 
@@ -72,5 +84,9 @@ export async function* generate<T>(
 			last_index = 0;
 			idx_boundary = buffer.indexOf(boundary);
 		}
+
+		if (payloads.length)
+			// @ts-expect-error
+			yield payloads;
 	}
 }

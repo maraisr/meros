@@ -1,5 +1,6 @@
 import type { IncomingMessage } from 'http';
 import { generate } from './lib/node';
+import type { Options } from './lib/types';
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
@@ -22,7 +23,7 @@ import { generate } from './lib/node';
  * }
  * ```
  */
-export async function meros<T=object>(response: IncomingMessage) {
+export async function meros<T=object>(response: IncomingMessage, options: Options = { multiple: false }) {
 	const ctype = response.headers['content-type'];
 	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
 
@@ -34,5 +35,6 @@ export async function meros<T=object>(response: IncomingMessage) {
 			? // +9 for 'boundary='.length
 			ctype.substring(idx_boundary + 9).trim().replace(/['"]/g, '')
 			: '-'}`,
+		options
 	);
 }
