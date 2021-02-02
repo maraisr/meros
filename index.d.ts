@@ -1,9 +1,16 @@
 /// <reference types="node" />
 import { IncomingMessage } from 'http';
 
+interface Options {
+	multiple: boolean;
+}
+
 type Part<Body, Fallback> =
-	| { json: true, headers: Record<string, string>, body: Body }
-	| { json: false, headers: Record<string, string>, body: Fallback };
+	| { json: boolean; headers: Record<string, string>; body: Body | Fallback }
+	| { json: false; headers: Record<string, string>; body: Fallback }
+	| { json: true; headers: Record<string, string>; body: Body };
+
+type Arrayable<T> = T | ReadonlyArray<T>;
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
@@ -20,7 +27,7 @@ type Part<Body, Fallback> =
  * }
  * ```
  */
-declare function meros<T = object>(response: Response): Promise<Response | AsyncGenerator<Part<T, string>>>;
+declare function meros<T = object>(response: Response, options?: Options): Promise<Response | AsyncGenerator<Arrayable<Part<T, string>>, any, unknown>>;
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
@@ -43,6 +50,6 @@ declare function meros<T = object>(response: Response): Promise<Response | Async
  * }
  * ```
  */
-declare function meros<T = object>(response: IncomingMessage): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
+declare function meros<T = object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>, any, unknown>>;
 
 export { meros };
