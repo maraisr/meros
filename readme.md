@@ -111,8 +111,8 @@ Returns: `Promise<Response | AsyncGenerator<Part | Part[]>`
 
 Meros returns a promise that will resolve to an `AsyncGenerator` if the response
 is of `multipart/mixed` mime, or simply returns the `Response` if something
-else; helpful for middlewares. The idea here being that you put run meros at the
-.then of the fetch api.
+else; helpful for middlewares. The idea here being that you run meros as a chain
+off fetch.
 
 ```ts
 fetch('/api').then(meros);
@@ -150,7 +150,7 @@ each `Part` gives you access to:
   object (noted by `json`) _or_ the base type of the environment
   (`Buffer | string`, for Node and Browser respectively).
 
-### `options.multiple: boolean`
+#### `options.multiple: boolean`
 
 Default: `false`
 
