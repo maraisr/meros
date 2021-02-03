@@ -54,7 +54,7 @@ export async function* generate<T>(
 					headers[tmp.shift().toLowerCase()] = tmp.join(': ');
 				}
 
-				let body: Buffer | T = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+				let body: T | Buffer = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 				let is_json = false;
 
 				tmp = headers['content-type'];
