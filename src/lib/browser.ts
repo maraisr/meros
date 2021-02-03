@@ -1,4 +1,4 @@
-import type { Options, Part, Arrayable } from './types';
+import type { Arrayable, Options, Part } from './types';
 
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
@@ -72,7 +72,12 @@ export async function* generate<T>(
 					is_eager ? yield tmp : payloads.push(tmp);
 
 					// hit a tail boundary, break
-					if (next.substring(0, 2) === '--') break outer;
+					if (next.substring(0, 2) === '--') {
+						if (payloads.length) {
+							yield payloads;
+						}
+						break outer;
+					}
 				}
 
 				buffer = next;

@@ -1,5 +1,5 @@
 import type { Readable } from 'stream';
-import type { Options, Part, Arrayable } from './types';
+import type { Arrayable, Options, Part } from './types';
 
 const separator = '\r\n\r\n';
 
@@ -70,7 +70,12 @@ export async function* generate<T>(
 				is_eager ? yield tmp : payloads.push(tmp);
 
 				// hit a tail boundary, break
-				if (next.slice(0, 2).toString() === '--') break outer;
+				if (next.slice(0, 2).toString() === '--') {
+					if (payloads.length) {
+						yield payloads;
+					}
+					break outer;
+				}
 			}
 
 			buffer = next;
