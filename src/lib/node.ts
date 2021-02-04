@@ -11,9 +11,10 @@ export async function* generate<T>(
 	const len_boundary = Buffer.byteLength(boundary),
 		is_eager = !options || !options.multiple;
 
-	let last_index = 0;
-	let buffer = Buffer.alloc(0);
-	let is_preamble = true;
+	let buffer = Buffer.alloc(0),
+		last_index = 0,
+		is_preamble = true,
+		payloads = [];
 
 	outer: for await (const chunk of stream) {
 		let idx_boundary = buffer.length;
@@ -34,8 +35,7 @@ export async function* generate<T>(
 			}
 		}
 
-		const payloads = [];
-
+		payloads = [];
 		while (!!~idx_boundary) {
 			const current = buffer.slice(0, idx_boundary);
 			const next = buffer.slice(idx_boundary + len_boundary);
@@ -70,12 +70,7 @@ export async function* generate<T>(
 				is_eager ? yield tmp : payloads.push(tmp);
 
 				// hit a tail boundary, break
-				if (next.slice(0, 2).toString() === '--') {
-					if (payloads.length) {
-						yield payloads;
-					}
-					break outer;
-				}
+				if (next.slice(0, 2).toString() === '--') break outer;
 			}
 
 			buffer = next;
@@ -83,8 +78,8 @@ export async function* generate<T>(
 			idx_boundary = buffer.indexOf(boundary);
 		}
 
-		if (payloads.length) {
-			yield payloads;
-		}
+		if (payloads.length) yield payloads;
 	}
+
+	if (payloads.length) yield payloads;
 }
