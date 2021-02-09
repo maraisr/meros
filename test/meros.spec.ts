@@ -17,8 +17,8 @@ import {
 
 function testFor(
 	name: string,
-	meros: typeof merosNode,
-	responder: typeof mockResponseNode,
+	meros: typeof merosNode | typeof merosBrowser,
+	responder: typeof mockResponseNode | typeof mockResponseBrowser,
 ) {
 	const describe = (ns: string, cb: (t: Test) => void) => {
 		const t = suite(`${name}~${ns}`);

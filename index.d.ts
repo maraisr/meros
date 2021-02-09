@@ -16,8 +16,6 @@ type Part<Body, Fallback> =
 	| { json: false; headers: Record<string, string>; body: Fallback }
 	| { json: true; headers: Record<string, string>; body: Body };
 
-type Arrayable<T> = T | ReadonlyArray<T>;
-
 // Browser~
 
 declare function meros<T = object>(
@@ -50,7 +48,7 @@ declare function meros<T = object>(
 declare function meros<T = object>(
 	response: Response,
 	options?: Options,
-): Promise<Response | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
+): Promise<Response | AsyncGenerator<Part<T, Buffer>>>;
 
 // Node~
 
@@ -90,6 +88,6 @@ declare function meros<T = object>(
 declare function meros<T = object>(
 	response: IncomingMessage,
 	options?: Options,
-): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
+): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
 
 export { meros };

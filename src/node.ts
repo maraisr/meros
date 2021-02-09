@@ -1,10 +1,10 @@
 import type { IncomingMessage } from 'http';
 import { generate } from './lib/node';
-import type { Arrayable, Options, Part } from './lib/types';
+import type { Options, Part } from './lib/types';
 
 export function meros<T=object>(response: IncomingMessage, options: { multiple: true }): Promise<IncomingMessage | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
 export function meros<T=object>(response: IncomingMessage, options?: { multiple: false }): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
-export function meros<T=object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
+export function meros<T=object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
