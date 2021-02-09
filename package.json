@@ -1,7 +1,7 @@
 {
 	"name": "meros",
 	"version": "1.1.0",
-	"description": "A fast 633B utility that makes reading multipart responses simple",
+	"description": "A fast 610B utility that makes reading multipart responses simple",
 	"keywords": [
 		"defer",
 		"fetch",
@@ -50,7 +50,7 @@
 	"scripts": {
 		"bench": "node -r ts-node/register -r ./test/_polyfill.js bench/index.ts",
 		"build": "rollup -c",
-		"format": "prettier  --write --list-different \"{*,.github/**/*}.+(json|yml|md)\"",
+		"format": "prettier  --write --list-different \"{*,.github/**/*}.+(ts|json|yml|md)\"",
 		"prepublishOnly": "yarn build",
 		"test": "uvu -r ts-node/register -r ./test/_polyfill.js -i _polyfill -i mocks test",
 		"typecheck": "tsc --noEmit"
@@ -77,6 +77,7 @@
 	},
 	"devDependencies": {
 		"@marais/tsconfig": "0.0.1",
+		"@n1ru4l/push-pull-async-iterable-iterator": "^2.0.1",
 		"@rollup/plugin-node-resolve": "11.1.1",
 		"@types/benchmark": "2.1.0",
 		"@types/node": "14.14.25",

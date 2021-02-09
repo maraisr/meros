@@ -12,12 +12,11 @@ export async function* generate<T>(
 		is_eager = !options || !options.multiple;
 
 	let buffer = Buffer.alloc(0),
-		last_index = 0,
 		is_preamble = true,
 		payloads = [];
 
 	outer: for await (const chunk of stream) {
-		let idx_boundary = buffer.length;
+		let idx_boundary = buffer.byteLength;
 		buffer = Buffer.concat([buffer, chunk]);
 		const idx_chunk = (chunk as Buffer).indexOf(boundary);
 
@@ -26,13 +25,7 @@ export async function* generate<T>(
 			idx_boundary += idx_chunk;
 		} else {
 			// search combined (boundary can be across chunks)
-			idx_boundary = buffer.indexOf(boundary, last_index);
-
-			if (!~idx_boundary) {
-				// rewind a bit for next `indexOf`
-				last_index = buffer.length - chunk.length;
-				continue;
-			}
+			idx_boundary = buffer.indexOf(boundary);
 		}
 
 		payloads = [];
@@ -74,7 +67,6 @@ export async function* generate<T>(
 			}
 
 			buffer = next;
-			last_index = 0;
 			idx_boundary = buffer.indexOf(boundary);
 		}
 

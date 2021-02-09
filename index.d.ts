@@ -20,12 +20,18 @@ type Arrayable<T> = T | ReadonlyArray<T>;
 
 // Browser~
 
-declare function meros<T = object>(response: Response, options: {
-	multiple: true;
-}): Promise<Response | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
-declare function meros<T = object>(response: Response, options?: {
-	multiple: false;
-}): Promise<Response | AsyncGenerator<Part<T, Buffer>>>;
+declare function meros<T = object>(
+	response: Response,
+	options: {
+		multiple: true;
+	},
+): Promise<Response | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
+declare function meros<T = object>(
+	response: Response,
+	options?: {
+		multiple: false;
+	},
+): Promise<Response | AsyncGenerator<Part<T, Buffer>>>;
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
  * multipart body, then we'll resolve with {@link Response}.
@@ -41,16 +47,25 @@ declare function meros<T = object>(response: Response, options?: {
  * }
  * ```
  */
-declare function meros<T = object>(response: Response, options?: Options): Promise<Response | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
+declare function meros<T = object>(
+	response: Response,
+	options?: Options,
+): Promise<Response | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
 
 // Node~
 
-declare function meros<T = object>(response: IncomingMessage, options: {
-	multiple: true;
-}): Promise<IncomingMessage | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
-declare function meros<T = object>(response: IncomingMessage, options?: {
-	multiple: false;
-}): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
+declare function meros<T = object>(
+	response: IncomingMessage,
+	options: {
+		multiple: true;
+	},
+): Promise<IncomingMessage | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
+declare function meros<T = object>(
+	response: IncomingMessage,
+	options?: {
+		multiple: false;
+	},
+): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
  * multipart body, then we'll resolve with {@link IncomingMessage}.
@@ -72,6 +87,9 @@ declare function meros<T = object>(response: IncomingMessage, options?: {
  * }
  * ```
  */
-declare function meros<T = object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
+declare function meros<T = object>(
+	response: IncomingMessage,
+	options?: Options,
+): Promise<IncomingMessage | AsyncGenerator<Arrayable<Part<T, Buffer>>>>;
 
 export { meros };

@@ -12,7 +12,6 @@ export async function* generate<T>(
 		is_eager = !options || !options.multiple;
 
 	let buffer = '',
-		last_index = 0,
 		is_preamble = true,
 		payloads = [];
 
@@ -29,13 +28,7 @@ export async function* generate<T>(
 				idx_boundary += idx_chunk;
 			} else {
 				// search combined (boundary can be across chunks)
-				idx_boundary = buffer.indexOf(boundary, last_index);
-
-				if (!~idx_boundary) {
-					// rewind a bit for next `indexOf`
-					last_index = buffer.length - chunk.length;
-					continue;
-				}
+				idx_boundary = buffer.indexOf(boundary);
 			}
 
 			payloads = [];
@@ -77,7 +70,6 @@ export async function* generate<T>(
 				}
 
 				buffer = next;
-				last_index = 0;
 				idx_boundary = buffer.indexOf(boundary);
 			}
 

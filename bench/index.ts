@@ -6,7 +6,7 @@ import ItMultipart from 'it-multipart';
 import { equal } from 'uvu/assert';
 import { meros as merosBrowser } from '../src/browser';
 import { meros as merosNode } from '../src/node';
-import { mockResponseBrowser, mockResponseNode } from '../test/mocks';
+import { makePart, mockResponseBrowser, mockResponseNode, preamble, tail, wrap } from '../test/mocks';
 
 const parts = [
 	{ hello: 'world' },
@@ -20,14 +20,35 @@ const parts = [
 	},
 ];
 
-async function runner(name: string, candidates: Record<string, Function>) {
-	const n_parts = parts.reduce((result, item) => {
-		if (Array.isArray(item)) {
-			return [...result, ...item];
-		}
-		return [...result, item];
-	}, [] as any[]);
+const results = parts.reduce((result, item) => {
+	if (Array.isArray(item)) {
+		return [...result, ...item];
+	}
+	return [...result, item];
+}, [] as any[]);
 
+const chunks = [
+	[preamble, wrap],
+	...parts.map((v, i) => {
+		if (Array.isArray(v)) {
+			return v.map(v2 => [makePart(v2), wrap]).flat()
+		}
+
+		if (i === parts.length - 1) {
+			return [makePart(v), tail];
+		}
+
+		return [makePart(v), wrap];
+	}),
+];
+
+const chunk_gen = (async function* () {
+	for (const value of chunks) {
+		yield value;
+	}
+});
+
+async function runner(name: string, candidates: Record<string, Function>) {
 	const bench = new Suite().on('cycle', (e) => {
 		console.log('  ' + e.target);
 	});
@@ -36,7 +57,7 @@ async function runner(name: string, candidates: Record<string, Function>) {
 	for (const [name, fn] of Object.entries(candidates)) {
 		const result = await fn();
 		try {
-			equal(result, n_parts, 'should match reference patch set');
+			equal(result, results, 'should match reference patch set');
 			console.log(`✔`, name);
 		} catch (err) {
 			console.log('✘', name, `(FAILED @ "${err.message}")`);
@@ -60,10 +81,8 @@ async function runner(name: string, candidates: Record<string, Function>) {
 	});
 }
 
-const mock_args = [parts, '-', false];
-
-const do_node_call = mockResponseNode.bind(null, ...mock_args);
-const do_browser_call = mockResponseBrowser.bind(null, ...mock_args);
+const do_node_call = mockResponseNode.bind(null, chunk_gen(), '-');
+const do_browser_call = mockResponseBrowser.bind(null, chunk_gen(), '-');
 
 global['fetch'] = async function (url, options) {
 	return do_browser_call();
