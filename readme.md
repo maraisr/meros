@@ -36,7 +36,7 @@ yarn add meros
 // Rely on bundler/environment dection
 import { meros } from 'meros';
 
-const parts = await fetch('/fetch-multipart').then(meros);
+const parts = await fetch('/api').then(meros);
 
 // As a simple Async Generator
 for await (const part of parts) {
@@ -58,7 +58,7 @@ from(parts).pipe(
 import { meros } from 'meros/browser';
 // import { meros } from 'https://cdn.skypack.dev/meros';
 
-const parts = await fetch('/fetch-multipart').then(meros);
+const parts = await fetch('/api').then(meros);
 
 // Node
 import http from 'http';
@@ -99,40 +99,27 @@ collide with things from the body:
 
 ## 🔎 API
 
-### _Browser_
+Meros offers two flavours, both for the browser and for node; but their api's
+are fundamentally the same.
+
+> **Note:** The type `Response` is used loosely here and simply alludes to
+> Node's `IncomingMessage` or the browser's `Response` type.
+
+### `meros(response: Response, options?: Options)`
+
+Returns: `Promise<Response | AsyncGenerator<Part | Part[]>`
+
+Meros returns a promise that will resolve to an `AsyncGenerator` if the response
+is of `multipart/mixed` mime, or simply returns the `Response` if something
+else; helpful for middlewares. The idea here being that you run meros as a chain
+off fetch.
 
 ```ts
-function meros<T = object>(
-  response: Response,
-): Promise<
-  | Response
-  | AsyncGenerator<
-      | { json: true; headers: Record<string, string>; body: T }
-      | { json: false; headers: Record<string, string>; body: string }
-    >
->;
+fetch('/api').then(meros);
 ```
 
-### _Node_
-
-```ts
-function meros<T = object>(
-  response: IncomingMessage,
-): Promise<
-  | IncomingMessage
-  | AsyncGenerator<
-      | { json: true; headers: Record<string, string>; body: T }
-      | { json: false; headers: Record<string, string>; body: Buffer }
-    >
->;
-```
-
-Returns an async generator that yields on every part. Worth noting that if
-multiple parts are present in one chunk, each part will yield independently.
-
-> If the `content-type` is **NOT** a multipart, then it will resolve with the
-> response argument. Or really any unhandled cases, we'll resolve with the
-> response.
+> If the `content-type` is **NOT** a multipart, then meros will resolve with the
+> response argument.
 >
 > <details>
 > <summary>Example on how to handle this case</summary>
@@ -140,7 +127,7 @@ multiple parts are present in one chunk, each part will yield independently.
 > ```ts
 > import { meros } from 'meros';
 >
-> const response = await fetch('/fetch-multipart'); // Assume this returns json
+> const response = await fetch('/api'); // Assume this returns json
 > const parts = await meros(response);
 >
 > if (parts[Symbol.asyncIterator] < 'u') {
@@ -154,6 +141,40 @@ multiple parts are present in one chunk, each part will yield independently.
 >
 > </details>
 
+each `Part` gives you access to:
+
+- `json: boolean` ~ Tells you the `body` would be a JavaScript object of your
+  defined generic `T`.
+- `headers: object` ~ A key-value pair of all headers discovered from this part.
+- `body: T | Fallback` ~ Is the _body_ of the part, either as a JavaScript
+  object (noted by `json`) _or_ the base type of the environment
+  (`Buffer | string`, for Node and Browser respectively).
+
+#### `options.multiple: boolean`
+
+Default: `false`
+
+Setting this to `true` will yield once for all available parts of a chunk,
+rather than yielding once per part. This is an optimization technique for
+technologies like GraphQL where rather than commit the payload to the store, to
+be added-to in the next process-tick we can simply do that synchronously.
+
+> **Important:** This will alter the behaviour and yield arrays—than yield
+> payloads.
+
+```ts
+const chunks = await fetch('/api').then((response) =>
+  meros(response, { multiple: true }),
+);
+
+// As a simple Async Generator
+for await (const parts of chunks) {
+  for (const part of parts) {
+    // Do something with this part, maybe aggregate?
+  }
+}
+```
+
 ## 💨 Benchmark
 
 ```
@@ -162,19 +183,19 @@ Validation :: node
 ✘ it-multipart (FAILED @ "should match reference patch set")
 
 Benchmark :: node
-  meros                     x 27,567 ops/sec ±2.04% (77 runs sampled)
-  it-multipart              x 16,064 ops/sec ±1.20% (79 runs sampled)
+  meros                     x 289,318 ops/sec ±1.21% (81 runs sampled)
+  it-multipart              x 173,136 ops/sec ±0.85% (80 runs sampled)
 
 Validation :: browser
 ✔ meros
 ✘ fetch-multipart-graphql (FAILED @ "should match reference patch set")
 
 Benchmark :: browser
-  meros                     x 30,077 ops/sec ±0.92% (80 runs sampled)
-  fetch-multipart-graphql   x 25,551 ops/sec ±1.44% (81 runs sampled)
+  meros                     x 1,000,417 ops/sec ±1.41% (81 runs sampled)
+  fetch-multipart-graphql   x 353,207 ops/sec ±0.92% (83 runs sampled)
 ```
 
-> Ran with Node v15.1.0
+> Ran with Node v15.8.0
 
 ## ❤ Thanks
 

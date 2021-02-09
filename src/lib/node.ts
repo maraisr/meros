@@ -1,20 +1,22 @@
 import type { Readable } from 'stream';
-import type { Part } from './types';
+import type { Arrayable, Options, Part } from './types';
 
 const separator = '\r\n\r\n';
 
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
-): AsyncGenerator<Part<T, Buffer>> {
-	const len_boundary = Buffer.byteLength(boundary);
+	options?: Options
+): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
+	const len_boundary = Buffer.byteLength(boundary),
+		is_eager = !options || !options.multiple;
 
-	let last_index = 0;
-	let buffer = Buffer.alloc(0);
-	let is_preamble = true;
+	let buffer = Buffer.alloc(0),
+		is_preamble = true,
+		payloads = [];
 
 	outer: for await (const chunk of stream) {
-		let idx_boundary = buffer.length;
+		let idx_boundary = buffer.byteLength;
 		buffer = Buffer.concat([buffer, chunk]);
 		const idx_chunk = (chunk as Buffer).indexOf(boundary);
 
@@ -23,15 +25,10 @@ export async function* generate<T>(
 			idx_boundary += idx_chunk;
 		} else {
 			// search combined (boundary can be across chunks)
-			idx_boundary = buffer.indexOf(boundary, last_index);
-
-			if (!~idx_boundary) {
-				// rewind a bit for next `indexOf`
-				last_index = buffer.length - chunk.length;
-				continue;
-			}
+			idx_boundary = buffer.indexOf(boundary);
 		}
 
+		payloads = [];
 		while (!!~idx_boundary) {
 			const current = buffer.slice(0, idx_boundary);
 			const next = buffer.slice(idx_boundary + len_boundary);
@@ -50,27 +47,31 @@ export async function* generate<T>(
 					headers[tmp.shift().toLowerCase()] = tmp.join(': ');
 				}
 
-				let body = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+				let body: T | Buffer = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 				let is_json = false;
 
 				tmp = headers['content-type'];
 				if (tmp && !!~tmp.indexOf('application/json')) {
 					try {
-						body = JSON.parse(body.toString());
+						body = JSON.parse(body.toString()) as T;
 						is_json = true;
 					} catch (_) {
 					}
 				}
 
-				// @ts-ignore
-				yield { headers, body, json: is_json };
+				tmp = { headers, body, json: is_json };
+				is_eager ? yield tmp : payloads.push(tmp);
 
+				// hit a tail boundary, break
 				if (next.slice(0, 2).toString() === '--') break outer;
 			}
 
 			buffer = next;
-			last_index = 0;
 			idx_boundary = buffer.indexOf(boundary);
 		}
+
+		if (payloads.length) yield payloads;
 	}
+
+	if (payloads.length) yield payloads;
 }

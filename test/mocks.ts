@@ -2,99 +2,70 @@
 
 import type { IncomingMessage } from 'http';
 
-export function makeChunk(
-	payload: any,
-	boundary: string,
-	contentType: string = 'application/json',
-) {
-	const chunk = Buffer.from(
-		contentType === 'text/plain' ? payload : JSON.stringify(payload),
-		'utf8',
-	);
+type Part = string;
+
+export const wrap = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}\r\n`;
+export const tail = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}--\r\n`;
+export const preamble = () => 'preamble';
+
+export const makePart = (payload: any): Part => {
 	const returns = [
-		`Content-Type: ${contentType}`,
+		`content-type: ${
+			typeof payload === 'string' ? 'text/plain' : 'application/json'
+		}`,
 		'',
-		chunk,
+		Buffer.from(
+			typeof payload === 'string' ? payload : JSON.stringify(payload),
+			'utf8',
+		),
 	];
 
 	return returns.join('\r\n');
-}
+};
 
-function* makePatches(
-	parts: (string | object | (string | object)[])[],
-	boundary: string,
-	rambo: true,
-) {
-	const boundary_wrap = `\r\n--${boundary}\r\n`;
-	const patches = parts.map((part) => {
-		if (Array.isArray(part))
-			return part
-				.map((p) =>
-					makeChunk(
-						p,
-						boundary,
-						typeof p === 'string'
-							? 'text/plain'
-							: 'application/json',
-					),
-				)
-				.join(boundary_wrap);
-		return makeChunk(
-			part,
-			boundary,
-			typeof part === 'string' ? 'text/plain' : 'application/json',
-		);
-	});
-
-	yield Buffer.from('preamble');
-	yield Buffer.from(boundary_wrap);
-
-	const len = patches.length;
-	let c = 0;
-	for (const patch of patches) {
-		if (rambo) {
-			const toSend = Math.ceil(patch.length / 9);
-			for (let i = 0, o = 0; i < toSend; ++i, o += 9) {
-				const ct = patch.substr(o, 9);
-				yield Buffer.from(ct);
-			}
-		} else {
-			yield Buffer.from(patch);
-		}
-		if (c < len-1) {
-			yield Buffer.from(boundary_wrap);
-		}
-		++c;
+export const splitString = (str: Part, count: number): string[] => {
+	const length = str.length,
+		chunks = new Array(count),
+		chars = Math.floor(length / count);
+	for (let f = 0, n = chars, i = 0; i < count; i++) {
+		chunks[i] = str.slice(f, i === count - 1 ? undefined : n);
+		f = n;
+		n = f + chars;
 	}
+	return chunks;
+};
 
-	yield Buffer.from(`\r\n--${boundary}--\r\n`);
+const processChunk = (chunk: string[], boundary: string) => {
+	return Buffer.from(
+		chunk
+			.map((v) => {
+				if (typeof v === 'function') v = v(boundary);
+				return v;
+			})
+			.join(''),
+	);
+};
 
-	yield Buffer.from('epilogue\r\n');
-	yield Buffer.from(makeChunk({ shouldnt: 'work' }, boundary));
-}
-
-export async function mockResponseNode(
-	parts: (string | object | (string | object)[])[],
+export async function mockResponseNode<T>(
+	chunks: AsyncIterableIterator<T>,
 	boundary: string,
-	rambo: boolean = true,
 ): Promise<IncomingMessage> {
 	return {
 		headers: {
 			'content-type': `multipart/mixed; boundary=${boundary}`,
+			'Content-Type': `multipart/mixed; boundary=${boundary}`,
 		},
-		[Symbol.asyncIterator]: makePatches.bind(
-			null,
-			parts,
-			boundary.replace(/['"]/g, ''),
-			rambo,
-		),
+		[Symbol.asyncIterator]: async function* () {
+			for await (let chunk of chunks) {
+				yield processChunk(chunk, boundary);
+			}
+		},
 	};
 }
 
-export async function mockResponseBrowser(
-	parts: (string | object | (string | object)[])[],
+export async function mockResponseBrowser<T>(
+	chunks: AsyncIterableIterator<T>,
 	boundary: string,
-	rambo: boolean = true,
 ): Promise<Response> {
 	return {
 		headers: new Map([
@@ -104,14 +75,15 @@ export async function mockResponseBrowser(
 		status: 200,
 		body: {
 			getReader() {
-				const patches = makePatches(
-					parts,
-					boundary.replace(/['"]/g, ''),
-					rambo,
-				);
 				return {
 					async read() {
-						return patches.next();
+						const { value: chunk, done } = await chunks.next();
+						return {
+							value: chunk
+								? processChunk(chunk, boundary)
+								: undefined,
+							done,
+						};
 					},
 					releaseLock() {
 						// nothing

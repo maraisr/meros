@@ -1,167 +1,365 @@
 // @ts-nocheck
 
-import { suite } from 'uvu';
+import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
+import { suite, Test } from 'uvu';
 import * as assert from 'uvu/assert';
 import { meros as merosBrowser } from '../src/browser';
 import { meros as merosNode } from '../src/node';
-import { mockResponseBrowser, mockResponseNode } from './mocks';
+import {
+	makePart,
+	mockResponseBrowser,
+	mockResponseNode,
+	preamble,
+	splitString,
+	tail,
+	wrap,
+} from './mocks';
 
-function test(
+function testFor(
 	name: string,
-	mod: typeof merosNode | typeof merosBrowser,
-	responder: typeof mockResponseNode | typeof mockResponseNode,
+	meros: typeof merosNode,
+	responder: typeof mockResponseNode,
 ) {
-	const tester = suite(name);
+	const describe = (ns: string, cb: (t: Test) => void) => {
+		const t = suite(`${name}~${ns}`);
+		cb(t);
+		t.run();
+	};
 
-	tester('exports', () => {
-		assert.type(mod, 'function');
-	});
+	// ---
 
-	tester('should yield single chunk', async () => {
-		const response = await responder([{ foo: 'bar' }], 'abc123');
+	const multiPayloadMultiChunk = async (boundary) => {
+		try {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, boundary);
 
-		const parts = await mod(response);
-		const collection = [];
+			const part = [
+				preamble(),
+				wrap(boundary),
+				makePart({
+					foo: 'bar',
+				}),
+				wrap(boundary),
+				makePart({
+					bar: 'baz',
+				}),
+				tail(boundary),
+			];
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			const split_parts = splitString(part.join(''), 11);
+
+			const parts = await meros(response);
+			const collection = [];
+
+			for (const chunk of split_parts) {
+				pushValue([chunk]);
+			}
+
+			for await (let { body: part } of parts) {
+				collection.push(part);
+			}
+
+			assert.equal(collection, [{ foo: 'bar' }, { bar: 'baz' }]);
+		} catch (e) {
+			console.log(e);
 		}
+	};
 
-		assert.is(collection.length, 1, 'it should have yield\'d once');
-		assert.equal(collection, [{ foo: 'bar' }]);
+	describe('api', (t) => {
+		t('should export a function', () => {
+			assert.type(meros, 'function');
+		});
+
+		t('should resolve to an AsyncGenerator', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+			const parts = await meros(response);
+
+			assert.type(parts[Symbol.asyncIterator], 'function');
+		});
+
+		t('should cleanup when `?.returns` fires', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+			const parts = await meros(response);
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({
+					foo: 'bar',
+				}),
+				wrap,
+			]);
+
+			let r = await parts.next();
+			assert.equal(r.done, false);
+			assert.equal(r.value.body, { foo: 'bar' });
+
+			await asyncIterableIterator.return();
+
+			pushValue([
+				makePart({
+					foo: 'bar',
+				}),
+				tail,
+			]);
+
+			r = await parts.next();
+			assert.equal(r.done, true);
+			assert.equal(r.value, undefined);
+		});
 	});
 
-	tester('should yield cross chunk', async () => {
-		const response = await responder(
-			[[{ foo: 'bar' }, { bar: 'baz' }]],
-			'abc123',
-		);
+	describe('processing', (t) => {
+		t('should yield single payload single chunk', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
 
-		const parts = await mod(response);
-		const collection = [];
+			const parts = await meros(response);
+			const collection = [];
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
+			pushValue([
+				preamble,
+				wrap,
+				makePart({
+					foo: 'bar',
+				}),
+				tail,
+			]);
 
-		assert.is(collection.length, 2, 'it should have yield\'d twice');
-		assert.equal(collection, [{ foo: 'bar' }, { bar: 'baz' }]);
+			for await (let { body: part } of parts) {
+				collection.push(part);
+			}
+
+			assert.equal(collection, [{ foo: 'bar' }]);
+		});
+
+		t('should yield single payload cross chunk', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const part = makePart({
+				foo: 'bar',
+			});
+			const split_parts = splitString(part, 2);
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([preamble, wrap, split_parts[0]]);
+
+			pushValue([split_parts[1], tail]);
+
+			for await (let { body: part } of parts) {
+				collection.push(part);
+			}
+
+			assert.equal(collection, [{ foo: 'bar' }]);
+		});
+
+		t('should yield multiple payload single chunk', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({
+					foo: 'bar',
+				}),
+				wrap,
+				makePart({
+					bar: 'baz',
+				}),
+				tail,
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(part);
+			}
+
+			assert.equal(collection, [{ foo: 'bar' }, { bar: 'baz' }]);
+		});
+
+		t('should yield multiple payload cross chunk', async () => {
+			await multiPayloadMultiChunk('-');
+		});
+
+		t('should return array when multi true', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+			const parts = await meros(response, { multiple: true });
+
+			pushValue([preamble, wrap, makePart({ foo: 'bar' }), wrap]);
+
+			let { value } = await parts.next();
+			assert.is(Array.isArray(value), true);
+			assert.equal(value, [
+				{
+					headers: {
+						'content-type': 'application/json',
+					},
+					body: { foo: 'bar' },
+					json: true,
+				},
+			]);
+
+			pushValue([
+				makePart({ bar: 'baz' }),
+				wrap,
+				makePart({ foo: 'bliz' }),
+				tail,
+			]);
+
+			value = (await parts.next()).value;
+			assert.is(Array.isArray(value), true);
+			assert.equal(
+				value.map((i) => i.body),
+				[{ bar: 'baz' }, { foo: 'bliz' }],
+			);
+		});
 	});
 
-	tester('should yield for single chunk multi parts', async () => {
-		const response = await responder(
-			[[{ foo: 'bar' }, { bar: 'baz' }]],
-			'abc123',
-			false,
-		);
+	describe('body', (t) => {
+		t('should yield json and plaintext', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
 
-		const parts = await mod(response);
-		const collection = [];
+			const parts = await meros(response);
+			const collection = [];
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
+			pushValue([
+				preamble,
+				wrap,
+				makePart({
+					foo: 'bar',
+				}),
+				wrap,
+				makePart('bar: baz'),
+				tail,
+			]);
 
-		assert.is(collection.length, 2, 'it should have yield\'d twice');
-		assert.equal(collection, [{ foo: 'bar' }, { bar: 'baz' }]);
-	});
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
 
-	tester('should see plain text and json separately', async () => {
-		const response = await responder(
-			[{ foo: 'bar' }, 'baz', { baz: 'foo' }],
-			'-',
-		);
+			assert.equal(collection, [{ foo: 'bar' }, 'bar: baz']);
+		});
 
-		const parts = await mod(response);
-		const collection = [];
+		t('should allow unicode body', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
+			const parts = await meros(response);
+			const collection = [];
 
-		assert.is(collection.length, 3, 'it should have yield\'d three times');
-		assert.equal(collection, [{ foo: 'bar' }, 'baz', { baz: 'foo' }]);
-	});
+			pushValue([preamble, wrap, makePart('🚀'), wrap]);
 
-	tester('should allow unicode body', async () => {
-		const response = await responder(['👀'], 'abc123');
+			pushValue([makePart('😎'), tail]);
 
-		const parts = await mod(response);
-		const collection = [];
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
+			assert.equal(collection, ['🚀', '😎']);
+		});
 
-		assert.is(collection.length, 1, 'it should have yield\'d once');
-		assert.equal(collection[0], '👀');
-	});
+		t('should retain newlines', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
 
-	/*
-	Because of:
-	The boundary parameter, which consists of 1 to 70 characters from a set of characters known to be very robust through mail gateways, and NOT ending with white space.
+			const parts = await meros(response);
+			const collection = [];
 
-	That would make unicode like emoji... fairly robust?
-	 */
-	tester('should allow unicode boundary', async () => {
-		const response = await responder(['howdy', 'teddy bear'], '😘');
+			pushValue([
+				preamble,
+				wrap,
+				makePart(`foo
 
-		const parts = await mod(response);
-		const collection = [];
+bar
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
+`),
+				wrap,
+				makePart('bar: baz\n'),
+				tail,
+			]);
 
-		assert.is(collection.length, 2, 'it should have yield\'d twice');
-		assert.equal(collection, ['howdy', 'teddy bear']);
-	});
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
 
-	tester('should handle quoted boundaries', async () => {
-		const response = await responder(
-			['howdy', 'teddy bear'],
-			'"test-boundary"',
-		);
+			assert.equal(collection, [
+				`foo
 
-		const parts = await mod(response);
-		const collection = [];
+bar
 
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
-
-		assert.is(collection.length, 2, 'it should have yield\'d twice');
-		assert.equal(collection, ['howdy', 'teddy bear']);
-	});
-
-	tester('should hand newline plaintext', async () => {
-		const response = await responder(
-			[
-				`hello
-world
 `,
-			],
-			'"test-boundary"',
-		);
-
-		const parts = await mod(response);
-		const collection = [];
-
-		for await (let { body: part } of parts) {
-			collection.push(Buffer.isBuffer(part) ? part.toString() : part);
-		}
-
-		assert.equal(collection.length, 1);
-		assert.equal(
-			collection[0],
-			`hello
-world
+				`bar: baz
 `,
-		);
+			]);
+		});
 	});
 
-	return tester;
+	describe('boundary', (t) => {
+		t('should allow complex', async () => {
+			await multiPayloadMultiChunk('abc123');
+		});
+
+		t('should allow really long boundary', async () => {
+			await multiPayloadMultiChunk(
+				'abcdefghijklmnopqrstuvwxyz_abcdefghijklmnopqrstuvwxyz',
+			);
+		});
+
+		/*
+		Because of:
+		The boundary parameter, which consists of 1 to 70 characters from a set of characters known to be very robust through mail gateways, and NOT ending with white space.
+
+		That would make unicode like emoji... fairly robust?
+		*/
+		t('should allow unicode', async () => {
+			await multiPayloadMultiChunk('✨');
+		});
+
+		t('should allow quoted', async () => {
+			await multiPayloadMultiChunk('"boundary"');
+		});
+	});
 }
 
-test('node', merosNode, mockResponseNode).run();
-test('browser', merosBrowser, mockResponseBrowser).run();
+testFor('node', merosNode, mockResponseNode);
+testFor('browser', merosBrowser, mockResponseBrowser);

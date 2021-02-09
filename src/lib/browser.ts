@@ -1,4 +1,4 @@
-import type { Part } from './types';
+import type { Arrayable, Options, Part } from './types';
 
 const separator = '\r\n\r\n';
 const decoder = new TextDecoder;
@@ -6,11 +6,14 @@ const decoder = new TextDecoder;
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
-): AsyncGenerator<Part<T, string>> {
-	const reader = stream.getReader();
-	let buffer = '';
-	let last_index = 0;
-	let is_preamble = true;
+	options?: Options
+): AsyncGenerator<Arrayable<Part<T, string>>> {
+	const reader = stream.getReader(),
+		is_eager = !options || !options.multiple;
+
+	let buffer = '',
+		is_preamble = true,
+		payloads = [];
 
 	try {
 		let result: ReadableStreamReadResult<Uint8Array>;
@@ -25,15 +28,10 @@ export async function* generate<T>(
 				idx_boundary += idx_chunk;
 			} else {
 				// search combined (boundary can be across chunks)
-				idx_boundary = buffer.indexOf(boundary, last_index);
-
-				if (!~idx_boundary) {
-					// rewind a bit for next `indexOf`
-					last_index = buffer.length - chunk.length;
-					continue;
-				}
+				idx_boundary = buffer.indexOf(boundary);
 			}
 
+			payloads = [];
 			while (!!~idx_boundary) {
 				const current = buffer.substring(0, idx_boundary);
 				const next = buffer.substring(idx_boundary + boundary.length);
@@ -52,30 +50,33 @@ export async function* generate<T>(
 						headers[tmp.shift().toLowerCase()] = tmp.join(': ');
 					}
 
-					let body = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+					let body: T | string = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
 					let is_json = false;
 
 					tmp = headers['content-type'];
 					if (tmp && !!~tmp.indexOf('application/json')) {
 						try {
-							body = JSON.parse(body);
+							body = JSON.parse(body) as T;
 							is_json = true;
 						} catch (_) {
 						}
 					}
 
-					// @ts-ignore
-					yield { headers, body, json: is_json };
+					tmp = { headers, body, json: is_json };
+					is_eager ? yield tmp : payloads.push(tmp);
 
+					// hit a tail boundary, break
 					if (next.substring(0, 2) === '--') break outer;
 				}
 
 				buffer = next;
-				last_index = 0;
 				idx_boundary = buffer.indexOf(boundary);
 			}
+
+			if (payloads.length) yield payloads;
 		}
 	} finally {
+		if (payloads.length) yield payloads;
 		reader.releaseLock();
 	}
 }
