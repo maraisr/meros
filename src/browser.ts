@@ -1,9 +1,9 @@
 import { generate } from './lib/browser';
 import type { Options, Part } from './lib/types';
 
-export function meros<T=object>(response: Response, options: { multiple: true }): Promise<Response | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
-export function meros<T=object>(response: Response, options?: { multiple: false }): Promise<Response | AsyncGenerator<Part<T, Buffer>>>;
-export function meros<T=object>(response: Response, options?: Options): Promise<Response | AsyncGenerator<Part<T, Buffer>>>;
+export function meros<T=object>(response: Response, options: { multiple: true }): Promise<Response | AsyncGenerator<ReadonlyArray<Part<T, string>>>>;
+export function meros<T=object>(response: Response, options?: { multiple: false }): Promise<Response | AsyncGenerator<Part<T, string>>>;
+export function meros<T=object>(response: Response, options?: Options): Promise<Response | AsyncGenerator<Part<T, string>>>;
 
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the response isn't a
