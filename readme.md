@@ -18,10 +18,11 @@
 ## ⚡ Features
 
 - No dependencies
+- Seemless api
 - Super [performant](#-benchmark)
 - Supports _any_<sup>1</sup> `content-type`
 - _preamble_ and _epilogue_ don't yield
-- Browser-Compatible
+- Browser/Node Compatible
 - Plugs into existing libraries like Relay and rxjs
 
 ## ⚙️ Install
@@ -33,7 +34,7 @@ yarn add meros
 ## 🚀 Usage
 
 ```ts
-// Rely on bundler/environment dection
+// Relies on bundler/environment detection
 import { meros } from 'meros';
 
 const parts = await fetch('/api').then(meros);
@@ -53,19 +54,23 @@ from(parts).pipe(
 
 ## _Specific Environment_
 
+#### _Browser_
+
 ```ts
-// Browser
 import { meros } from 'meros/browser';
 // import { meros } from 'https://cdn.skypack.dev/meros';
 
 const parts = await fetch('/api').then(meros);
+```
 
-// Node
+#### _Node_
+
+```ts
 import http from 'http';
 import { meros } from 'meros/node';
 
 const response = await new Promise((resolve) => {
-  const request = http.get(`http://my-domain/mock-ep`, (response) => {
+  const request = http.get(`http://example.com/api`, (response) => {
     resolve(response);
   });
   request.end();
@@ -73,29 +78,6 @@ const response = await new Promise((resolve) => {
 
 const parts = await meros(response);
 ```
-
-## 🎒 Notes
-
-This library aims to implement [RFC1341] in its entirety, however we aren't
-there yet. That being said, you may very well use this library in other
-scenarios like streaming in file form uploads.
-
-Please note; be sure to define a boundary that can be guaranteed to never
-collide with things from the body:
-
-> _Because encapsulation boundaries must not appear in the body parts being
-> encapsulated, a user agent must exercise care to choose a unique boundary._
->
-> <small>~ [RFC1341] 7.2.1</small>
-
-- `meros` comes from Ancient Greek μέρος méros, meaning "part".
-
-### _Caveats_
-
-- No support the `/alternative` , `/digest` _or_ `/parallel` subtype at this
-  time.
-- No support for
-  [nested multiparts](https://tools.ietf.org/html/rfc1341#appendix-C)
 
 ## 🔎 API
 
@@ -127,7 +109,7 @@ fetch('/api').then(meros);
 > ```ts
 > import { meros } from 'meros';
 >
-> const response = await fetch('/api'); // Assume this returns json
+> const response = await fetch('/api'); // Assume this isnt multipart
 > const parts = await meros(response);
 >
 > if (parts[Symbol.asyncIterator] < 'u') {
@@ -196,6 +178,25 @@ Benchmark :: browser
 ```
 
 > Ran with Node v15.8.0
+
+## 🎒 Notes
+
+Why the name? _meros_ comes from Ancient Greek μέρος méros, meaning "part".
+
+This library aims to implement [RFC1341] in its entirety, however we aren't
+there yet. That being said, you may very well use this library in other
+scenarios like streaming in file form uploads.
+
+Another goal here is to aide in being the defacto standard transport library to
+support
+[`@defer` and `@stream` GraphQL directives](https://foundation.graphql.org/news/2020/12/08/improving-latency-with-defer-and-stream-directives/)
+
+### _Caveats_
+
+- No support the `/alternative` , `/digest` _or_ `/parallel` subtype at this
+  time.
+- No support for
+  [nested multiparts](https://tools.ietf.org/html/rfc1341#appendix-C)
 
 ## ❤ Thanks
 
