@@ -62,7 +62,7 @@ export async function* generate<T>(
 						}
 					}
 
-					tmp = { headers, body, json: is_json };
+					tmp = { headers, body, json: is_json } as Part<T, string>;
 					is_eager ? yield tmp : payloads.push(tmp);
 
 					// hit a tail boundary, break
