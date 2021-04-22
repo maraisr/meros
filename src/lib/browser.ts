@@ -16,7 +16,7 @@ export async function* generate<T>(
 		payloads = [];
 
 	try {
-		let result: ReadableStreamReadResult<Uint8Array>;
+		let result: ReadableStreamDefaultReadResult<Uint8Array>;
 		outer: while (!(result = await reader.read()).done) {
 			const chunk = decoder.decode(result.value);
 			const idx_chunk = chunk.indexOf(boundary);
