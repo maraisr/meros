@@ -2,7 +2,7 @@ name: CI
 
 on:
     push:
-        branches: [main, new]
+        branches: [main]
     pull_request: {}
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                nodejs: [12, 14, 15]
+                nodejs: [12, 14, 15, 16]
         steps:
             - uses: actions/checkout@main
             - uses: actions/setup-node@main
@@ -49,9 +49,7 @@ jobs:
               run: yarn bench
 
             - name: Report
-              if: matrix.nodejs >= 15
+              if: matrix.nodejs >= 16
               run: |-
                   nyc report --reporter=text-lcov > coverage.lcov;
                   bash <(curl -s https://codecov.io/bash);
-              env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
