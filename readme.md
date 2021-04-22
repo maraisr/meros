@@ -3,8 +3,8 @@
 	<p align="center"><code>yarn add meros</code> makes reading multipart responses simple</p>
 	<hr />
 	<span>
-		<a href="https://github.com/maraisr/meros/actions?query=workflow:CI+branch:main">
-			<img src="https://github.com/maraisr/meros/workflows/CI/badge.svg?query=branch:main"/>
+		<a href="https://github.com/maraisr/meros/actions/workflows/ci.yml">
+			<img src="https://github.com/maraisr/meros/actions/workflows/ci.yml/badge.svg"/>
 		</a>
 		<a href="https://npm.im/meros">
 			<img src="https://img.shields.io/npm/dm/meros" alt="downloads"/>
