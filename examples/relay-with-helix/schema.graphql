@@ -2,8 +2,12 @@ schema {
 	query: Query
 }
 
+type Alphabet {
+	char: String!
+}
+
 type Query {
-	alphabet: [String]
+	alphabet: [Alphabet!]!
 	song: Song
 }
 
@@ -13,3 +17,4 @@ type Song {
 }
 
 directive @defer(label: String, if: Boolean = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+directive @stream(label: String, initial_count: Int!, if: Boolean = true) on FIELD

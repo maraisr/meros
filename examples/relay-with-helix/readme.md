@@ -7,13 +7,13 @@ Example demonstrating how `meros` can be used to stream defer'd GraphQL patches 
 1. Install
 
 ```sh
-yarn
+pnpm i
 ```
 
 2. Start
 
 ```sh
-yarn start
+pnpm run start
 ```
 
 3. Load up:

@@ -1,47 +1,54 @@
-const polka = require('polka');
-const morgan = require('morgan');
-const { json } = require('@polka/parse');
-const cors = require('cors')();
+const polka = require("polka");
+const morgan = require("morgan");
+const { json } = require("@polka/parse");
+const cors = require("cors")();
 const {
 	getGraphQLParameters,
 	processRequest,
 	renderGraphiQL,
 	shouldRenderGraphiQL,
-} = require('graphql-helix');
+} = require("graphql-helix");
 const {
 	GraphQLList,
 	GraphQLObjectType,
 	GraphQLSchema,
 	GraphQLString,
-} = require('graphql');
+} = require("graphql");
 
 const schema = new GraphQLSchema({
 	query: new GraphQLObjectType({
-		name: 'Query',
+		name: "Query",
 		fields: () => ({
 			alphabet: {
-				type: new GraphQLList(GraphQLString),
+				type: new GraphQLList(new GraphQLObjectType({
+					name: "Alphabet",
+					fields: {
+						char: {
+							type: GraphQLString,
+						},
+					},
+				})),
 				resolve: async function* () {
 					for (let letter = 65; letter <= 90; letter++) {
-						await new Promise((resolve) => setTimeout(resolve, 1000));
-						yield String.fromCharCode(letter);
+						await new Promise((resolve) => setTimeout(resolve, 500));
+						yield { char: String.fromCharCode(letter) };
 					}
 				},
 			},
 			song: {
 				type: new GraphQLObjectType({
-					name: 'Song',
+					name: "Song",
 					fields: () => ({
 						firstVerse: {
 							type: GraphQLString,
-							resolve: () => 'Now I know my ABC\'s.',
+							resolve: () => "Now I know my ABC's.",
 						},
 						secondVerse: {
 							type: GraphQLString,
 							resolve: () =>
 								new Promise((resolve) =>
 									setTimeout(
-										() => resolve('Next time won\'t you sing with me?'),
+										() => resolve("Next time won't you sing with me?"),
 										5000,
 									),
 								),
@@ -49,15 +56,15 @@ const schema = new GraphQLSchema({
 					}),
 				}),
 				resolve: () =>
-					new Promise((resolve) => setTimeout(() => resolve('goodbye'), 1000)),
+					new Promise((resolve) => setTimeout(() => resolve("goodbye"), 1000)),
 			},
 		}),
 	}),
 });
 
 polka()
-	.use(morgan('[:method] :url :status :res[content-type] in :response-time ms'), cors, json())
-	.use('/graphql', async (req, res) => {
+	.use(morgan("[:method] :url :status :res[content-type] in :response-time ms"), cors, json())
+	.use("/graphql", async (req, res) => {
 		const request = {
 			body: req.body,
 			headers: req.headers,
@@ -68,7 +75,10 @@ polka()
 		if (shouldRenderGraphiQL(request)) {
 			res.end(renderGraphiQL());
 		} else {
-			const { operationName, query, variables } = getGraphQLParameters(request);
+			let { operationName, query, variables } = getGraphQLParameters(request);
+
+			// BEWARE HACKS
+			query = query.replace("initial_count", "initialCount");
 
 			const result = await processRequest({
 				operationName,
@@ -78,41 +88,43 @@ polka()
 				schema,
 			});
 
-			if (result.type === 'RESPONSE') {
+			if (result.type === "RESPONSE") {
 				result.headers.forEach(({ name, value }) => res.setHeader(name, value));
 				res.writeHead(result.status, {
-					'Content-Type': 'application/json',
+					"Content-Type": "application/json",
 				});
 				res.end(JSON.stringify(result.payload));
-			} else if (result.type === 'MULTIPART_RESPONSE') {
+			} else if (result.type === "MULTIPART_RESPONSE") {
 				res.writeHead(200, {
-					Connection: 'keep-alive',
-					'Content-Type': 'multipart/mixed; boundary=abc123',
-					'Transfer-Encoding': 'chunked',
+					Connection: "keep-alive",
+					"Content-Type": "multipart/mixed; boundary=\"-\"",
+					"Transfer-Encoding": "chunked",
 				});
 
-				req.on('close', () => {
+				req.on("close", () => {
 					result.unsubscribe();
 				});
 
-				res.write('--abc123');
+				res.write("---");
 
-				await result.subscribe(result => {
-					const chunk = Buffer.from(JSON.stringify(result), 'utf8');
+				await result.subscribe((result) => {
+					const chunk = Buffer.from(JSON.stringify(result), "utf8");
 					const data = [
-						'',
-						'Content-Type: application/json; charset=utf-8',
-						'Content-Length: ' + String(chunk.length),
-						'',
+						"",
+						"Content-Type: application/json; charset=utf-8",
+						"",
 						chunk,
 					];
+
 					if (result.hasNext) {
-						data.push('--abc123');
+						data.push("---");
 					}
-					res.write(data.join('\r\n'));
+
+					res.write(data.join("\r\n"));
 				});
 
-				res.end('\r\n--abc123--\r\n');
+				res.write("\r\n-----\r\n");
+				res.end();
 			}
 		}
 	})
