@@ -1,18 +1,22 @@
-<div align="center">
-	<h1 align="center">meros</h1>
-	<p align="center"><code>npm add meros</code> makes reading multipart responses simple</p>
-	<hr />
+<img src="logo.svg" alt="meros">
+<br />
+<br />
+
+<div align="right">
+	<p><code>npm add meros</code> makes reading multipart responses simple</p>
 	<span>
 		<a href="https://github.com/maraisr/meros/actions/workflows/ci.yml">
 			<img src="https://github.com/maraisr/meros/actions/workflows/ci.yml/badge.svg"/>
 		</a>
 		<a href="https://npm-stat.com/charts.html?package=meros">
-    		<img src="https://badgen.net/npm/dm/meros" alt="downloads"/>
+    		<img src="https://badgen.net/npm/dm/meros?labelColor=black&color=black&cache=600" alt="downloads"/>
 		</a>
 		<a href="https://bundlephobia.com/result?p=meros">
-			<img src="https://badgen.net/bundlephobia/minzip/meros" alt="size"/>
+			<img src="https://badgen.net/bundlephobia/minzip/meros?labelColor=black&color=black" alt="size"/>
 		</a>
 	</span>
+  <br />
+  <br />
 </div>
 
 ## ⚡ Features
@@ -24,12 +28,6 @@
 - _preamble_ and _epilogue_ don't yield
 - Browser/Node Compatible
 - Plugs into existing libraries like Relay and rxjs
-
-## ⚙️ Install
-
-```sh
-npm add meros
-```
 
 ## 🚀 Usage
 
