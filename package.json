@@ -48,11 +48,11 @@
 		"node"
 	],
 	"scripts": {
-		"bench": "node -r ts-node/register -r ./test/_polyfill.js bench/index.ts",
+		"bench": "node -r tsm -r ./test/_polyfill.ts bench/index.ts",
 		"build": "rollup -c",
 		"format": "prettier  --write --list-different \"{*,.github/**/*}.+(ts|json|yml|md)\"",
 		"prepublishOnly": "pnpm run build",
-		"test": "uvu -r ts-node/register -r ./test/_polyfill.js -i _polyfill -i mocks test",
+		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"prettier": {
@@ -81,19 +81,15 @@
 		"@marais/tsconfig": "0.0.1",
 		"@n1ru4l/push-pull-async-iterable-iterator": "2.1.4",
 		"@rollup/plugin-node-resolve": "13.0.0",
-		"@types/benchmark": "2.1.0",
 		"@types/node": "15.6.0",
-		"benchmark": "2.1.4",
-		"fetch-multipart-graphql": "3.0.0",
-		"it-multipart": "1.0.9",
 		"prettier": "2.3.0",
 		"rollup": "2.48.0",
 		"rollup-plugin-dts": "3.0.2",
 		"rollup-plugin-filesize": "9.1.1",
 		"rollup-plugin-terser": "7.0.2",
 		"rollup-plugin-typescript2": "0.30.0",
-		"ts-node": "9.1.1",
 		"tslib": "^2.2.0",
+		"tsm": "^2.1.0",
 		"typescript": "4.2.4",
 		"uvu": "0.5.1"
 	},

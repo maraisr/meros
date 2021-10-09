@@ -1,0 +1,9 @@
+{
+	"private": true,
+	"dependencies": {
+		"@types/benchmark": "2.1.1",
+		"benchmark": "2.1.4",
+		"fetch-multipart-graphql": "3.0.0",
+		"it-multipart": "1.0.9"
+	}
+}
