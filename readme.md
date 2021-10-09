@@ -148,25 +148,25 @@ for await (const parts of chunks) {
 
 ## 💨 Benchmark
 
+> via the [`/bench`](/bench) directory with Node v16.11.0
+
 ```
 Validation :: node
 ✔ meros
 ✘ it-multipart (FAILED @ "should match reference patch set")
 
 Benchmark :: node
-  meros                     x 289,318 ops/sec ±1.21% (81 runs sampled)
-  it-multipart              x 173,136 ops/sec ±0.85% (80 runs sampled)
+  meros                     x 262,515 ops/sec ±2.45% (77 runs sampled)
+  it-multipart              x 165,562 ops/sec ±0.99% (79 runs sampled)
 
 Validation :: browser
 ✔ meros
 ✘ fetch-multipart-graphql (FAILED @ "should match reference patch set")
 
 Benchmark :: browser
-  meros                     x 1,000,417 ops/sec ±1.41% (81 runs sampled)
-  fetch-multipart-graphql   x 353,207 ops/sec ±0.92% (83 runs sampled)
+  meros                     x 864,124 ops/sec ±0.77% (80 runs sampled)
+  fetch-multipart-graphql   x 283,296 ops/sec ±0.96% (82 runs sampled)
 ```
-
-> Ran with Node v15.8.0
 
 ## 🎒 Notes
 

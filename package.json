@@ -57,19 +57,19 @@
 	},
 	"devDependencies": {
 		"@marais/tsconfig": "0.0.1",
-		"@n1ru4l/push-pull-async-iterable-iterator": "2.1.4",
-		"@rollup/plugin-node-resolve": "13.0.0",
-		"@types/node": "15.6.0",
-		"prettier": "2.3.0",
-		"rollup": "2.48.0",
-		"rollup-plugin-dts": "3.0.2",
+		"@n1ru4l/push-pull-async-iterable-iterator": "3.0.0",
+		"@rollup/plugin-node-resolve": "13.0.5",
+		"@types/node": "16.10.3",
+		"prettier": "2.4.1",
+		"rollup": "2.58.0",
+		"rollup-plugin-dts": "4.0.0",
 		"rollup-plugin-filesize": "9.1.1",
 		"rollup-plugin-terser": "7.0.2",
 		"rollup-plugin-typescript2": "0.30.0",
-		"tslib": "^2.2.0",
-		"tsm": "^2.1.0",
-		"typescript": "4.2.4",
-		"uvu": "0.5.1"
+		"tslib": "2.3.1",
+		"tsm": "2.1.0",
+		"typescript": "4.4.3",
+		"uvu": "0.5.2"
 	},
 	"peerDependencies": {
 		"@types/node": ">=12"
@@ -83,6 +83,6 @@
 		"node": ">=12"
 	},
 	"volta": {
-		"node": "16.2.0"
+		"node": "16.11.0"
 	}
 }
