@@ -55,28 +55,6 @@
 		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts",
 		"typecheck": "tsc --noEmit"
 	},
-	"prettier": {
-		"bracketSpacing": true,
-		"printWidth": 80,
-		"proseWrap": "always",
-		"singleQuote": true,
-		"tabWidth": 4,
-		"trailingComma": "all",
-		"useTabs": true,
-		"overrides": [
-			{
-				"files": [
-					"*.md",
-					"*.yml"
-				],
-				"options": {
-					"tabWidth": 2,
-					"printWidth": 120,
-					"useTabs": false
-				}
-			}
-		]
-	},
 	"devDependencies": {
 		"@marais/tsconfig": "0.0.1",
 		"@n1ru4l/push-pull-async-iterable-iterator": "2.1.4",
