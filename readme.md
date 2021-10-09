@@ -9,7 +9,7 @@
 			<img src="https://github.com/maraisr/meros/actions/workflows/ci.yml/badge.svg"/>
 		</a>
 		<a href="https://npm-stat.com/charts.html?package=meros">
-    		<img src="https://badgen.net/npm/dm/meros?labelColor=black&color=black&cache=600" alt="downloads"/>
+    		<img src="https://badgen.net/npm/dw/meros?labelColor=black&color=black&cache=600" alt="downloads"/>
 		</a>
 		<a href="https://bundlephobia.com/result?p=meros">
 			<img src="https://badgen.net/bundlephobia/minzip/meros?labelColor=black&color=black" alt="size"/>
