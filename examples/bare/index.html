@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang='en'>
+<script type='module'>
+	import { meros } from 'https://unpkg.com/meros@latest/browser/index.mjs?module';
+
+	const parts = await fetch('/data').then(meros);
+
+	for await (let part of parts) {
+		const el = document.createElement('div');
+		el.innerText = part.body.letter;
+		document.body.appendChild(el);
+	}
+</script>
+</html>
