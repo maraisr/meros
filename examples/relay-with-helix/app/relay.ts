@@ -15,7 +15,7 @@ const STORE_CACHE_RELEASE_TIME = 2 * 60 * 1000; // 2 mins
 const fetchQuery: FetchFunction = (params, variables, _cacheConfig) => {
 	return Observable.create((sink) => {
 		(async () => {
-			const response = await fetch('http://localhost:3004/graphql', {
+			const response = await fetch('/graphql', {
 				body: JSON.stringify({
 					query: params.text,
 					variables,
@@ -35,17 +35,7 @@ const fetchQuery: FetchFunction = (params, variables, _cacheConfig) => {
 						break;
 					}
 
-					const { data, path, hasNext, label } = part.body;
-
-					if (hasNext)
-						sink.next({
-							data,
-							path: path as (string | number)[],
-							label,
-							extensions: {
-								is_final: !hasNext,
-							},
-						});
+					sink.next(part.body);
 				}
 			} else {
 				sink.next(await parts.json());
@@ -83,7 +73,8 @@ function isAsyncIterable(input: unknown): input is AsyncIterable<unknown> {
 		typeof input === 'object' &&
 		input !== null &&
 		// Some browsers still don't have Symbol.asyncIterator implemented (iOS Safari)
-		// That means every custom AsyncIterable must be built using a AsyncGeneratorFunction (async function * () {})
+		// That means every custom AsyncIterable must be built using a AsyncGeneratorFunction
+		// (async function * () {})
 		((input as any)[Symbol.toStringTag] === 'AsyncGenerator' ||
 			Symbol.asyncIterator in input)
 	);

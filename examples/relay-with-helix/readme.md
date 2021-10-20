@@ -18,5 +18,4 @@ pnpm run start
 
 3. Load up:
 
-- _localhost:3004_ is our GraphQL Helix server
-- _localhost:8080_ is where our Relay/React SPA is running
+- _localhost:8080_ is where our Relay/React SPA is running as well as `/graphql` where helix is

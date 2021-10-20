@@ -50,7 +50,7 @@
 	"scripts": {
 		"bench": "node -r tsm -r ./test/_polyfill.ts bench/index.ts",
 		"build": "rollup -c",
-		"format": "prettier  --write --list-different \"{*,.github/**/*}.+(ts|json|yml|md)\"",
+		"format": "prettier --write --list-different \"{*,examples/*/**,.github/**/*}.+(ts|tsx|json|yml|md)\"",
 		"prepublishOnly": "pnpm run build",
 		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts",
 		"typecheck": "tsc --noEmit"

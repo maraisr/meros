@@ -1,0 +1,17 @@
+{
+	"root": ".",
+	"excludes": ["**/node_modules/**"],
+	"codegenCommand": "pnpm relay",
+	"sources": {
+		"app": "default"
+	},
+	"projects": {
+		"default": {
+			"schema": "schema.graphql",
+			"language": "typescript",
+			"useImportTypeSyntax": true,
+			"shouldGenerateParametersFile": true,
+			"requireCustomScalarTypes": true
+		}
+	}
+}
