@@ -31,6 +31,8 @@
 
 ## 🚀 Usage
 
+> Visit [/examples](/examples) for more info!
+
 ```ts
 // Relies on bundler/environment detection
 import { meros } from 'meros';

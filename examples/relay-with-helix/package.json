@@ -1,5 +1,5 @@
 {
-	"name": "meros-relay-with-helix",
+	"name": "meros-example-relay-with-helix",
 	"private": true,
 	"version": "0.0.1",
 	"scripts": {
