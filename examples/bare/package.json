@@ -9,7 +9,8 @@
 		"node": ">=16.11"
 	},
 	"dependencies": {
-		"meros": "1.1.4"
+		"meros": "1.1.4",
+		"piecemeal": "^0.0.2"
 	},
 	"devDependencies": {
 		"tsm": "2.1.2"

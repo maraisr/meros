@@ -3,6 +3,8 @@ import type { ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 
+import * as Piecemeal from 'piecemeal/node';
+
 const index_doc = await readFile('./index.html', 'utf8');
 
 const not_found = (res: ServerResponse) => {
@@ -16,37 +18,18 @@ const serve_index = (res: ServerResponse) => {
 	res.end(index_doc);
 };
 
-// ~> The multipart responder
-const serve_data = async (res: ServerResponse) => {
-	res.writeHead(200, {
-		Connection: 'keep-alive',
-		'Content-Type': 'multipart/mixed; boundary="-"',
-		'Transfer-Encoding': 'chunked',
-	});
-
-	res.write('---');
-
+async function* alphabet() {
 	for (let letter = 65; letter <= 90; letter++) {
 		await new Promise((resolve) => setTimeout(resolve, 150));
-
-		const chunk = Buffer.from(
-			JSON.stringify({ letter: String.fromCharCode(letter) }),
-			'utf8',
-		);
-		const data = [
-			'',
-			'Content-Type: application/json; charset=utf-8',
-			'',
-			chunk,
-		];
-
-		if (letter !== 90) data.push('---');
-
-		res.write(data.join('\r\n'));
+		yield { letter: String.fromCharCode(letter) };
 	}
+}
 
-	res.write('\r\n-----\r\n');
-	res.end();
+// ~> The multipart responder
+const serve_data = async (res: ServerResponse) => {
+	const stream = Piecemeal.stream(alphabet());
+
+	await stream.pipe(res);
 };
 
 createServer((req, res) => {

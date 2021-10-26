@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"meros": "1.1.4",
+		"piecemeal": "^0.0.2",
 		"polka": "1.0.0-next.22"
 	},
 	"devDependencies": {
