@@ -10,7 +10,6 @@
 			"schema": "schema.graphql",
 			"language": "typescript",
 			"useImportTypeSyntax": true,
-			"shouldGenerateParametersFile": true,
 			"requireCustomScalarTypes": true
 		}
 	}

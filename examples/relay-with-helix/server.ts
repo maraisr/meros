@@ -17,6 +17,9 @@ import relay from 'vite-plugin-relay';
 
 const vite_app = await viteServer({
 	plugins: [reactRefresh(), relay.default],
+	define: {
+		global: 'globalThis',
+	},
 	server: {
 		middlewareMode: 'html',
 	},

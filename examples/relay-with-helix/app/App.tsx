@@ -7,9 +7,11 @@ import type { App_SecondLyric$key } from './__generated__/App_SecondLyric.graphq
 
 const SecondVerse: FC<{ fragRef: App_SecondLyric$key }> = ({ fragRef }) => {
 	const data = useFragment(
-		graphql`fragment App_SecondLyric on Song {
-			secondVerse
-		}`,
+		graphql`
+			fragment App_SecondLyric on Song {
+				secondVerse
+			}
+		`,
 		fragRef,
 	);
 
@@ -17,15 +19,17 @@ const SecondVerse: FC<{ fragRef: App_SecondLyric$key }> = ({ fragRef }) => {
 };
 const Songs = () => {
 	const data = useLazyLoadQuery<App_Query>(
-		graphql`query App_Query {
-			song {
-				firstVerse
-				...App_SecondLyric @defer
+		graphql`
+			query App_Query {
+				song {
+					firstVerse
+					...App_SecondLyric @defer
+				}
+				alphabet @stream(initial_count: 3) {
+					char
+				}
 			}
-			alphabet @stream(initial_count: 3) {
-				char
-			}
-		}`,
+		`,
 		{},
 	);
 
