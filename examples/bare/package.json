@@ -10,9 +10,9 @@
 	},
 	"dependencies": {
 		"meros": "1.1.4",
-		"piecemeal": "^0.0.2"
+		"piecemeal": "^0.0.3"
 	},
 	"devDependencies": {
-		"tsm": "2.1.2"
+		"tsm": "2.2.1"
 	}
 }
