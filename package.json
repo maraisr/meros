@@ -52,7 +52,7 @@
 		"build": "rollup -c",
 		"format": "prettier --write --list-different \"{*,examples/*/**,.github/**/*}.+(ts|tsx|json|yml|md)\"",
 		"prepublishOnly": "pnpm run build",
-		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts",
+		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts -i suites",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {

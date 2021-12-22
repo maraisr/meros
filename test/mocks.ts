@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
 import type { IncomingMessage } from 'http';
 
 type Part = string;
@@ -8,7 +9,7 @@ export const wrap = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')
 export const tail = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}--\r\n`;
 export const preamble = () => 'preamble';
 
-export const makePart = (payload: any, headers: string = []): Part => {
+export const makePart = (payload: any, headers: string[] = []): Part => {
 	const returns = [
 		`content-type: ${
 			typeof payload === 'string' ? 'text/plain' : 'application/json; charset=utf-8'
@@ -96,3 +97,33 @@ export async function mockResponseBrowser<T>(
 		bodyUsed: false,
 	};
 }
+
+export type Meros = any
+export type Responder = any;
+
+export const bodies = (parts: any[]) => parts.map(({
+	body,
+	json,
+}) => json ? body : body.toString());
+
+export const test_helper = async (
+	meros: Meros,
+	responder: Responder,
+	process: (v: any) => void, boundary = '-') => {
+	const {
+		asyncIterableIterator,
+		pushValue,
+	} = makePushPullAsyncIterableIterator();
+	const response = await responder(asyncIterableIterator, boundary);
+
+	const parts = await meros(response);
+	const collection = [];
+
+	await process(pushValue);
+
+	for await (let part of parts) {
+		collection.push(part);
+	}
+
+	return collection;
+};
