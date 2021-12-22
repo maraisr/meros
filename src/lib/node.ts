@@ -17,7 +17,6 @@ export async function* generate<T>(
 		is_preamble = true,
 		payloads = [];
 
-
 	outer: for await (const chunk of stream) {
 		let idx_boundary = buffer.byteLength;
 		buffer = Buffer.concat([buffer, chunk]);
