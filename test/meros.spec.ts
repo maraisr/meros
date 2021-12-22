@@ -147,6 +147,35 @@ function testFor(
 			assert.equal(collection, [{ foo: 'bar' }]);
 		});
 
+		t('should yield correct headers', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({
+					foo: 'bar',
+				}, [
+					'cache-control: public,max-age=30',
+					'etag: test',
+				]),
+				tail,
+			]);
+
+			for await (let { headers } of parts) {
+				collection.push(headers);
+			}
+
+			assert.equal(collection, [{ 'content-type': 'application/json', 'cache-control': 'public,max-age=30', 'etag': 'test' }]);
+		});
+
 		t('should yield single payload cross chunk', async () => {
 			const {
 				asyncIterableIterator,

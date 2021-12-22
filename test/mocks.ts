@@ -8,11 +8,12 @@ export const wrap = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')
 export const tail = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}--\r\n`;
 export const preamble = () => 'preamble';
 
-export const makePart = (payload: any): Part => {
+export const makePart = (payload: any, headers: string = []): Part => {
 	const returns = [
 		`content-type: ${
 			typeof payload === 'string' ? 'text/plain' : 'application/json'
 		}`,
+		...headers,
 		'',
 		Buffer.from(
 			typeof payload === 'string' ? payload : JSON.stringify(payload),

@@ -46,8 +46,8 @@ export async function* generate<T>(
 					// parse headers
 					let tmp;
 					while (tmp = arr_headers.shift()) {
-						tmp = tmp.split(': ');
-						headers[tmp.shift().toLowerCase()] = tmp.join(': ');
+						tmp = tmp.split(': ', 2);
+						headers[tmp.shift()!.toLowerCase()] = tmp[0];
 					}
 
 					let body: T | string = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
