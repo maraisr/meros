@@ -14,9 +14,9 @@
 		"polka": "1.0.0-next.22"
 	},
 	"devDependencies": {
-		"@marais/tsconfig": "0.0.1",
+		"@marais/tsconfig": "0.0.2",
 		"tsm": "2.2.1",
-		"typescript": "4.5.2",
-		"vite": "2.6.14"
+		"typescript": "4.5.4",
+		"vite": "2.7.6"
 	}
 }
