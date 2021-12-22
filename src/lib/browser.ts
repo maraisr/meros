@@ -6,8 +6,10 @@ const decoder = new TextDecoder;
 export async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
-	options?: Options
+	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, string>>> {
+	boundary = '\r\n' + boundary;
+
 	const reader = stream.getReader(),
 		is_eager = !options || !options.multiple;
 
@@ -41,7 +43,7 @@ export async function* generate<T>(
 				} else {
 					const headers: Record<string, string> = {};
 					const idx_headers = current.indexOf(separator);
-					const arr_headers = buffer.slice(0, idx_headers).toString().trim().split(/\r\n/);
+					const arr_headers = buffer.slice(0, idx_headers).trim().split(/\r\n/);
 
 					// parse headers
 					let tmp;
@@ -50,7 +52,9 @@ export async function* generate<T>(
 						headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 					}
 
-					let body: T | string = current.substring(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+					const last_idx = current.lastIndexOf('\r\n', idx_headers + separator.length);
+
+					let body: T | string = current.substring(idx_headers + separator.length, last_idx > -1 ? undefined : last_idx);
 					let is_json = false;
 
 					tmp = headers['content-type'];

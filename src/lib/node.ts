@@ -6,14 +6,17 @@ const separator = '\r\n\r\n';
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
-	options?: Options
+	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
+	boundary = '\r\n' + boundary;
+
 	const len_boundary = Buffer.byteLength(boundary),
 		is_eager = !options || !options.multiple;
 
 	let buffer = Buffer.alloc(0),
 		is_preamble = true,
 		payloads = [];
+
 
 	outer: for await (const chunk of stream) {
 		let idx_boundary = buffer.byteLength;
@@ -47,7 +50,9 @@ export async function* generate<T>(
 					headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 				}
 
-				let body: T | Buffer = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));
+				const last_idx = current.lastIndexOf('\r\n', idx_headers + separator.length);
+
+				let body: T | Buffer = current.slice(idx_headers + separator.length, last_idx > -1 ? undefined : last_idx);
 				let is_json = false;
 
 				tmp = headers['content-type'];

@@ -373,6 +373,83 @@ bar
 `,
 			]);
 		});
+
+		t('should allow boundary char in payload', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({ 'desc': '---' }),
+				tail,
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, [{ 'desc': '---' }]);
+		});
+
+		t('should allow boundary char in in multiple chunks', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({ 'one': '---' }),
+			]);
+
+			pushValue([
+				wrap,
+				makePart({ 'two': '---' }),
+				tail
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, [{ 'one': '---' }, { 'two': '---' }]);
+		});
+
+		t('should allow simple boundary char payload', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart('"---"'),
+				tail
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, ['"---"']);
+		});
 	});
 
 	describe('boundary', (t) => {
