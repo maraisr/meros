@@ -11,7 +11,7 @@ export const preamble = () => 'preamble';
 export const makePart = (payload: any, headers: string = []): Part => {
 	const returns = [
 		`content-type: ${
-			typeof payload === 'string' ? 'text/plain' : 'application/json'
+			typeof payload === 'string' ? 'text/plain' : 'application/json; charset=utf-8'
 		}`,
 		...headers,
 		'',

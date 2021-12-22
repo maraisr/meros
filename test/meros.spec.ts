@@ -178,7 +178,7 @@ function testFor(
 
 			assert.equal(collection, [
 				{
-					'content-type': 'application/json',
+					'content-type': 'application/json; charset=utf-8',
 					'cache-control': 'public,max-age=30',
 					'etag': 'test',
 					'x-test': 'test:test',
@@ -263,7 +263,7 @@ function testFor(
 			assert.equal(value, [
 				{
 					headers: {
-						'content-type': 'application/json',
+						'content-type': 'application/json; charset=utf-8',
 					},
 					body: { foo: 'bar' },
 					json: true,
@@ -371,6 +371,153 @@ bar
 `,
 				`bar: baz
 `,
+			]);
+		});
+
+		t('should allow boundary char in payload', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({ 'desc': '---' }),
+				tail,
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, [{ 'desc': '---' }]);
+		});
+
+		t('should allow boundary char in in multiple chunks', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart({ 'one': '---' }),
+			]);
+
+			pushValue([
+				wrap,
+				makePart({ 'two': '---' }),
+				tail,
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, [{ 'one': '---' }, { 'two': '---' }]);
+		});
+
+		t('should allow simple boundary char payload', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				preamble,
+				wrap,
+				makePart('"---"'),
+				tail,
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, ['"---"']);
+		});
+
+		t('should allow real-world dataset', async () => {
+			const {
+				asyncIterableIterator,
+				pushValue,
+			} = makePushPullAsyncIterableIterator();
+			const response = await responder(asyncIterableIterator, '-');
+
+			const parts = await meros(response);
+			const collection = [];
+
+			pushValue([
+				wrap,
+				makePart({
+					'data': { 'user': { 'id': 'VXNlcgpkN2FhNzFjMjctN2I0Yy00MzczLTkwZGItMzhjMjZlNjA4MzNh' } },
+					'hasNext': true,
+				}),
+				wrap,
+				...splitString(makePart({
+					'label': 'WelcomeQuery$defer$ProjectList_projects_1qwc77',
+					'path': ['user'],
+					'data': {
+						'id': 'VXNlcgpkN2FhNzFjMjctN2I0Yy00MzczLTkwZGItMzhjMjZlNjA4MzNh',
+						'projects': {
+							'edges': [{
+								'node': {
+									'id': 'UHJvamVjdAppMQ==',
+									'name': 'New project',
+									'desc': '',
+									'lastUpdate': '2021-12-22T12:57:45.488\u002B03:00',
+									'__typename': 'Project',
+								}, 'cursor': 'MA==',
+							}], 'pageInfo': { 'endCursor': 'MA==', 'hasNextPage': false },
+						},
+					},
+					'hasNext': false,
+				}), 11),
+				tail,
+			]);
+
+			for await (let { body: part } of parts) {
+				collection.push(Buffer.isBuffer(part) ? part.toString() : part);
+			}
+
+			assert.equal(collection, [
+				{
+					'data': { 'user': { 'id': 'VXNlcgpkN2FhNzFjMjctN2I0Yy00MzczLTkwZGItMzhjMjZlNjA4MzNh' } },
+					'hasNext': true,
+				},
+				{
+					'label': 'WelcomeQuery$defer$ProjectList_projects_1qwc77',
+					'path': ['user'],
+					'data': {
+						'id': 'VXNlcgpkN2FhNzFjMjctN2I0Yy00MzczLTkwZGItMzhjMjZlNjA4MzNh',
+						'projects': {
+							'edges': [{
+								'node': {
+									'id': 'UHJvamVjdAppMQ==',
+									'name': 'New project',
+									'desc': '',
+									'lastUpdate': '2021-12-22T12:57:45.488\u002B03:00',
+									'__typename': 'Project',
+								}, 'cursor': 'MA==',
+							}], 'pageInfo': { 'endCursor': 'MA==', 'hasNextPage': false },
+						},
+					},
+					'hasNext': false,
+				},
 			]);
 		});
 	});
