@@ -43,8 +43,8 @@ export async function* generate<T>(
 				// parse headers
 				let tmp;
 				while (tmp = arr_headers.shift()) {
-					tmp = tmp.split(': ', 2);
-					headers[tmp.shift()!.toLowerCase()] = tmp[0];
+					tmp = tmp.split(': ');
+					headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 				}
 
 				let body: T | Buffer = current.slice(idx_headers + separator.length, current.lastIndexOf('\r\n'));

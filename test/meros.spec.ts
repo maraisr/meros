@@ -165,6 +165,9 @@ function testFor(
 				}, [
 					'cache-control: public,max-age=30',
 					'etag: test',
+					'x-test: test:test', // tests the colon
+					'x-test-2: test: test', // tests the colon
+					'x-valid: _ :;.,\/"\'?!(){}[]@<>=-+*#$&`|~^%',
 				]),
 				tail,
 			]);
@@ -173,7 +176,16 @@ function testFor(
 				collection.push(headers);
 			}
 
-			assert.equal(collection, [{ 'content-type': 'application/json', 'cache-control': 'public,max-age=30', 'etag': 'test' }]);
+			assert.equal(collection, [
+				{
+					'content-type': 'application/json',
+					'cache-control': 'public,max-age=30',
+					'etag': 'test',
+					'x-test': 'test:test',
+					'x-test-2': 'test: test',
+					'x-valid': '_ :;.,\/"\'?!(){}[]@<>=-+*#$&`|~^%',
+				},
+			]);
 		});
 
 		t('should yield single payload cross chunk', async () => {
