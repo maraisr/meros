@@ -1,7 +1,7 @@
-import filesize from 'rollup-plugin-filesize';
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
 import types from 'rollup-plugin-dts';
+import { transpileModule } from 'typescript';
+import tsconfig from './tsconfig.json';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
@@ -13,25 +13,31 @@ const MODULE = () => ({
 	],
 	plugins: [
 		resolve({
-			extensions: ['.js', '.ts'],
-			preferBuiltins: true
+			extensions: ['.ts', '.js'],
+			preferBuiltins: true,
 		}),
-		typescript({}),
-		filesize({
-			showBrotliSize: true,
-			reporter: [
-				(options, bundle, { minSize, gzipSize, brotliSize, fileName }) => {
-					console.log(`${fileName} ↠ ${minSize} (min) ~ ${gzipSize} (gzip) ~ ${brotliSize} (brotli)`);
-				},
-			],
-		}),
+		{
+			name: 'typescript',
+			transform(code, file) {
+				if (/\.d\.ts$/.test(file)) return '';
+				if (!/\.ts$/.test(file)) return code;
+				// @ts-ignore
+				let output = transpileModule(code, {
+					...tsconfig, fileName: file,
+				});
+				return {
+					code: output.outputText,
+					map: output.sourceMapText || null,
+				};
+			},
+		},
 	],
 });
 
 const TYPES = () => ({
 	plugins: [
 		resolve({
-			extensions: ['.js', '.ts'],
+			extensions: ['.ts', '.js'],
 			preferBuiltins: true,
 		}),
 		types(),
@@ -70,7 +76,13 @@ export default [
 				esModule: false,
 				interop: false,
 				strict: false,
-				plugins: [terser()],
+				plugins: [terser({
+					compress: {
+						hoist_funs: true,
+						toplevel: true,
+						unsafe: true,
+					},
+				})],
 			},
 		],
 	}, {
