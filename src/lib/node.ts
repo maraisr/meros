@@ -8,8 +8,6 @@ export async function* generate<T>(
 	boundary: string,
 	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
-	boundary = '\r\n' + boundary;
-
 	const len_boundary = Buffer.byteLength(boundary),
 		is_eager = !options || !options.multiple;
 

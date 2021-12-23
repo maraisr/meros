@@ -35,7 +35,7 @@ export async function meros<T=object>(response: IncomingMessage, options?: Optio
 
 	return generate<T>(
 		response,
-		`--${!!~idx_boundary
+		`\r\n--${!!~idx_boundary
 			? // +9 for 'boundary='.length
 			ctype.substring(idx_boundary + 9).trim().replace(/['"]/g, '')
 			: '-'}`,
