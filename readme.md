@@ -45,11 +45,9 @@ for await (const part of parts) {
 }
 
 // Used with rxjs streams
-from(parts).pipe(
-  tap((part) => {
-    // Do something with it
-  }),
-);
+from(parts).subscribe((part) => {
+  // Do something with it
+});
 ```
 
 ## _Specific Environment_
