@@ -1,7 +1,7 @@
 export interface Options {
 	/**
-	 * Setting this to true will yield an array. In other words; instead of yielding once for every payload—we collect
-	 * all complete payloads for a chunk and then yield.
+	 * Setting this to true will yield an array. In other words; instead of yielding once for every
+	 * payload—we collect all complete payloads for a chunk and then yield.
 	 *
 	 * @default false
 	 */

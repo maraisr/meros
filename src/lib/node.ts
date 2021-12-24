@@ -8,7 +8,8 @@ export async function* generate<T>(
 	boundary: string,
 	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
-	const is_eager = !options || !options.multiple;;
+	const is_eager = !options || !options.multiple;
+
 
 	let len_boundary = Buffer.byteLength(boundary),
 		buffer = Buffer.alloc(0),
@@ -35,7 +36,7 @@ export async function* generate<T>(
 
 			if (is_preamble) {
 				is_preamble = false;
-				boundary = '\r\n'+ boundary;
+				boundary = '\r\n' + boundary;
 				len_boundary += 2;
 			} else {
 				const headers: Record<string, string> = {};
