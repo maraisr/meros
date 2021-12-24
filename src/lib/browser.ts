@@ -38,6 +38,7 @@ export async function* generate<T>(
 
 				if (is_preamble) {
 					is_preamble = false;
+					boundary = '\r\n' + boundary;
 				} else {
 					const headers: Record<string, string> = {};
 					const idx_headers = current.indexOf(separator);

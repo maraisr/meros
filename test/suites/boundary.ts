@@ -55,7 +55,7 @@ export default (meros: Meros, responder: Responder) => {
 		'===',
 	]) {
 		Boundary(boundary, make_test.bind(0, boundary, true));
-		Boundary.skip(boundary, make_test.bind(0, boundary, false));
+		Boundary(boundary, make_test.bind(0, boundary, false));
 	}
 
 	Boundary.run();
