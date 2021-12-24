@@ -1,4 +1,4 @@
-import { meros } from '../node';
+import { meros } from '../src/node';
 import { mockResponseNode } from './mocks';
 
 import suites from './suites';

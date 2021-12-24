@@ -1,4 +1,4 @@
-import { meros } from '../browser';
+import { meros } from '../src/browser';
 import { mockResponseBrowser } from './mocks';
 
 import suites from './suites';
