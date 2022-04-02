@@ -46,13 +46,11 @@
 		"./package.json": "./package.json"
 	},
 	"main": "node/index.js",
-	"unpkg": "browser/index.min.js",
 	"module": "node/index.mjs",
 	"browser": "browser/index.mjs",
 	"types": "index.d.ts",
 	"files": [
 		"*.d.ts",
-		"types",
 		"browser",
 		"node"
 	],
