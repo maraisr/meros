@@ -1,5 +1,6 @@
 import type { Readable } from 'stream';
-import type { Arrayable, Options, Part } from './types';
+import type { Options, Part } from 'meros';
+import type { Arrayable } from './types';
 
 const separator = '\r\n\r\n';
 
