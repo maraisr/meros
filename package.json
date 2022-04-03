@@ -73,7 +73,7 @@
 		"uvu": "0.5.3"
 	},
 	"peerDependencies": {
-		"@types/node": ">=12"
+		"@types/node": ">=13"
 	},
 	"peerDependenciesMeta": {
 		"@types/node": {
@@ -81,7 +81,7 @@
 		}
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=13"
 	},
 	"volta": {
 		"node": "17.3.0"
