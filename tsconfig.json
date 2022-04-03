@@ -2,7 +2,6 @@
 	"extends": "@marais/tsconfig",
 	"compilerOptions": {
 		"noEmit": true,
-		"target": "ES2019",
 		"declaration": false,
 		"removeComments": false,
 		"lib": ["DOM", "ESNext"],
