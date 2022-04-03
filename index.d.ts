@@ -1,5 +1,3 @@
-import { IncomingMessage } from 'http';
-
 export interface Options {
 	/**
 	 * Setting this to true will yield an array. In other words; instead of yielding once for every payload—we collect
