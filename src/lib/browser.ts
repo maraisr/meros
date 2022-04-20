@@ -1,8 +1,6 @@
 import type { Options, Part } from 'meros';
 import type { Arrayable } from './types';
 
-const SEPERATOR = '\r\n\r\n';
-const SEPERATOR_LENGTH = 4;
 const decoder = new TextDecoder;
 
 export async function* generate<T>(
@@ -44,8 +42,8 @@ export async function* generate<T>(
 					boundary = '\r\n' + boundary;
 				} else {
 					const headers: Record<string, string> = {};
-					const idx_headers = current.indexOf(SEPERATOR);
-					const arr_headers = buffer.slice(0, idx_headers).trim().split(/\r\n/);
+					const idx_headers = current.indexOf('\r\n\r\n');
+					const arr_headers = buffer.slice(0, idx_headers).trim().split('\r\n');
 
 					// parse headers
 					let tmp;
@@ -54,9 +52,9 @@ export async function* generate<T>(
 						headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 					}
 
-					const last_idx = current.lastIndexOf('\r\n', idx_headers + SEPERATOR_LENGTH);
+					const last_idx = current.lastIndexOf('\r\n', idx_headers + 4); // 4 -> '\r\n\r\n'.length
 
-					let body: T | string = current.substring(idx_headers + SEPERATOR_LENGTH, last_idx > -1 ? undefined : last_idx);
+					let body: T | string = current.substring(idx_headers + 4, last_idx > -1 ? undefined : last_idx);
 					let is_json = false;
 
 					tmp = headers['content-type'];

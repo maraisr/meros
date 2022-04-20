@@ -2,9 +2,6 @@ import type { Readable } from 'stream';
 import type { Options, Part } from 'meros';
 import type { Arrayable } from './types';
 
-const SEPERATOR = '\r\n\r\n';
-const SEPERATOR_LENGTH = 4;
-
 export async function* generate<T>(
 	stream: Readable,
 	boundary: string,
@@ -41,8 +38,8 @@ export async function* generate<T>(
 				len_boundary += 2;
 			} else {
 				const headers: Record<string, string> = {};
-				const idx_headers = current.indexOf(SEPERATOR);
-				const arr_headers = buffer.slice(0, idx_headers).toString().trim().split(/\r\n/);
+				const idx_headers = current.indexOf('\r\n\r\n');
+				const arr_headers = buffer.slice(0, idx_headers).toString().trim().split('\r\n');
 
 				// parse headers
 				let tmp;
@@ -51,9 +48,9 @@ export async function* generate<T>(
 					headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 				}
 
-				const last_idx = current.lastIndexOf('\r\n', idx_headers + SEPERATOR_LENGTH);
+				const last_idx = current.lastIndexOf('\r\n', idx_headers + 4); // 4 -> '\r\n\r\n'.length
 
-				let body: T | Buffer = current.slice(idx_headers + SEPERATOR_LENGTH, last_idx > -1 ? undefined : last_idx);
+				let body: T | Buffer = current.slice(idx_headers + 4, last_idx > -1 ? undefined : last_idx);
 				let is_json = false;
 
 				tmp = headers['content-type'];
