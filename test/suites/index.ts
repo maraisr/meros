@@ -16,4 +16,4 @@ export default (meros: Meros, responder: Responder) => {
 	Body(meros, responder);
 
 	UseCases(meros, responder);
-}
+};

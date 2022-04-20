@@ -1,6 +1,15 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { bodies, makePart, Meros, preamble, Responder, tail, test_helper, wrap } from '../mocks';
+import {
+	bodies,
+	makePart,
+	preamble,
+	tail,
+	wrap,
+	test_helper,
+	type Meros,
+	type Responder,
+} from '../mocks';
 
 export default (meros: Meros, responder: Responder) => {
 	const make_test = test_helper.bind(0, meros, responder);
@@ -8,35 +17,24 @@ export default (meros: Meros, responder: Responder) => {
 	const Body = suite('body');
 
 	Body('json', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart({ foo: 'bar' }),
-				tail,
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart({ foo: 'bar' }), tail]);
 		});
 
-		assert.equal(
-			collection,
-			[{
+		assert.equal(collection, [
+			{
 				body: { foo: 'bar' },
 				json: true,
 				headers: {
 					'content-type': 'application/json; charset=utf-8',
 				},
-			}],
-		);
+			},
+		]);
 	});
 
 	Body('plain-text', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart('test'),
-				tail,
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart('test'), tail]);
 		});
 
 		assert.equal(collection.length, 1);
@@ -45,7 +43,7 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Body('mixed', async () => {
-		const collection = await make_test(push => {
+		const collection = await make_test((push) => {
 			push([
 				preamble,
 				wrap,
@@ -65,25 +63,17 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Body('unicode body', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart('🚀'),
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart('🚀')]);
 
-			push([
-				wrap,
-				makePart('😎'),
-				tail,
-			]);
+			push([wrap, makePart('😎'), tail]);
 		});
 
 		assert.equal(bodies(collection), ['🚀', '😎']);
 	});
 
 	Body('retain newlines', async () => {
-		const collection = await make_test(push => {
+		const collection = await make_test((push) => {
 			push([
 				preamble,
 				wrap,
@@ -94,11 +84,7 @@ bar
 `),
 			]);
 
-			push([
-				wrap,
-				makePart('bar: baz\n'),
-				tail,
-			]);
+			push([wrap, makePart('bar: baz\n'), tail]);
 		});
 
 		assert.equal(bodies(collection), [
@@ -114,58 +100,37 @@ bar
 
 	// Doesnt mean --- can exist nakedly, multipart rules still apply.
 	Body('boundary in payload*', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart({ 'test': '---' }),
-				tail,
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart({ test: '---' }), tail]);
 		});
 
-		assert.equal(bodies(collection), [
-			{ 'test': '---' },
-		]);
+		assert.equal(bodies(collection), [{ test: '---' }]);
 	});
 
 	Body('boundary exist in multi payload*', async () => {
-		const collection = await make_test(push => {
+		const collection = await make_test((push) => {
 			push([
 				preamble,
 				wrap,
-				makePart({ 'one': '---' }),
+				makePart({ one: '---' }),
 				wrap,
-				makePart({ 'two': '---' }),
+				makePart({ two: '---' }),
 				tail,
 			]);
 		});
 
-		assert.equal(bodies(collection), [
-			{ 'one': '---' },
-			{ 'two': '---' },
-		]);
+		assert.equal(bodies(collection), [{ one: '---' }, { two: '---' }]);
 	});
 
 	Body('boundary exist in multi payloads*', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart({ 'one': '---' }),
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart({ one: '---' })]);
 
-			push([
-				wrap,
-				makePart({ 'two': '---' }),
-				tail,
-			]);
+			push([wrap, makePart({ two: '---' }), tail]);
 		});
 
-		assert.equal(bodies(collection), [
-			{ 'one': '---' },
-			{ 'two': '---' },
-		]);
+		assert.equal(bodies(collection), [{ one: '---' }, { two: '---' }]);
 	});
 
 	Body.run();
-}
+};

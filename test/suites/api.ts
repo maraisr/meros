@@ -1,8 +1,14 @@
 import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import type { Meros, Responder } from '../mocks';
-import { makePart, preamble, tail, wrap } from '../mocks';
+import {
+	makePart,
+	preamble,
+	tail,
+	wrap,
+	type Meros,
+	type Responder,
+} from '../mocks';
 
 export default (meros: Meros, responder: Responder) => {
 	const API = suite('api');
@@ -20,19 +26,12 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	API('should cleanup when `returns` fires', async () => {
-		const {
-			asyncIterableIterator,
-			pushValue,
-		} = makePushPullAsyncIterableIterator();
+		const { asyncIterableIterator, pushValue } =
+			makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, '-');
 		const parts = await meros(response);
 
-		pushValue([
-			preamble,
-			wrap,
-			makePart('test'),
-			wrap,
-		]);
+		pushValue([preamble, wrap, makePart('test'), wrap]);
 
 		let r = await parts.next();
 		assert.equal(r.done, false);
@@ -40,10 +39,7 @@ export default (meros: Meros, responder: Responder) => {
 
 		await asyncIterableIterator.return();
 
-		pushValue([
-			makePart('test'),
-			tail,
-		]);
+		pushValue([makePart('test'), tail]);
 
 		r = await parts.next();
 		assert.equal(r.done, true);
@@ -51,4 +47,4 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	API.run();
-}
+};

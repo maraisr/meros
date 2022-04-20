@@ -6,13 +6,13 @@ import * as assert from 'uvu/assert';
 import {
 	bodies,
 	makePart,
-	type Meros,
 	preamble,
-	type Responder,
 	splitString,
 	tail,
-	test_helper,
 	wrap,
+	test_helper,
+	type Meros,
+	type Responder,
 } from '../mocks';
 
 export default (meros: Meros, responder: Responder) => {
@@ -21,42 +21,25 @@ export default (meros: Meros, responder: Responder) => {
 	const Chunk = suite('chunking');
 
 	Chunk('single yield single chunk', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart({ foo: 'bar' }),
-				tail,
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart({ foo: 'bar' }), tail]);
 		});
 
-		assert.equal(
-			bodies(collection),
-			[{ foo: 'bar' }],
-		);
+		assert.equal(bodies(collection), [{ foo: 'bar' }]);
 	});
 
 	Chunk('single yield multi chunk', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap]);
 
-			push([
-				makePart('one'),
-				tail,
-			]);
+			push([makePart('one'), tail]);
 		});
 
-		assert.equal(
-			bodies(collection),
-			['one'],
-		);
+		assert.equal(bodies(collection), ['one']);
 	});
 
 	Chunk('multiple yields single chunk', async () => {
-		const collection = await make_test(push => {
+		const collection = await make_test((push) => {
 			push([
 				preamble,
 				wrap,
@@ -67,31 +50,17 @@ export default (meros: Meros, responder: Responder) => {
 			]);
 		});
 
-		assert.equal(
-			bodies(collection),
-			['one', 'two'],
-		);
+		assert.equal(bodies(collection), ['one', 'two']);
 	});
 
 	Chunk('multiple yields multi chunk', async () => {
-		const collection = await make_test(push => {
-			push([
-				preamble,
-				wrap,
-				makePart('one'),
-			]);
+		const collection = await make_test((push) => {
+			push([preamble, wrap, makePart('one')]);
 
-			push([
-				wrap,
-				makePart('two'),
-				tail,
-			]);
+			push([wrap, makePart('two'), tail]);
 		});
 
-		assert.equal(
-			bodies(collection),
-			['one', 'two'],
-		);
+		assert.equal(bodies(collection), ['one', 'two']);
 	});
 
 	Chunk('goes rambo', async () => {
@@ -103,11 +72,8 @@ export default (meros: Meros, responder: Responder) => {
 		];
 		const boundary = randomBytes(50).toString('hex');
 
-		const collection = await make_test(push => {
-			push([
-				wrap(boundary),
-				makePart('one'),
-			]);
+		const collection = await make_test((push) => {
+			push([wrap(boundary), makePart('one')]);
 
 			for (let payload of result) {
 				push([wrap(boundary)]);
@@ -116,17 +82,10 @@ export default (meros: Meros, responder: Responder) => {
 				}
 			}
 
-			push([
-				wrap(boundary),
-				makePart('two'),
-				tail(boundary),
-			]);
+			push([wrap(boundary), makePart('two'), tail(boundary)]);
 		}, boundary);
 
-		assert.equal(
-			bodies(collection),
-			['one', ...result, 'two'],
-		);
+		assert.equal(bodies(collection), ['one', ...result, 'two']);
 	});
 
 	Chunk.run();
@@ -134,10 +93,8 @@ export default (meros: Meros, responder: Responder) => {
 	const Multi = suite('chunking :: multi');
 
 	Multi('when true :: basic', async () => {
-		const {
-			asyncIterableIterator,
-			pushValue,
-		} = makePushPullAsyncIterableIterator();
+		const { asyncIterableIterator, pushValue } =
+			makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, '-');
 		const parts = await meros(response, { multiple: true });
 
@@ -171,4 +128,4 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Multi.run();
-}
+};
