@@ -10,10 +10,6 @@
 			"meros": ["./index.d.ts"]
 		}
 	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.d.ts",
-		"index.d.ts"
-	],
+	"include": ["src/**/*.ts", "src/**/*.d.ts", "index.d.ts"],
 	"exclude": ["node_modules"]
 }
