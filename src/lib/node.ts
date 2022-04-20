@@ -12,10 +12,10 @@ export async function* generate<T>(
 ): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
 	const is_eager = !options || !options.multiple;
 
-	let len_boundary = Buffer.byteLength(boundary),
-		buffer = Buffer.alloc(0),
-		is_preamble = true,
-		payloads = [];
+	let len_boundary = Buffer.byteLength(boundary);
+	let buffer = Buffer.alloc(0);
+	let is_preamble = true;
+	let payloads = [];
 
 	outer: for await (const chunk of stream) {
 		let idx_boundary = buffer.byteLength;
@@ -69,7 +69,7 @@ export async function* generate<T>(
 				is_eager ? yield tmp : payloads.push(tmp);
 
 				// hit a tail boundary, break
-				if (next.slice(0, 2).toString() === '--') break outer;
+				if ('--' === next.slice(0, 2).toString()) break outer;
 			}
 
 			buffer = next;

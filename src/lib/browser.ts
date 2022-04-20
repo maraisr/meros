@@ -10,12 +10,12 @@ export async function* generate<T>(
 	boundary: string,
 	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, string>>> {
-	const reader = stream.getReader(),
-		is_eager = !options || !options.multiple;
+	const reader = stream.getReader();
+	const is_eager = !options || !options.multiple;
 
-	let buffer = '',
-		is_preamble = true,
-		payloads = [];
+	let buffer = '';
+	let is_preamble = true;
+	let payloads = [];
 
 	try {
 		let result: ReadableStreamDefaultReadResult<Uint8Array>;
@@ -23,6 +23,7 @@ export async function* generate<T>(
 			const chunk = decoder.decode(result.value);
 			const idx_chunk = chunk.indexOf(boundary);
 			let idx_boundary = buffer.length;
+
 			buffer += chunk;
 
 			if (!!~idx_chunk) {
@@ -71,7 +72,7 @@ export async function* generate<T>(
 					is_eager ? yield tmp : payloads.push(tmp);
 
 					// hit a tail boundary, break
-					if (next.substring(0, 2) === '--') break outer;
+					if ('--' === next.substring(0, 2)) break outer;
 				}
 
 				buffer = next;
