@@ -87,5 +87,29 @@ export default (meros: Meros, responder: Responder) => {
 		]);
 	});
 
+	Headers('no headers', async () => {
+		const {
+			asyncIterableIterator,
+			pushValue,
+		} = makePushPullAsyncIterableIterator();
+		const response = await responder(asyncIterableIterator, '-');
+		const parts = await meros(response);
+
+		const collection = [];
+
+		pushValue([
+			preamble,
+			wrap,
+			makePart('part', false),
+			tail,
+		]);
+
+		for await (let { headers } of parts) {
+			collection.push(headers);
+		}
+
+		assert.equal(collection, [{}]);
+	});
+
 	Headers.run();
 }

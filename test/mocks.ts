@@ -9,11 +9,15 @@ export const wrap = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')
 export const tail = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}--\r\n`;
 export const preamble = () => 'preamble';
 
-export const makePart = (payload: any, headers: string[] = []): Part => {
+export const makePart = (payload: any, headers: string[] | boolean = []): Part => {
+	if (headers === false) {
+		headers = [];
+	} else {
+		(headers as string[])
+			.unshift(`content-type: ${typeof payload === 'string' ? 'text/plain' : 'application/json; charset=utf-8'}`);
+	}
+
 	const returns = [
-		`content-type: ${
-			typeof payload === 'string' ? 'text/plain' : 'application/json; charset=utf-8'
-		}`,
 		...headers,
 		'',
 		Buffer.from(
