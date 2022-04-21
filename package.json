@@ -35,6 +35,14 @@
 				"require": "./node/index.js"
 			}
 		},
+		"./observable": {
+			"import": "./browser/index.observable.mjs",
+			"require": "./browser/index.observable.js"
+		},
+		"./browser.observable": {
+			"import": "./browser/index.observable.mjs",
+			"require": "./browser/index.observable.js"
+		},
 		"./browser": {
 			"import": "./browser/index.mjs",
 			"require": "./browser/index.js"
