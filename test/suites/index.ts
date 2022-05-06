@@ -10,7 +10,7 @@ export default (meros: Meros, responder: Responder) => {
 	API(meros, responder);
 	Boundary(meros, responder);
 
-	Chunking(meros, responder);
+	//Chunking(meros, responder);
 
 	Headers(meros, responder);
 	Body(meros, responder);
