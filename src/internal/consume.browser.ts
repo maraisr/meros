@@ -8,7 +8,6 @@ export const make = (b: string, is_eager: boolean) => {
 	let boundary = b;
 	let buffer = '';
 	let is_preamble = true;
-	let payloads = [];
 
 	return function* consume<T extends Part<any, any>>(
 		result: ReadableStreamDefaultReadResult<Uint8Array>,
@@ -19,7 +18,6 @@ export const make = (b: string, is_eager: boolean) => {
 
 		buffer += chunk;
 
-
 		if (!!~idx_chunk) {
 			// chunk itself had `boundary` marker
 			idx_boundary += idx_chunk;
@@ -28,7 +26,7 @@ export const make = (b: string, is_eager: boolean) => {
 			idx_boundary = buffer.indexOf(boundary);
 		}
 
-		payloads = [];
+		let payloads:Array<T>|false = is_eager ? false : [];
 		while (!!~idx_boundary) {
 			const current = buffer.substring(0, idx_boundary);
 			const next = buffer.substring(idx_boundary + boundary.length);
@@ -63,17 +61,17 @@ export const make = (b: string, is_eager: boolean) => {
 				}
 
 				tmp = { headers, body, json: is_json } as T;
-				is_eager ? yield tmp : payloads.push(tmp);
+				is_eager ? yield tmp : (payloads as Array<T>).push(tmp);
 
 				// hit a tail boundary, break
-				if ('--' === next.substring(0, 2)) return  false;
+				if ('--' === next.substring(0, 2)) return payloads;
 			}
 
 			buffer = next;
 			idx_boundary = buffer.indexOf(boundary);
 		}
 
-		if (payloads.length) return payloads;
+		return payloads;
 	}
 }
 
