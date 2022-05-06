@@ -1,5 +1,5 @@
-import {Part} from "meros";
-import {Arrayable} from "../shared";
+import type { Part } from "meros";
+import type { Arrayable } from "../shared";
 
 const decoder = new TextDecoder;
 
@@ -26,7 +26,7 @@ export const make = (b: string, is_eager: boolean) => {
 			idx_boundary = buffer.indexOf(boundary);
 		}
 
-		let payloads:Array<T>|false = is_eager ? false : [];
+		let payloads: Array<T> | false = is_eager ? false : [];
 		while (!!~idx_boundary) {
 			const current = buffer.substring(0, idx_boundary);
 			const next = buffer.substring(idx_boundary + boundary.length);
@@ -60,7 +60,7 @@ export const make = (b: string, is_eager: boolean) => {
 					}
 				}
 
-				tmp = { headers, body, json: is_json } as T;
+				tmp = {headers, body, json: is_json} as T;
 				is_eager ? yield tmp : (payloads as Array<T>).push(tmp);
 
 				// hit a tail boundary, break

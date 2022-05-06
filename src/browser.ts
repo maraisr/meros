@@ -1,5 +1,5 @@
-import type {Options, Part} from 'meros';
-import {make} from './internal/consume.browser';
+import type { Options, Part } from 'meros';
+import { make } from './internal/consume.browser';
 
 import type {Arrayable} from './shared';
 
