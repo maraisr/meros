@@ -111,7 +111,7 @@ global['fetch'] = async function (url, options) {
 			for await (let part of parts) {
 				let data = '';
 				for await (const chunk of part.body) {
-					data += chunk.toString();
+					data += String(chunk);
 				}
 				collection.push(
 					!!~part.headers['content-type'].indexOf('application/json')

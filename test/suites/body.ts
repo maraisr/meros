@@ -39,7 +39,7 @@ export default (meros: Meros, responder: Responder) => {
 
 		assert.equal(collection.length, 1);
 		assert.equal(collection[0].json, false);
-		assert.equal(collection[0].body.toString(), 'test');
+		assert.equal(String(collection[0].body), 'test');
 	});
 
 	Body('mixed', async () => {
@@ -59,7 +59,7 @@ export default (meros: Meros, responder: Responder) => {
 		assert.equal(collection[0].json, true);
 		assert.equal(collection[0].body, { foo: 'bar' });
 		assert.equal(collection[1].json, false);
-		assert.equal(collection[1].body.toString(), 'bar: baz');
+		assert.equal(String(collection[1].body), 'bar: baz');
 	});
 
 	Body('unicode body', async () => {

@@ -116,7 +116,7 @@ export type Meros = any;
 export type Responder = any;
 
 export const bodies = (parts: any[]) =>
-	parts.map(({ body, json }) => (json ? body : body.toString()));
+	parts.map(({ body, json }) => (json ? body : String(body)));
 
 export const test_helper = async (
 	meros: Meros,

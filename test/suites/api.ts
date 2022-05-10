@@ -35,7 +35,7 @@ export default (meros: Meros, responder: Responder) => {
 
 		let r = await parts.next();
 		assert.equal(r.done, false);
-		assert.equal(r.value.body.toString(), 'test');
+		assert.equal(String(r.value.body), 'test');
 
 		await asyncIterableIterator.return();
 

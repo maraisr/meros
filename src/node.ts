@@ -17,9 +17,10 @@ async function* generate<T>(
 	let payloads = [];
 
 	outer: for await (const chunk of stream) {
-		let idx_boundary = buffer.byteLength;
-		buffer = Buffer.concat([buffer, chunk]);
 		const idx_chunk = (chunk as Buffer).indexOf(boundary);
+		let idx_boundary = buffer.byteLength;
+		
+		buffer = Buffer.concat([buffer, chunk]);
 
 		if (!!~idx_chunk) {
 			// chunk itself had `boundary` marker
@@ -60,7 +61,7 @@ async function* generate<T>(
 				tmp = headers['content-type'];
 				if (tmp && !!~tmp.indexOf('application/json')) {
 					try {
-						body = JSON.parse(body.toString()) as T;
+						body = JSON.parse(String(body)) as T;
 						is_json = true;
 					} catch (_) {
 					}
@@ -70,7 +71,7 @@ async function* generate<T>(
 				is_eager ? yield tmp : payloads.push(tmp);
 
 				// hit a tail boundary, break
-				if ('--' === next.slice(0, 2).toString()) break outer;
+				if ('--' === String(next.slice(0, 2))) break outer;
 			}
 
 			buffer = next;
