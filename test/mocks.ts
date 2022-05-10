@@ -101,7 +101,7 @@ export async function mockResponseBrowser<T>(
 							done,
 						};
 					},
-					releaseLock() {
+					cancel() {
 						// nothing
 					},
 				};

@@ -82,7 +82,7 @@ async function* generate<T>(
 		}
 	} finally {
 		if (payloads.length) yield payloads;
-		reader.releaseLock();
+		await reader.cancel();
 	}
 }
 
