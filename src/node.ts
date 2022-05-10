@@ -71,7 +71,7 @@ async function* generate<T>(
 				is_eager ? yield tmp : payloads.push(tmp);
 
 				// hit a tail boundary, break
-				if ('--' === String(next.slice(0, 2))) break outer;
+				if (next[0] === 45 && next[1] === 45) break outer;
 			}
 
 			buffer = next;
