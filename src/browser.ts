@@ -12,6 +12,7 @@ async function* generate<T>(
 	const reader = stream.getReader();
 	const is_eager = !options || !options.multiple;
 
+	let len_boundary = boundary.length;
 	let buffer = '';
 	let is_preamble = true;
 	let payloads = [];
@@ -36,15 +37,18 @@ async function* generate<T>(
 			payloads = [];
 			while (!!~idx_boundary) {
 				const current = buffer.substring(0, idx_boundary);
-				const next = buffer.substring(idx_boundary + boundary.length);
+				const next = buffer.substring(idx_boundary + len_boundary);
 
 				if (is_preamble) {
 					is_preamble = false;
 					boundary = '\r\n' + boundary;
+					len_boundary += 2;
 				} else {
 					const headers: Record<string, string> = {};
-					const idx_headers = current.indexOf('\r\n\r\n');
-					const arr_headers = buffer.slice(0, idx_headers).trim().split('\r\n');
+					const idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
+					const arr_headers = String(buffer.slice(0, idx_headers))
+						.trim()
+						.split('\r\n');
 
 					// parse headers
 					let tmp;
@@ -53,9 +57,9 @@ async function* generate<T>(
 						headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 					}
 
-					const last_idx = current.lastIndexOf('\r\n', idx_headers + 4); // 4 -> '\r\n\r\n'.length
+					const last_idx = current.lastIndexOf('\r\n', idx_headers); // 4 -> '\r\n\r\n'.length
 
-					let body: T | string = current.substring(idx_headers + 4, last_idx > -1 ? undefined : last_idx);
+					let body: T | string = current.substring(idx_headers, last_idx > -1 ? undefined : last_idx);
 					let is_json = false;
 
 					tmp = headers['content-type'];
