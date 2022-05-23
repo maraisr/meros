@@ -81,7 +81,7 @@ const parts = await meros(response);
 
 Meros offers two flavours, both for the browser and for node; but their api's are fundamentally the same.
 
-> **Note:** The type `Response` is used loosely here and simply alludes to Node's `IncomingMessage` or the browser's
+> **Note**: The type `Response` is used loosely here and simply alludes to Node's `IncomingMessage` or the browser's
 > `Response` type.
 
 ### `meros(response: Response, options?: Options)`
@@ -133,7 +133,7 @@ Setting this to `true` will yield once for all available parts of a chunk, rathe
 an optimization technique for technologies like GraphQL where rather than commit the payload to the store, to be
 added-to in the next process-tick we can simply do that synchronously.
 
-> **Important:** This will alter the behaviour and yield arrays—than yield payloads.
+> **Warning**: This will alter the behaviour and yield arrays—than yield payloads.
 
 ```ts
 const chunks = await fetch('/api').then((response) => meros(response, { multiple: true }));
