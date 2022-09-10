@@ -1,5 +1,5 @@
-import type { IncomingMessage } from 'http';
-import type { Readable } from 'stream';
+import type { IncomingMessage } from 'node:http';
+import type { Readable } from 'node:stream';
 
 import type { Options, Part } from 'meros';
 import type { Arrayable } from './shared';
