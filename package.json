@@ -23,23 +23,28 @@
 	"exports": {
 		".": {
 			"browser": {
+				"types": "./browser/index.d.ts",
 				"import": "./browser/index.mjs",
 				"require": "./browser/index.js"
 			},
 			"node": {
+				"types": "./node/index.d.ts",
 				"import": "./node/index.mjs",
 				"require": "./node/index.js"
 			},
 			"default": {
+				"types": "./node/index.d.ts",
 				"import": "./node/index.mjs",
 				"require": "./node/index.js"
 			}
 		},
 		"./browser": {
+			"types": "./browser/index.d.ts",
 			"import": "./browser/index.mjs",
 			"require": "./browser/index.js"
 		},
 		"./node": {
+			"types": "./node/index.d.ts",
 			"import": "./node/index.mjs",
 			"require": "./node/index.js"
 		},
@@ -65,11 +70,11 @@
 	"devDependencies": {
 		"@marais/tsconfig": "0.0.3",
 		"@n1ru4l/push-pull-async-iterable-iterator": "3.2.0",
-		"@types/node": "17.0.31",
+		"@types/node": "18.7.16",
 		"bundt": "2.0.0-next.5",
-		"prettier": "2.6.2",
-		"tsm": "2.2.1",
-		"typescript": "4.6.4",
+		"prettier": "2.7.1",
+		"tsm": "2.2.2",
+		"typescript": "4.8.3",
 		"uvu": "0.5.3"
 	},
 	"peerDependencies": {
