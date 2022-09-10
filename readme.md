@@ -1,22 +1,17 @@
 <img src="logo.svg" alt="meros">
+
 <br />
 <br />
 
 <div align="right">
-	<p><code>npm add meros</code> makes reading multipart responses simple</p>
-	<span>
-		<a href="https://github.com/maraisr/meros/actions/workflows/ci.yml">
-			<img src="https://github.com/maraisr/meros/actions/workflows/ci.yml/badge.svg"/>
-		</a>
-		<a href="https://npm-stat.com/charts.html?package=meros">
-    		<img src="https://badgen.net/npm/dw/meros?labelColor=black&color=black&cache=600" alt="downloads"/>
-		</a>
-		<a href="https://bundlephobia.com/result?p=meros">
-			<img src="https://badgen.net/bundlephobia/minzip/meros?labelColor=black&color=black" alt="size"/>
-		</a>
-	</span>
-  <br />
-  <br />
+
+`npm add meros` makes reading multipart responses simple
+
+[![npm stats](https://badgen.net/npm/dw/meros)](https://npm-stat.com/charts.html?package=meros)
+[![bundle size](https://badgen.net/bundlephobia/minzip/meros)](https://bundlephobia.com/result?p=meros)
+
+<br />
+
 </div>
 
 ## ⚡ Features
@@ -24,10 +19,12 @@
 - No dependencies
 - Seemless api
 - Super [performant](#-benchmark)
-- Supports _any_<sup>1</sup> `content-type`
+- Supports _any_[^1] `content-type`
 - _preamble_ and _epilogue_ don't yield
 - Browser/Node Compatible
 - Plugs into existing libraries like Relay and rxjs
+
+[^1]: By default, we'll look for JSON, and parse that for you. If not, we'll give you the body as what was streamed.
 
 ## 🚀 Usage
 
@@ -187,15 +184,16 @@ Another goal here is to aide in being the defacto standard transport library to 
 
 Special thanks to [Luke Edwards](https://github.com/lukeed) for performance guidance and high level api design.
 
+## 😇 Compassion
+
+This library is simple, a meer few hundred bytes. It's easy to copy, and easy to alter. If you do, that is fine ❤️ im
+all for the freedom of software. But please give credit where credit is due.
+
+- [urql](https://github.com/FormidableLabs/urql/blob/78368cf5bfcdd04bd663d8775d8883962128376b/packages/core/src/internal/fetchSource.ts#L34-L35)
+  you guys rock 🫶
+
 ## License
 
 MIT © [Marais Rossouw](https://marais.io)
-
-<details>
-<summary>Footnote</summary>
-
-> 1: By default, we'll look for JSON, and parse that for you. If not, we'll give you the body as what was streamed.
-
-</details>
 
 [rfc1341]: https://tools.ietf.org/html/rfc1341 'The Multipart Content-Type'
