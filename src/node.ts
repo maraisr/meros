@@ -89,12 +89,15 @@ export async function meros<T = object>(response: IncomingMessage, options?: Opt
 	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
 
 	const idx_boundary = ctype.indexOf('boundary=');
+	const idx_boundary_len = idx_boundary + 9; // +9 for 'boundary='.length
+  	const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
 
 	return generate<T>(
 		response,
 		`--${!!~idx_boundary
-			? // +9 for 'boundary='.length
-			ctype.substring(idx_boundary + 9).trim().replace(/['"]/g, '')
+			? ctype.substring(idx_boundary_len, eo_boundary > -1 ? eo_boundary : undefined)
+				.replace(/['"]/g, '')
+				.trim()
 			: '-'}`,
 		options,
 	);

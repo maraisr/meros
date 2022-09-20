@@ -1,7 +1,17 @@
 import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { type Meros, type Responder, splitString } from '../mocks';
+import {
+	type Meros,
+	type Responder,
+	splitString,
+	test_helper,
+	preamble,
+	wrap,
+	makePart,
+	tail,
+	bodies,
+} from '../mocks';
 
 export default (meros: Meros, responder: Responder) => {
 	const Boundary = suite('boundary');
@@ -58,6 +68,30 @@ export default (meros: Meros, responder: Responder) => {
 		Boundary(boundary, make_test.bind(0, boundary, true));
 		Boundary(boundary, make_test.bind(0, boundary, false));
 	}
+
+	Boundary('RFC 1521 page 69', async () => {
+		const collection = await test_helper(
+			meros,
+			responder,
+			(push) => {
+				push([
+					preamble,
+					wrap,
+					makePart({ foo: 'bar' }),
+					wrap,
+					makePart({ bar: 'baz' }),
+					tail,
+				]);
+			},
+			'-',
+			{
+				'content-type': 'multipart/mixed;boundary="-";charset=utf-8',
+				'Content-Type': 'multipart/mixed;boundary="-";charset=utf-8',
+			},
+		);
+
+		assert.equal(bodies(collection), [{ foo: 'bar' }, { bar: 'baz' }]);
+	});
 
 	Boundary.run();
 };

@@ -65,11 +65,13 @@ const processChunk = (chunk: string[], boundary: string) => {
 export async function mockResponseNode<T>(
 	chunks: AsyncIterableIterator<T>,
 	boundary: string,
+	headers: Record<string, string> = {},
 ): Promise<IncomingMessage> {
 	return {
 		headers: {
 			'content-type': `multipart/mixed; boundary=${boundary}`,
 			'Content-Type': `multipart/mixed; boundary=${boundary}`,
+			...headers,
 		},
 		[Symbol.asyncIterator]: async function* () {
 			for await (let chunk of chunks) {
@@ -82,12 +84,17 @@ export async function mockResponseNode<T>(
 export async function mockResponseBrowser<T>(
 	chunks: AsyncIterableIterator<T>,
 	boundary: string,
+	headers: Record<string, string> = {},
 ): Promise<Response> {
+	const headrs = new Map([
+		['content-type', `multipart/mixed; boundary=${boundary}`],
+		['Content-Type', `multipart/mixed; boundary=${boundary}`],
+	]);
+	Object.entries(headers).forEach((key, value) => {
+		headrs.set(key, value);
+	});
 	return {
-		headers: new Map([
-			['content-type', `multipart/mixed; boundary=${boundary}`],
-			['Content-Type', `multipart/mixed; boundary=${boundary}`],
-		]),
+		headers: headrs,
 		status: 200,
 		body: {
 			getReader() {
@@ -123,10 +130,11 @@ export const test_helper = async (
 	responder: Responder,
 	process: (v: any) => void,
 	boundary = '-',
+	headers?: Record<string, string>,
 ) => {
 	const { asyncIterableIterator, pushValue } =
 		makePushPullAsyncIterableIterator();
-	const response = await responder(asyncIterableIterator, boundary);
+	const response = await responder(asyncIterableIterator, boundary, headers);
 
 	const parts = await meros(response);
 	const collection = [];
