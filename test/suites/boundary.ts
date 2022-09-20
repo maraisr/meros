@@ -55,7 +55,6 @@ export default (meros: Meros, responder: Responder) => {
 	};
 
 	for (let boundary of [
-		'-',
 		'abc123',
 		'abcdefghijklmnopqrstuvwxyz_abcdefghijklmnopqrstuvwxyz',
 		'✨',
@@ -64,6 +63,18 @@ export default (meros: Meros, responder: Responder) => {
 		'----------------------------------------------------------',
 		'---',
 		'===',
+		"'",
+		'(',
+		')',
+		'+',
+		'_',
+		',',
+		'-',
+		'.',
+		'/',
+		':',
+		'=',
+		'?',
 	]) {
 		Boundary(boundary, make_test.bind(0, boundary, true));
 		Boundary(boundary, make_test.bind(0, boundary, false));
