@@ -1,6 +1,6 @@
 {
 	"name": "meros",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "A fast 626B utility that makes reading multipart responses simple",
 	"keywords": [
 		"defer",
