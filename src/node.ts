@@ -90,7 +90,7 @@ export async function meros<T = object>(response: IncomingMessage, options?: Opt
 
 	const idx_boundary = ctype.indexOf('boundary=');
 	const idx_boundary_len = idx_boundary + 9; // +9 for 'boundary='.length
-  	const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
+	const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
 
 	return generate<T>(
 		response,
