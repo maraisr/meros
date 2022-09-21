@@ -14,11 +14,7 @@
 	],
 	"repository": "maraisr/meros",
 	"license": "MIT",
-	"author": {
-		"name": "Marais Rossouw",
-		"email": "me@marais.dev",
-		"url": "https://marais.io"
-	},
+	"author": "Marais Rossow <me@marais.dev> (https://marais.io)",
 	"sideEffects": false,
 	"exports": {
 		".": {
@@ -67,7 +63,9 @@
 		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts -i suites",
 		"typecheck": "tsc --noEmit"
 	},
+	"prettier": "@marais/prettier",
 	"devDependencies": {
+		"@marais/prettier": "0.0.1",
 		"@marais/tsconfig": "0.0.3",
 		"@n1ru4l/push-pull-async-iterable-iterator": "3.2.0",
 		"@types/node": "18.7.16",
