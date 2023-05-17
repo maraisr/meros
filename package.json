@@ -58,7 +58,7 @@
 	"scripts": {
 		"bench": "tsm -r ./test/_polyfill.ts bench/index.ts",
 		"build": "bundt --minify",
-		"format": "prettier --write --list-different \"{*,test/**/*,examples/*/**,.github/**/*}.+(ts|tsx|json|yml|md)\"",
+		"format": "prettier --write --list-different \"{*,{src,examples,test}/**/*,.github/**/*}.{ts,tsx,json,yml,md}\"",
 		"prepublishOnly": "pnpm run build",
 		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts -i suites",
 		"typecheck": "tsc --noEmit"

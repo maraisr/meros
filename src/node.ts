@@ -48,14 +48,17 @@ async function* generate<T>(
 
 				// parse headers
 				let tmp;
-				while (tmp = arr_headers.shift()) {
+				while ((tmp = arr_headers.shift())) {
 					tmp = tmp.split(': ');
 					headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 				}
 
 				const last_idx = current.lastIndexOf('\r\n', idx_headers);
 
-				let body: T | Buffer = current.subarray(idx_headers, last_idx > -1 ? undefined : last_idx);
+				let body: T | Buffer = current.subarray(
+					idx_headers,
+					last_idx > -1 ? undefined : last_idx,
+				);
 				let is_json = false;
 
 				tmp = headers['content-type'];
@@ -63,8 +66,7 @@ async function* generate<T>(
 					try {
 						body = JSON.parse(String(body)) as T;
 						is_json = true;
-					} catch (_) {
-					}
+					} catch (_) {}
 				}
 
 				tmp = { headers, body, json: is_json } as Part<T, Buffer>;
@@ -95,10 +97,7 @@ export async function meros<T = object>(response: IncomingMessage, options?: Opt
 		const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
 
 		boundary = ctype
-			.slice(
-				idx_boundary_len,
-				eo_boundary > -1 ? eo_boundary : undefined,
-			)
+			.slice(idx_boundary_len, eo_boundary > -1 ? eo_boundary : undefined)
 			.trim()
 			.replace(/"/g, '');
 	}

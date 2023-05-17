@@ -22,6 +22,15 @@ import type { Options, Part } from 'meros';
  * }
  * ```
  */
-export function meros<T = object>(response: IncomingMessage, options: { multiple: true }): Promise<IncomingMessage | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
-export function meros<T = object>(response: IncomingMessage, options?: { multiple: false }): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
-export function meros<T = object>(response: IncomingMessage, options?: Options): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
+export function meros<T = object>(
+	response: IncomingMessage,
+	options: { multiple: true },
+): Promise<IncomingMessage | AsyncGenerator<ReadonlyArray<Part<T, Buffer>>>>;
+export function meros<T = object>(
+	response: IncomingMessage,
+	options?: { multiple: false },
+): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
+export function meros<T = object>(
+	response: IncomingMessage,
+	options?: Options,
+): Promise<IncomingMessage | AsyncGenerator<Part<T, Buffer>>>;
