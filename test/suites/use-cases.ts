@@ -46,8 +46,7 @@ export default (meros: Meros, responder: Responder) => {
 										id: 'UHJvamVjdAppMQ==',
 										name: 'New project',
 										desc: '',
-										lastUpdate:
-											'2021-12-22T12:57:45.488\u002B03:00',
+										lastUpdate: '2021-12-22T12:57:45.488\u002B03:00',
 										__typename: 'Project',
 									},
 									cursor: 'MA==',
@@ -87,8 +86,7 @@ export default (meros: Meros, responder: Responder) => {
 									id: 'UHJvamVjdAppMQ==',
 									name: 'New project',
 									desc: '',
-									lastUpdate:
-										'2021-12-22T12:57:45.488\u002B03:00',
+									lastUpdate: '2021-12-22T12:57:45.488\u002B03:00',
 									__typename: 'Project',
 								},
 								cursor: 'MA==',

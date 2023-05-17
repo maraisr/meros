@@ -1,9 +1,4 @@
-import {
-	GraphQLList,
-	GraphQLObjectType,
-	GraphQLSchema,
-	GraphQLString,
-} from 'graphql';
+import { GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql';
 
 export const schema = new GraphQLSchema({
 	query: new GraphQLObjectType({
@@ -22,9 +17,7 @@ export const schema = new GraphQLSchema({
 				),
 				resolve: async function* () {
 					for (let letter = 65; letter <= 90; letter++) {
-						await new Promise((resolve) =>
-							setTimeout(resolve, 500),
-						);
+						await new Promise((resolve) => setTimeout(resolve, 500));
 						yield { char: String.fromCharCode(letter) };
 					}
 				},
@@ -42,10 +35,7 @@ export const schema = new GraphQLSchema({
 							resolve: () =>
 								new Promise((resolve) =>
 									setTimeout(
-										() =>
-											resolve(
-												"Next time won't you sing with me?",
-											),
+										() => resolve("Next time won't you sing with me?"),
 										5000,
 									),
 								),
@@ -53,9 +43,7 @@ export const schema = new GraphQLSchema({
 					}),
 				}),
 				resolve: () =>
-					new Promise((resolve) =>
-						setTimeout(() => resolve('goodbye'), 1000),
-					),
+					new Promise((resolve) => setTimeout(() => resolve('goodbye'), 1000)),
 			},
 		}),
 	}),

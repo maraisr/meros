@@ -104,12 +104,7 @@ app.use('/graphql', async (req, res) => {
 			}
 
 			const chunk = Buffer.from(JSON.stringify(result), 'utf8');
-			const data = [
-				'',
-				'Content-Type: application/json; charset=utf-8',
-				'',
-				chunk,
-			];
+			const data = ['', 'Content-Type: application/json; charset=utf-8', '', chunk];
 
 			if (!result.extensions.is_final) {
 				data.push('---');

@@ -1,13 +1,7 @@
 import type { ExecutionPatchResult } from 'graphql';
 import { meros } from 'meros/browser';
 import type { FetchFunction } from 'relay-runtime';
-import {
-	Environment,
-	Network,
-	Observable,
-	RecordSource,
-	Store,
-} from 'relay-runtime';
+import { Environment, Network, Observable, RecordSource, Store } from 'relay-runtime';
 
 const STORE_ENTRIES = 150;
 const STORE_CACHE_RELEASE_TIME = 2 * 60 * 1000; // 2 mins

@@ -16,12 +16,8 @@ import {
 export default (meros: Meros, responder: Responder) => {
 	const Boundary = suite('boundary');
 
-	const make_test = async (
-		boundary: string,
-		with_preamble_boundary = true,
-	) => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
+	const make_test = async (boundary: string, with_preamble_boundary = true) => {
+		const { asyncIterableIterator, pushValue } = makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, boundary);
 
 		const part = [

@@ -15,8 +15,7 @@ export default (meros: Meros, responder: Responder) => {
 	const Headers = suite('headers');
 
 	Headers('smoke', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
+		const { asyncIterableIterator, pushValue } = makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, '-');
 		const parts = await meros(response);
 
@@ -57,8 +56,7 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Headers('crossing chunks', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
+		const { asyncIterableIterator, pushValue } = makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, '-');
 		const parts = await meros(response);
 
@@ -101,8 +99,7 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Headers('no headers', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
+		const { asyncIterableIterator, pushValue } = makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, '-');
 		const parts = await meros(response);
 

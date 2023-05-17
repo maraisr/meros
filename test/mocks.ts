@@ -5,24 +5,17 @@ import type { IncomingMessage } from 'http';
 
 type Part = string;
 
-export const wrap = (boundary: string) =>
-	`\r\n--${boundary.replace(/['"]/g, '')}\r\n`;
-export const tail = (boundary: string) =>
-	`\r\n--${boundary.replace(/['"]/g, '')}--\r\n`;
+export const wrap = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}\r\n`;
+export const tail = (boundary: string) => `\r\n--${boundary.replace(/['"]/g, '')}--\r\n`;
 export const preamble = () => 'preamble';
 
-export const makePart = (
-	payload: any,
-	headers: string[] | boolean = [],
-): Part => {
+export const makePart = (payload: any, headers: string[] | boolean = []): Part => {
 	if (headers === false) {
 		headers = [];
 	} else {
 		(headers as string[]).unshift(
 			`content-type: ${
-				typeof payload === 'string'
-					? 'text/plain'
-					: 'application/json; charset=utf-8'
+				typeof payload === 'string' ? 'text/plain' : 'application/json; charset=utf-8'
 			}`,
 		);
 	}
@@ -30,10 +23,7 @@ export const makePart = (
 	const returns = [
 		...headers,
 		'',
-		Buffer.from(
-			typeof payload === 'string' ? payload : JSON.stringify(payload),
-			'utf8',
-		),
+		Buffer.from(typeof payload === 'string' ? payload : JSON.stringify(payload), 'utf8'),
 	];
 
 	return returns.join('\r\n');
@@ -102,9 +92,7 @@ export async function mockResponseBrowser<T>(
 					async read() {
 						const { value: chunk, done } = await chunks.next();
 						return {
-							value: chunk
-								? processChunk(chunk, boundary)
-								: undefined,
+							value: chunk ? processChunk(chunk, boundary) : undefined,
 							done,
 						};
 					},
@@ -132,8 +120,7 @@ export const test_helper = async (
 	boundary = '-',
 	headers?: Record<string, string>,
 ) => {
-	const { asyncIterableIterator, pushValue } =
-		makePushPullAsyncIterableIterator();
+	const { asyncIterableIterator, pushValue } = makePushPullAsyncIterableIterator();
 	const response = await responder(asyncIterableIterator, boundary, headers);
 
 	const parts = await meros(response);

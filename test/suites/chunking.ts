@@ -40,14 +40,7 @@ export default (meros: Meros, responder: Responder) => {
 
 	Chunk('multiple yields single chunk', async () => {
 		const collection = await make_test((push) => {
-			push([
-				preamble,
-				wrap,
-				makePart('one'),
-				wrap,
-				makePart('two'),
-				tail,
-			]);
+			push([preamble, wrap, makePart('one'), wrap, makePart('two'), tail]);
 		});
 
 		assert.equal(bodies(collection), ['one', 'two']);
@@ -93,8 +86,7 @@ export default (meros: Meros, responder: Responder) => {
 	const Multi = suite('chunking :: multi');
 
 	Multi('when true :: basic', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
+		const { asyncIterableIterator, pushValue } = makePushPullAsyncIterableIterator();
 		const response = await responder(asyncIterableIterator, '-');
 		const parts = await meros(response, { multiple: true });
 
@@ -112,12 +104,7 @@ export default (meros: Meros, responder: Responder) => {
 			},
 		]);
 
-		pushValue([
-			makePart({ bar: 'baz' }),
-			wrap,
-			makePart({ foo: 'blitz' }),
-			tail,
-		]);
+		pushValue([makePart({ bar: 'baz' }), wrap, makePart({ foo: 'blitz' }), tail]);
 
 		value = (await parts.next()).value;
 		assert.is(Array.isArray(value), true);

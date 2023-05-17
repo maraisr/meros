@@ -44,14 +44,7 @@ export default (meros: Meros, responder: Responder) => {
 
 	Body('mixed', async () => {
 		const collection = await make_test((push) => {
-			push([
-				preamble,
-				wrap,
-				makePart({ foo: 'bar' }),
-				wrap,
-				makePart('bar: baz'),
-				tail,
-			]);
+			push([preamble, wrap, makePart({ foo: 'bar' }), wrap, makePart('bar: baz'), tail]);
 		});
 
 		assert.equal(collection.length, 2);
