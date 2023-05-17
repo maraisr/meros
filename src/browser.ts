@@ -36,8 +36,8 @@ async function* generate<T>(
 
       payloads = [];
       while (!!~idx_boundary) {
-        const current = buffer.substring(0, idx_boundary);
-        const next = buffer.substring(idx_boundary + len_boundary);
+        const current = buffer.slice(0, idx_boundary);
+        const next = buffer.slice(idx_boundary + len_boundary);
 
         if (is_preamble) {
           is_preamble = false;
@@ -59,7 +59,7 @@ async function* generate<T>(
 
           const last_idx = current.lastIndexOf('\r\n', idx_headers); // 4 -> '\r\n\r\n'.length
 
-          let body: T | string = current.substring(idx_headers, last_idx > -1 ? undefined : last_idx);
+          let body: T | string = current.slice(idx_headers, last_idx > -1 ? undefined : last_idx);
           let is_json = false;
 
           tmp = headers['content-type'];
@@ -75,7 +75,7 @@ async function* generate<T>(
           is_eager ? yield tmp : payloads.push(tmp);
 
           // hit a tail boundary, break
-          if ('--' === next.substring(0, 2)) break outer;
+          if ('--' === next.slice(0, 2)) break outer;
         }
 
         buffer = next;
@@ -103,7 +103,7 @@ export async function meros<T = object>(response: Response, options?: Options) {
 		const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
 
 		boundary = ctype
-			.substring(
+			.slice(
 				idx_boundary_len,
 				eo_boundary > -1 ? eo_boundary : undefined,
 			)

@@ -19,7 +19,7 @@ async function* generate<T>(
 	outer: for await (const chunk of stream) {
 		const idx_chunk = (chunk as Buffer).indexOf(boundary);
 		let idx_boundary = buffer.byteLength;
-		
+
 		buffer = Buffer.concat([buffer, chunk]);
 
 		if (!!~idx_chunk) {
@@ -95,7 +95,7 @@ export async function meros<T = object>(response: IncomingMessage, options?: Opt
 		const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
 
 		boundary = ctype
-			.substring(
+			.slice(
 				idx_boundary_len,
 				eo_boundary > -1 ? eo_boundary : undefined,
 			)
