@@ -1,153 +1,141 @@
 // @ts-nocheck
 
-import { Suite } from 'benchmark';
-import { fetchImpl as fetchMultiPartGraphql } from 'fetch-multipart-graphql/dist/fetch';
-import ItMultipart from 'it-multipart';
+import { suite } from '@marais/bench';
 import { equal } from 'uvu/assert';
-import { meros as merosBrowser } from '../src/browser';
-import { meros as merosNode } from '../src/node';
+
 import { makePart, mockResponseBrowser, mockResponseNode, preamble, tail, wrap } from '../test/mocks';
 
+import fetchMultiPartGraphql from 'fetch-multipart-graphql';
+import ItMultipart from 'it-multipart';
+import { meros as merosBrowser } from '../src/browser';
+import { meros as merosNode } from '../src/node';
+
+const fmg = fetchMultiPartGraphql.default;
+
 const parts = [
-	{ hello: 'world' },
-	[{ other: 'world' }, { another: 'world' }],
-	{
-		massive: {
-			nested: {
-				world: 'okay',
-			},
-		},
-	},
+    { hello: 'world' },
+    [{ other: 'world' }, { another: 'world' }],
+    {
+        massive: {
+            nested: {
+                world: 'okay',
+            },
+        },
+    },
 ];
 
 const results = parts.reduce((result, item) => {
-	if (Array.isArray(item)) {
-		return [...result, ...item];
-	}
-	return [...result, item];
+    if (Array.isArray(item)) {
+        return [...result, ...item];
+    }
+    return [...result, item];
 }, [] as any[]);
 
 const chunks = [
-	[preamble, wrap],
-	...parts.map((v, i) => {
-		if (Array.isArray(v)) {
-			return v.map(v2 => [makePart(v2), wrap]).flat()
-		}
+    [preamble, wrap],
+    ...parts.map((v, i) => {
+        if (Array.isArray(v)) {
+            return v.map(v2 => [makePart(v2), wrap]).flat()
+        }
 
-		if (i === parts.length - 1) {
-			return [makePart(v), tail];
-		}
+        if (i === parts.length - 1) {
+            return [makePart(v), tail];
+        }
 
-		return [makePart(v), wrap];
-	}),
+        return [makePart(v), wrap];
+    }),
 ];
 
-const chunk_gen = (async function* () {
-	for (const value of chunks) {
-		yield value;
-	}
+const chunk_gen = (async function*() {
+    for (const value of chunks) {
+        yield value;
+    }
 });
-
-async function runner(name: string, candidates: Record<string, Function>) {
-	const bench = new Suite().on('cycle', (e) => {
-		console.log('  ' + e.target);
-	});
-
-	console.log('\nValidation :: %s', name);
-	for (const [name, fn] of Object.entries(candidates)) {
-		const result = await fn();
-		try {
-			equal(result, results, 'should match reference patch set');
-			console.log(`✔`, name);
-		} catch (err) {
-			console.log('✘', name, `(FAILED @ "${err.message}")`);
-		}
-	}
-
-	console.log('\nBenchmark :: %s', name);
-	for (const [name, fn] of Object.entries(candidates)) {
-		bench.add(name.padEnd(25), {
-			defer: true,
-			fn: async (deferred) => {
-				await fn();
-				deferred.resolve();
-			},
-		});
-	}
-
-	return new Promise((resolve) => {
-		bench.on('complete', resolve);
-		bench.run();
-	});
-}
 
 const do_node_call = mockResponseNode.bind(null, chunk_gen(), '-');
 const do_browser_call = mockResponseBrowser.bind(null, chunk_gen(), '-');
 
-global['fetch'] = async function (url, options) {
-	return do_browser_call();
+global['fetch'] = async function(url, options) {
+    return do_browser_call();
 };
 
-(async function () {
-	await runner('node', {
-		meros: async () => {
-			const response = await do_node_call();
-			const parts = await merosNode(response);
+const verify = (result) => {
+    equal(result, results, 'should match reference patch set');
+    return true;
+};
 
-			const collection = [];
+console.log('Node');
+await suite({
+    meros() {
+        return async () => {
+            const response = await do_node_call();
+            const parts = await merosNode(response);
 
-			for await (let { body } of parts) {
-				collection.push(body);
-			}
+            const collection = [];
 
-			return collection;
-		},
-		'it-multipart': async () => {
-			const response = await do_node_call();
-			const parts = await ItMultipart(response);
+            for await (let { body } of parts) {
+                collection.push(body);
+            }
 
-			const collection = [];
+            return collection;
+        }
+    },
+    'it-multipart'() {
+        return async () => {
+            const response = await do_node_call();
+            const parts = await ItMultipart(response);
 
-			for await (let part of parts) {
-				let data = '';
-				for await (const chunk of part.body) {
-					data += String(chunk);
-				}
-				collection.push(
-					!!~part.headers['content-type'].indexOf('application/json')
-						? JSON.parse(data)
-						: data,
-				);
-			}
+            const collection = [];
 
-			return collection;
-		},
-	});
+            for await (let part of parts) {
+                let data = '';
+                for await (const chunk of part.body) {
+                    data += String(chunk);
+                }
+                collection.push(
+                    !!~part.headers['content-type'].indexOf('application/json')
+                        ? JSON.parse(data)
+                        : data,
+                );
+            }
 
-	await runner('browser', {
-		meros: async () => {
-			const response = await do_browser_call();
-			const parts = await merosBrowser(response);
+            return collection;
+        }
+    },
+}, (run) => {
+    run(undefined, undefined, verify);
+});
 
-			const collection = [];
+console.log('\nBrowser');
+await suite({
+    meros() {
+        return async () => {
+        const response = await do_browser_call();
+        const parts = await merosBrowser(response);
 
-			for await (let { body } of parts) {
-				collection.push(body);
-			}
+        const collection = [];
 
-			return collection;
-		},
-		'fetch-multipart-graphql': async () => {
-			return new Promise((resolve, reject) => {
-				let collection: any[] = [];
+        for await (let { body } of parts) {
+            collection.push(body);
+        }
 
-				fetchMultiPartGraphql('test', {
-					onNext: (parts: any) =>
-						(collection = [...collection, ...parts]),
-					onError: (err: Error) => reject(err),
-					onComplete: () => resolve(collection),
-				});
-			});
-		},
-	});
-})();
+        return collection;
+        }
+    },
+    'fetch-multipart-graphql'() {
+        return async () => {
+            return new Promise((resolve, reject) => {
+                let collection: any[] = [];
+
+                fmg('test', {
+                    onNext: (parts: any) =>
+                        (collection = [...collection, ...parts]),
+                    onError: (err: Error) => reject(err),
+                    onComplete: () => resolve(collection),
+                });
+            });
+        }
+    },
+}, (run) => {
+    run(undefined, undefined, verify);
+});

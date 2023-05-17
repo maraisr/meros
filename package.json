@@ -56,7 +56,7 @@
 		"node"
 	],
 	"scripts": {
-		"bench": "node -r tsm -r ./test/_polyfill.ts bench/index.ts",
+		"bench": "tsm -r ./test/_polyfill.ts bench/index.ts",
 		"build": "bundt --minify",
 		"format": "prettier --write --list-different \"{*,test/**/*,examples/*/**,.github/**/*}.+(ts|tsx|json|yml|md)\"",
 		"prepublishOnly": "pnpm run build",

@@ -1,9 +1,9 @@
 {
 	"private": true,
+	"type": "module",
 	"dependencies": {
-		"@types/benchmark": "2.1.1",
-		"benchmark": "2.1.4",
-		"fetch-multipart-graphql": "3.0.0",
+		"@marais/bench": "0.0.8",
+		"fetch-multipart-graphql": "3.2.1",
 		"it-multipart": "1.0.9"
 	}
 }

@@ -1,69 +1,67 @@
-lockfileVersion: 5.3
-
-specifiers:
-  '@types/benchmark': 2.1.1
-  benchmark: 2.1.4
-  fetch-multipart-graphql: 3.0.0
-  it-multipart: 1.0.9
+lockfileVersion: '6.0'
 
 dependencies:
-  '@types/benchmark': 2.1.1
-  benchmark: 2.1.4
-  fetch-multipart-graphql: 3.0.0
-  it-multipart: 1.0.9
+  '@marais/bench':
+    specifier: 0.0.8
+    version: 0.0.8
+  fetch-multipart-graphql:
+    specifier: 3.2.1
+    version: 3.2.1
+  it-multipart:
+    specifier: 1.0.9
+    version: 1.0.9
 
 packages:
 
-  /@types/benchmark/2.1.1:
-    resolution: {integrity: sha512-XmdNOarpSSxnb3DE2rRFOFsEyoqXLUL+7H8nSGS25vs+JS0018bd+cW5Ma9vdlkPmoTHSQ6e8EUFMFMxeE4l+g==}
+  /@marais/bench@0.0.8:
+    resolution: {integrity: sha512-DZ3TqK1eUN77E2nV2Aj2aady61rveJGqGAPNQglzoJL001HJq9elFLRS6pw25e6geIEmRld9cJ5F/EHFUYa+DQ==}
+    dependencies:
+      '@thi.ng/bench': 3.2.11
     dev: false
 
-  /base64-js/1.5.1:
+  /@thi.ng/api@8.8.1:
+    resolution: {integrity: sha512-ugTtl3dvOuRsLAF9hZcd/ULBXDG0cAacEQ26jRY00JEEwdy24WR1DOO4iL2mHei0vm2HyvfJ8IlJoRR7mSSqUA==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/bench@3.2.11:
+    resolution: {integrity: sha512-1SSCfwbIXJ9KUIjAaLZEmKSC5OCQf5hDpmzLXlhDFr1SlOaBYXgtu+k8GrSRqmu2kezTV0u23nfW7LSJ5YX2ZA==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.8.1
+    dev: false
+
+  /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     dev: false
 
-  /benchmark/2.1.4:
-    resolution: {integrity: sha1-CfPeMckWQl1JjMLuVloOvzwqVik=}
-    dependencies:
-      lodash: 4.17.21
-      platform: 1.3.6
-    dev: false
-
-  /buffer-indexof/1.1.1:
+  /buffer-indexof@1.1.1:
     resolution: {integrity: sha512-4/rOEg86jivtPTeOUUT61jJO1Ya1TrR/OkqCSZDyq84WJh3LuuiphBYJN+fm5xufIk4XAFcEwte/8WzC8If/1g==}
     dev: false
 
-  /buffer/6.0.3:
+  /buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
     dev: false
 
-  /fetch-multipart-graphql/3.0.0:
-    resolution: {integrity: sha512-asrZG9CMaRUJmzqU+jqyBp52IB3MEzO38bhrPVB73BNAZ8ShBYgQUPOR9d/kYO4dfIrJIki/sTjeNYbUGuqOzQ==}
+  /fetch-multipart-graphql@3.2.1:
+    resolution: {integrity: sha512-uNbr6ysfn3GmR7s6LzkeACpYfxdLvCHSDn9DHSZNHpn6jkDH9mWa8rT4jfqXNzua5PG1z5DpDnZjJzIH462Kew==}
     dev: false
 
-  /ieee754/1.2.1:
+  /ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
     dev: false
 
-  /it-multipart/1.0.9:
+  /it-multipart@1.0.9:
     resolution: {integrity: sha512-EGavbE/ohpP3DESwmjRSz6U3iBtgj2yVgCvqF3EkFO93WxndDg0vDnA2zeSbgyglIINXE93Kvk5Vl8ub6es5Jw==}
     dependencies:
       buffer: 6.0.3
       buffer-indexof: 1.1.1
-      parse-headers: 2.0.4
+      parse-headers: 2.0.5
     dev: false
 
-  /lodash/4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: false
-
-  /parse-headers/2.0.4:
-    resolution: {integrity: sha512-psZ9iZoCNFLrgRjZ1d8mn0h9WRqJwFxM9q3x7iUjN/YT2OksthDJ5TiPCu2F38kS4zutqfW+YdVVkBZZx3/1aw==}
-    dev: false
-
-  /platform/1.3.6:
-    resolution: {integrity: sha512-fnWVljUchTro6RiCFvCXBbNhJc2NijN7oIQxbwsyL0buWJPG85v81ehlHI9fXrJsMNgTofEoWIQeClKpgxFLrg==}
+  /parse-headers@2.0.5:
+    resolution: {integrity: sha512-ft3iAoLOB/MlwbNXgzy43SWGP6sQki2jQvAyBg/zDFAgr9bfNWZIUj42Kw2eJIl8kEi4PbgE6U1Zau/HwI75HA==}
     dev: false
