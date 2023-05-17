@@ -14,9 +14,9 @@ async function* generate<T>(
 
 	let len_boundary = boundary.length;
 	let buffer = '';
-	let is_preamble = true;
 	let payloads = [];
-	let idx_boundary = 0;
+	let idx_boundary;
+	let in_main;
 	let tmp;
 
 	try {
@@ -39,10 +39,9 @@ async function* generate<T>(
 				let current = buffer.slice(0, idx_boundary);
 				let next = buffer.slice(idx_boundary + len_boundary);
 
-				if (is_preamble) {
-					is_preamble = false;
+				if (!in_main) {
 					boundary = '\r\n' + boundary;
-					len_boundary += 2;
+					in_main = len_boundary += 2;
 				} else {
 					let idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
 					let last_idx = current.lastIndexOf('\r\n', idx_headers);

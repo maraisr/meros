@@ -13,9 +13,9 @@ async function* generate<T>(
 
 	let len_boundary = Buffer.byteLength(boundary);
 	let buffer = Buffer.alloc(0);
-	let is_preamble = true;
 	let payloads = [];
-	let idx_boundary = 0;
+	let idx_boundary;
+	let in_main;
 	let tmp;
 
 	outer: for await (let chunk of stream) {
@@ -34,10 +34,9 @@ async function* generate<T>(
 			let current = buffer.subarray(0, idx_boundary);
 			let next = buffer.subarray(idx_boundary + len_boundary);
 
-			if (is_preamble) {
-				is_preamble = false;
+			if (!in_main) {
 				boundary = '\r\n' + boundary;
-				len_boundary += 2;
+				in_main = len_boundary += 2;
 			} else {
 				let idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
 				let last_idx = current.lastIndexOf('\r\n', idx_headers);
