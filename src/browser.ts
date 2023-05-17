@@ -17,6 +17,7 @@ async function* generate<T>(
 	let is_preamble = true;
 	let payloads = [];
 	let idx_boundary = 0;
+	let tmp;
 
 	try {
 		let result: ReadableStreamReadResult<Uint8Array>;
@@ -43,18 +44,19 @@ async function* generate<T>(
 					boundary = '\r\n' + boundary;
 					len_boundary += 2;
 				} else {
-					let headers: Record<string, string> = {};
 					let idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
-					let arr_headers = String(buffer.slice(0, idx_headers))
+					let arr_headers = String(current.slice(0, idx_headers))
 						.trim()
 						.split('\r\n');
 
-					// parse headers
-					let tmp;
-					while ((tmp = arr_headers.shift())) {
-						tmp = tmp.split(': ');
-						headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
-					}
+					let headers: Record<string, string> = {};
+					let len = arr_headers.length;
+					for (
+						;
+						(tmp = arr_headers[--len]);
+						tmp = tmp.split(': '),
+							headers[tmp.shift()!.toLowerCase()] = tmp.join(': ')
+					);
 
 					let last_idx = current.lastIndexOf('\r\n', idx_headers); // 4 -> '\r\n\r\n'.length
 
