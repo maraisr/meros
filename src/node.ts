@@ -9,7 +9,7 @@ async function* generate<T>(
 	boundary: string,
 	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, Buffer>>> {
-	const is_eager = !options || !options.multiple;
+	let is_eager = !options || !options.multiple;
 
 	let len_boundary = Buffer.byteLength(boundary);
 	let buffer = Buffer.alloc(0);
@@ -17,11 +17,11 @@ async function* generate<T>(
 	let payloads = [];
 	let idx_boundary = 0;
 
-	outer: for await (const chunk of stream) {
+	outer: for await (let chunk of stream) {
 		idx_boundary = buffer.byteLength;
 		buffer = Buffer.concat([buffer, chunk]);
 
-		const idx_chunk = (chunk as Buffer).indexOf(boundary);
+		let idx_chunk = (chunk as Buffer).indexOf(boundary);
 		// if the chunk has a boundary, simply use it
 		!!~idx_chunk
 			? (idx_boundary += idx_chunk)
@@ -30,17 +30,17 @@ async function* generate<T>(
 
 		payloads = [];
 		while (!!~idx_boundary) {
-			const current = buffer.subarray(0, idx_boundary);
-			const next = buffer.subarray(idx_boundary + len_boundary);
+			let current = buffer.subarray(0, idx_boundary);
+			let next = buffer.subarray(idx_boundary + len_boundary);
 
 			if (is_preamble) {
 				is_preamble = false;
 				boundary = '\r\n' + boundary;
 				len_boundary += 2;
 			} else {
-				const headers: Record<string, string> = {};
-				const idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
-				const arr_headers = String(buffer.subarray(0, idx_headers))
+				let headers: Record<string, string> = {};
+				let idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
+				let arr_headers = String(buffer.subarray(0, idx_headers))
 					.trim()
 					.split('\r\n');
 
@@ -51,7 +51,7 @@ async function* generate<T>(
 					headers[tmp.shift()!.toLowerCase()] = tmp.join(': ');
 				}
 
-				const last_idx = current.lastIndexOf('\r\n', idx_headers);
+				let last_idx = current.lastIndexOf('\r\n', idx_headers);
 
 				let body: T | Buffer = current.subarray(
 					idx_headers,
@@ -85,14 +85,14 @@ async function* generate<T>(
 }
 
 export async function meros<T = object>(response: IncomingMessage, options?: Options) {
-	const ctype = response.headers['content-type'];
+	let ctype = response.headers['content-type'];
 	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
 
-	const idx_boundary = ctype.indexOf('boundary=');
+	let idx_boundary = ctype.indexOf('boundary=');
 	let boundary = '-';
 	if (!!~idx_boundary) {
-		const idx_boundary_len = idx_boundary + 9; // +9 for 'boundary='.length
-		const eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
+		let idx_boundary_len = idx_boundary + 9; // +9 for 'boundary='.length
+		let eo_boundary = ctype.indexOf(';', idx_boundary_len); // strip any parameter
 
 		boundary = ctype
 			.slice(idx_boundary_len, eo_boundary > -1 ? eo_boundary : undefined)
