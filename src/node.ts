@@ -17,18 +17,15 @@ async function* generate<T>(
 	let payloads = [];
 
 	outer: for await (const chunk of stream) {
-		const idx_chunk = (chunk as Buffer).indexOf(boundary);
 		let idx_boundary = buffer.byteLength;
-
 		buffer = Buffer.concat([buffer, chunk]);
 
-		if (!!~idx_chunk) {
-			// chunk itself had `boundary` marker
-			idx_boundary += idx_chunk;
-		} else {
-			// search combined (boundary can be across chunks)
-			idx_boundary = buffer.indexOf(boundary);
-		}
+		const idx_chunk = (chunk as Buffer).indexOf(boundary);
+		// if the chunk has a boundary, simply use it
+		!!~idx_chunk
+			? (idx_boundary += idx_chunk)
+			: // if not lets search for it in our current buffer
+			  (idx_boundary = buffer.indexOf(boundary));
 
 		payloads = [];
 		while (!!~idx_boundary) {
