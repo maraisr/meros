@@ -40,6 +40,14 @@ async function* generate<T>(
 				len_boundary += 2;
 			} else {
 				let idx_headers = current.indexOf('\r\n\r\n') + 4; // 4 -> '\r\n\r\n'.length
+				let last_idx = current.lastIndexOf('\r\n', idx_headers);
+
+				let is_json = false;
+				let body: T | Buffer = current.subarray(
+					idx_headers,
+					last_idx > -1 ? undefined : last_idx,
+				);
+
 				let arr_headers = String(current.subarray(0, idx_headers))
 					.trim()
 					.split('\r\n');
@@ -51,14 +59,6 @@ async function* generate<T>(
 					(tmp = arr_headers[--len]);
 					tmp = tmp.split(': '), headers[tmp.shift()!.toLowerCase()] = tmp.join(': ')
 				);
-
-				let last_idx = current.lastIndexOf('\r\n', idx_headers);
-
-				let body: T | Buffer = current.subarray(
-					idx_headers,
-					last_idx > -1 ? undefined : last_idx,
-				);
-				let is_json = false;
 
 				tmp = headers['content-type'];
 				if (tmp && !!~tmp.indexOf('application/json')) {
