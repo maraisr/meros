@@ -15,9 +15,10 @@ async function* generate<T>(
 	let buffer = Buffer.alloc(0);
 	let is_preamble = true;
 	let payloads = [];
+	let idx_boundary = 0;
 
 	outer: for await (const chunk of stream) {
-		let idx_boundary = buffer.byteLength;
+		idx_boundary = buffer.byteLength;
 		buffer = Buffer.concat([buffer, chunk]);
 
 		const idx_chunk = (chunk as Buffer).indexOf(boundary);

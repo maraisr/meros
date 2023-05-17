@@ -16,13 +16,14 @@ async function* generate<T>(
 	let buffer = '';
 	let is_preamble = true;
 	let payloads = [];
+	let idx_boundary = 0;
 
 	try {
 		let result: ReadableStreamReadResult<Uint8Array>;
 		outer: while (!(result = await reader.read()).done) {
 			const chunk = decoder.decode(result.value);
 
-			let idx_boundary = buffer.length;
+			idx_boundary = buffer.length;
 			buffer += chunk;
 
 			const idx_chunk = chunk.indexOf(boundary);
