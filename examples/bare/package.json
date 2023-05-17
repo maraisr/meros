@@ -9,10 +9,10 @@
 		"node": ">=16.11"
 	},
 	"dependencies": {
-		"meros": "1.1.4",
-		"piecemeal": "^0.0.5"
+		"meros": "workspace:*",
+		"piecemeal": "^0.1.0"
 	},
 	"devDependencies": {
-		"tsm": "2.2.1"
+		"tsm": "2.3.0"
 	}
 }
