@@ -185,9 +185,6 @@ Special thanks to [Luke Edwards](https://github.com/lukeed) for performance guid
 This library is simple, a meer few hundred bytes. It's easy to copy, and easy to alter. If you do, that is fine ❤️ im
 all for the freedom of software. But please give credit where credit is due.
 
-- [urql](https://github.com/FormidableLabs/urql/blob/78368cf5bfcdd04bd663d8775d8883962128376b/packages/core/src/internal/fetchSource.ts#L34-L35)
-  you guys rock 🫶
-
 ## License
 
 MIT © [Marais Rossouw](https://marais.io)
