@@ -96,7 +96,7 @@ export async function meros<T = object>(response: Response, options?: Options) {
 	if (!response.ok || !response.body || response.bodyUsed) return response;
 
 	let ctype = response.headers.get('content-type');
-	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
+	if (!ctype || !~ctype.indexOf('multipart/')) return response;
 
 	let idx_boundary = ctype.indexOf('boundary=');
 	let boundary = '-';
