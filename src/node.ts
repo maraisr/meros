@@ -86,7 +86,7 @@ async function* generate<T>(
 
 export async function meros<T = object>(response: IncomingMessage, options?: Options) {
 	let ctype = response.headers['content-type'];
-	if (!ctype || !~ctype.indexOf('multipart/mixed')) return response;
+	if (!ctype || !~ctype.indexOf('multipart/')) return response;
 
 	let idx_boundary = ctype.indexOf('boundary=');
 	let boundary = '-';
