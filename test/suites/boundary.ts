@@ -100,5 +100,42 @@ export default (meros: Meros, responder: Responder) => {
 		assert.equal(bodies(collection), [{ foo: 'bar' }, { bar: 'baz' }]);
 	});
 
+	[
+		'multipart/mixed',
+		'multipart/x-mixed-replace',
+		'multipart/alternative',
+		'multipart/digest',
+		'multipart/parallel',
+		'multipart/form-data',
+		'multipart/encrypted',
+		'multipart/signed',
+		'multipart/related',
+		'multipart/report',
+	].forEach((type) => {
+		Boundary('using x-mixed-replace', async () => {
+			const collection = await test_helper(
+				meros,
+				responder,
+				(push) => {
+					push([
+						preamble,
+						wrap,
+						makePart({ foo: 'bar' }),
+						wrap,
+						makePart({ bar: 'baz' }),
+						tail,
+					]);
+				},
+				'-',
+				{
+					'content-type': type + ';boundary="-";charset=utf-8',
+					'Content-Type': type + ';boundary="-";charset=utf-8',
+				},
+			);
+
+			assert.equal(bodies(collection), [{ foo: 'bar' }, { bar: 'baz' }]);
+		});
+	});
+
 	Boundary.run();
 };
