@@ -13,11 +13,14 @@ export const makePart = (payload: any, headers: string[] | boolean = []): Part =
 	if (headers === false) {
 		headers = [];
 	} else {
-		(headers as string[]).unshift(
-			`content-type: ${
-				typeof payload === 'string' ? 'text/plain' : 'application/json; charset=utf-8'
-			}`,
-		);
+		if (!headers.includes('content-type'))
+			(headers as string[]).unshift(
+				`content-type: ${
+					typeof payload === 'string'
+						? 'text/plain'
+						: 'application/json; charset=utf-8'
+				}`,
+			);
 	}
 
 	const returns = [
