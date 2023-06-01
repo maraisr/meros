@@ -83,7 +83,7 @@ Meros offers two flavours, both for the browser and for node; but their api's ar
 
 ### `meros(response: Response, options?: Options)`
 
-Returns: `Promise<Response | AsyncGenerator<Part | Part[]>`
+Returns: `Promise<Response | AsyncGenerator<Part | Part[]>>`
 
 Meros returns a promise that will resolve to an `AsyncGenerator` if the response is of `multipart/mixed` mime, or simply
 returns the `Response` if something else; helpful for middlewares. The idea here being that you run meros as a chain off
