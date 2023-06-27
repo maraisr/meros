@@ -1,12 +1,9 @@
 {
 	"name": "meros-example-basic",
-	"private": true,
 	"version": "0.0.1",
+	"private": true,
 	"scripts": {
 		"start": "tsm server.ts"
-	},
-	"engines": {
-		"node": ">=16.11"
 	},
 	"dependencies": {
 		"meros": "workspace:*",
@@ -18,5 +15,8 @@
 		"tsm": "2.3.0",
 		"typescript": "5.0.4",
 		"vite": "4.3.7"
+	},
+	"engines": {
+		"node": ">=16.11"
 	}
 }
