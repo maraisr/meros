@@ -60,7 +60,7 @@
 		"build": "bundt --minify",
 		"format": "prettier --write --list-different \"{*,{src,examples,test}/**/*,.github/**/*}.{ts,tsx,json,yml,md}\"",
 		"prepublishOnly": "pnpm run build",
-		"test": "uvu test \".spec.ts$\" -r tsm -r test/_polyfill.ts -i suites",
+		"test": "uvu test \".test.ts$\" -r tsm -r test/_polyfill.ts -i suites",
 		"typecheck": "tsc --noEmit"
 	},
 	"prettier": "@marais/prettier",
