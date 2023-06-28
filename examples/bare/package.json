@@ -1,18 +1,18 @@
 {
-	"name": "meros-example-bare",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "tsm example.ts"
-	},
-	"dependencies": {
-		"meros": "workspace:*",
-		"piecemeal": "^0.1.0"
-	},
-	"devDependencies": {
-		"tsm": "2.3.0"
-	},
-	"engines": {
-		"node": ">=16.11"
-	}
+  "name": "meros-example-bare",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "tsm example.ts"
+  },
+  "dependencies": {
+    "meros": "workspace:*",
+    "piecemeal": "^0.1.0"
+  },
+  "devDependencies": {
+    "tsm": "2.3.0"
+  },
+  "engines": {
+    "node": ">=16.11"
+  }
 }

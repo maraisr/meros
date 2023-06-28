@@ -1,12 +1,12 @@
 {
-	"extends": "@marais/tsconfig",
-	"compilerOptions": {
-		"baseUrl": ".",
-		"paths": {
-			"meros": ["index.d.ts"],
-			"meros/*": ["src/*.d.ts"]
-		}
-	},
-	"include": ["index.d.ts", "src", "test"],
-	"exclude": ["node_modules"]
+  "extends": "@marais/tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "meros": ["index.d.ts"],
+      "meros/*": ["src/*.d.ts"]
+    }
+  },
+  "include": ["index.d.ts", "src", "test"],
+  "exclude": ["node_modules"]
 }

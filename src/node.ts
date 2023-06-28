@@ -56,7 +56,8 @@ async function* generate<T>(
 				for (
 					;
 					(tmp = arr_headers[--len]);
-					tmp = tmp.split(': '), headers[tmp.shift()!.toLowerCase()] = tmp.join(': ')
+					tmp = tmp.split(': '),
+						headers[tmp.shift()!.toLowerCase()] = tmp.join(': ')
 				);
 
 				tmp = headers['content-type'];
@@ -84,7 +85,10 @@ async function* generate<T>(
 	if (payloads.length) yield payloads;
 }
 
-export async function meros<T = object>(response: IncomingMessage, options?: Options) {
+export async function meros<T = object>(
+	response: IncomingMessage,
+	options?: Options,
+) {
 	let ctype = response.headers['content-type'];
 	if (!ctype || !~ctype.indexOf('multipart/')) return response;
 

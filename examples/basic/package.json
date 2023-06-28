@@ -1,22 +1,22 @@
 {
-	"name": "meros-example-basic",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "tsm server.ts"
-	},
-	"dependencies": {
-		"meros": "workspace:*",
-		"piecemeal": "^0.1.0",
-		"polka": "1.0.0-next.22"
-	},
-	"devDependencies": {
-		"@marais/tsconfig": "0.0.4",
-		"tsm": "2.3.0",
-		"typescript": "5.0.4",
-		"vite": "4.3.7"
-	},
-	"engines": {
-		"node": ">=16.11"
-	}
+  "name": "meros-example-basic",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "tsm server.ts"
+  },
+  "dependencies": {
+    "meros": "workspace:*",
+    "piecemeal": "^0.1.0",
+    "polka": "1.0.0-next.22"
+  },
+  "devDependencies": {
+    "@marais/tsconfig": "0.0.4",
+    "tsm": "2.3.0",
+    "typescript": "5.0.4",
+    "vite": "4.3.7"
+  },
+  "engines": {
+    "node": ">=16.11"
+  }
 }

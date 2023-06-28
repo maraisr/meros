@@ -1,8 +1,8 @@
 {
-	"extends": "@marais/tsconfig",
-	"compilerOptions": {
-		"rootDir": ".",
-		"lib": ["DOM", "ESNext"]
-	},
-	"files": ["*.ts"]
+  "extends": "@marais/tsconfig",
+  "compilerOptions": {
+    "rootDir": ".",
+    "lib": ["DOM", "ESNext"]
+  },
+  "files": ["*.ts"]
 }
