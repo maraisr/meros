@@ -1,15 +1,12 @@
 {
 	"extends": "@marais/tsconfig",
 	"compilerOptions": {
-		"noEmit": true,
-		"declaration": false,
-		"removeComments": false,
-		"lib": ["DOM", "ESNext"],
 		"baseUrl": ".",
 		"paths": {
-			"meros": ["./index.d.ts"]
+			"meros": ["index.d.ts"],
+			"meros/*": ["src/*.d.ts"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.d.ts", "index.d.ts"],
+	"include": ["index.d.ts", "src", "test"],
 	"exclude": ["node_modules"]
 }

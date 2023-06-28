@@ -1,11 +1,11 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
+	type Meros,
+	type Responder,
 	bodies,
 	makePart,
-	Meros,
 	preamble,
-	Responder,
 	splitString,
 	tail,
 	test_helper,
