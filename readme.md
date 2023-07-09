@@ -1,16 +1,34 @@
-<img src="logo.svg" alt="meros">
+<div align="left">
 
-<br />
-<br />
+<samp>
 
-<div align="right">
+![meros](logo.svg)
 
-`npm add meros` makes reading multipart responses simple
+</samp>
 
-[![npm stats](https://badgen.net/npm/dw/meros)](https://npm-stat.com/charts.html?package=meros)
-[![bundle size](https://badgen.net/bundlephobia/minzip/meros)](https://bundlephobia.com/result?p=meros)
+**A utility that makes reading multipart responses simple**
 
-<br />
+<a href="https://npm-stat.com/charts.html?package=meros">
+  <img src="https://badgen.net/npm/dm/meros?color=black&label=npm%20downloads" alt="js downloads">
+</a>
+<a href="https://unpkg.com/meros/browser/index.mjs">
+  <img src="https://img.badgesize.io/https://unpkg.com/meros/browser/index.mjs?compression=gzip&label=gzip&color=black" alt="gzip size" />
+</a>
+<a href="https://unpkg.com/meros/browser/index.mjs">
+  <img src="https://img.badgesize.io/https://unpkg.com/meros/browser/index.mjs?compression=brotli&label=brotli&color=black" alt="brotli size" />
+</a>
+
+<br>
+<br>
+
+<sup>
+
+This is free to use software, but if you do like it, consisder supporting me ❤️
+
+[![sponsor me](https://badgen.net/badge/icon/sponsor?icon=github&label&color=gray)](https://github.com/sponsors/maraisr)
+[![buy me a coffee](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&label&color=gray)](https://www.buymeacoffee.com/marais)
+
+</sup>
 
 </div>
 
