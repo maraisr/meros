@@ -200,7 +200,7 @@ Special thanks to [Luke Edwards](https://github.com/lukeed) for performance guid
 
 ## 😇 Compassion
 
-This library is simple, a meer few hundred bytes. It's easy to copy, and easy to alter. If you do, that is fine ❤️ im
+This library is simple, a mere few hundred bytes. It's easy to copy, and easy to alter. If you do, that is fine ❤️ I'm
 all for the freedom of software. But please give credit where credit is due.
 
 ## License
