@@ -11,6 +11,9 @@
 <a href="https://npm-stat.com/charts.html?package=meros">
   <img src="https://badgen.net/npm/dm/meros?color=black&label=npm%20downloads" alt="js downloads">
 </a>
+<a href="https://licenses.dev/npm/meros">
+  <img src="https://licenses.dev/b/npm/meros?style=dark" alt="licenses" />
+</a>
 <a href="https://unpkg.com/meros/browser/index.mjs">
   <img src="https://img.badgesize.io/https://unpkg.com/meros/browser/index.mjs?compression=gzip&label=gzip&color=black" alt="gzip size" />
 </a>
