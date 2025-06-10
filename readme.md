@@ -38,7 +38,7 @@ This is free to use software, but if you do like it, consisder supporting me ❤
 ## ⚡ Features
 
 - No dependencies
-- Seemless api
+- Seamless api
 - Super [performant](#-benchmark)
 - Supports _any_[^1] `content-type`
 - _preamble_ and _epilogue_ don't yield
