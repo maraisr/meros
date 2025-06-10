@@ -102,5 +102,27 @@ export default (meros: Meros, responder: Responder) => {
 		]);
 	});
 
+	UseCase('handles utf-8', async () => {
+		const stream = (async function* () {
+			const smiley = Buffer.from('🤔');
+			yield Buffer.from('\r\n---\r\n\r\n');
+			yield smiley.subarray(0, 2);
+			yield smiley.subarray(2);
+			yield Buffer.from('\r\n-----\r\n');
+		})();
+
+		const response = await responder(stream, '-');
+
+		const chunks = await meros(response);
+		const collection = [];
+
+		for await (const chunk of chunks) {
+			// TODO: Node yields a buffer here
+			collection.push(String(chunk.body));
+		}
+
+		assert.equal(collection, ['🤔']);
+	});
+
 	UseCase.run();
 };

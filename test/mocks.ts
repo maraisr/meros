@@ -52,15 +52,17 @@ export const splitString = (str: Part, count: number): string[] => {
 	return chunks;
 };
 
-const processChunk = (chunk: string[], boundary: string) => {
-	return Buffer.from(
-		chunk
-			.map((v) => {
-				if (typeof v === 'function') v = v(boundary);
-				return v;
-			})
-			.join(''),
-	);
+const processChunk = (chunk: string[] | Buffer, boundary: string) => {
+	if (Array.isArray(chunk))
+		return Buffer.from(
+			chunk
+				.map((v) => {
+					if (typeof v === 'function') v = v(boundary);
+					return v;
+				})
+				.join(''),
+		);
+	return chunk;
 };
 
 export async function mockResponseNode<T>(

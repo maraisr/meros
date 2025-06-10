@@ -2,13 +2,12 @@ import type { Options, Part } from 'meros';
 
 import type { Arrayable } from './shared';
 
-let decoder = new TextDecoder();
-
 async function* generate<T>(
 	stream: ReadableStream<Uint8Array>,
 	boundary: string,
 	options?: Options,
 ): AsyncGenerator<Arrayable<Part<T, string>>> {
+	let decoder = new TextDecoder('utf8');
 	let reader = stream.getReader();
 	let is_eager = !options || !options.multiple;
 
@@ -22,7 +21,7 @@ async function* generate<T>(
 	try {
 		let result: ReadableStreamReadResult<Uint8Array>;
 		outer: while (!(result = await reader.read()).done) {
-			let chunk = decoder.decode(result.value);
+			let chunk = decoder.decode(result.value, { stream: true });
 
 			idx_boundary = buffer.length;
 			buffer += chunk;
