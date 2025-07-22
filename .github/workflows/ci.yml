@@ -15,12 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: (env) setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 10.12.1
+          version: 10.13.1
 
       - name: (env) setup node v${{ matrix.node }}
-        uses: actions/setup-node@main
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: pnpm
