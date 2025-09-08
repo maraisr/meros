@@ -1,5 +1,7 @@
 import type { Options, Part } from 'meros';
 
+export { Options, Part } from 'meros';
+
 /**
  * Yield immediately for every part made available on the response. If the `content-type` of the
  * response isn't a multipart body, then we'll resolve with {@link Response}.
