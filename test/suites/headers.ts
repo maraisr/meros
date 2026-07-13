@@ -1,120 +1,72 @@
-import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
-	makePart,
+	chunk,
+	closingDelimiter,
+	collect,
+	delimiter,
+	part,
 	preamble,
-	splitString,
-	wrap,
-	tail,
-	type Meros,
-	type Responder,
-} from '../mocks';
+	split,
+	type TestContext,
+} from '../utils';
 
-export default (meros: Meros, responder: Responder) => {
+export default ({ parse }: TestContext) => {
 	const Headers = suite('headers');
+	const fixture = part({ foo: 'bar' }, [
+		'cache-control: public,max-age=30',
+		'etag: test',
+		'x-test: test:test',
+		'x-test-2: test: test',
+		'x-valid: _ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
+	]);
+	const expected = {
+		'content-type': 'application/json; charset=utf-8',
+		'cache-control': 'public,max-age=30',
+		etag: 'test',
+		'x-test': 'test:test',
+		'x-test-2': 'test: test',
+		'x-valid': '_ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
+	};
 
-	Headers('smoke', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, '-');
-		const parts = await meros(response);
+	Headers('parses headers', async () => {
+		const collection = await collect(
+			parse([chunk(preamble, delimiter(), fixture, closingDelimiter())]),
+		);
 
-		const collection = [];
-
-		pushValue([
-			preamble,
-			wrap,
-			makePart(
-				{
-					foo: 'bar',
-				},
-				[
-					'cache-control: public,max-age=30',
-					'etag: test',
-					'x-test: test:test', // tests the colon
-					'x-test-2: test: test', // tests the colon
-					'x-valid: _ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
-				],
-			),
-			tail,
-		]);
-
-		for await (let { headers } of parts) {
-			collection.push(headers);
-		}
-
-		assert.equal(collection, [
-			{
-				'content-type': 'application/json; charset=utf-8',
-				'cache-control': 'public,max-age=30',
-				etag: 'test',
-				'x-test': 'test:test',
-				'x-test-2': 'test: test',
-				'x-valid': '_ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
-			},
-		]);
+		assert.equal(
+			collection.map(({ headers }) => headers),
+			[expected],
+		);
 	});
 
 	Headers('crossing chunks', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, '-');
-		const parts = await meros(response);
+		const collection = await collect(
+			parse([delimiter(), ...split(fixture, 11), closingDelimiter()]),
+		);
 
-		const collection = [];
-
-		pushValue([
-			wrap,
-			...splitString(
-				makePart(
-					{
-						foo: 'bar',
-					},
-					[
-						'cache-control: public,max-age=30',
-						'etag: test',
-						'x-test: test:test', // tests the colon
-						'x-test-2: test: test', // tests the colon
-						'x-valid: _ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
-					],
-				),
-				11,
-			),
-			tail,
-		]);
-
-		for await (let { headers } of parts) {
-			collection.push(headers);
-		}
-
-		assert.equal(collection, [
-			{
-				'content-type': 'application/json; charset=utf-8',
-				'cache-control': 'public,max-age=30',
-				etag: 'test',
-				'x-test': 'test:test',
-				'x-test-2': 'test: test',
-				'x-valid': '_ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
-			},
-		]);
+		assert.equal(
+			collection.map(({ headers }) => headers),
+			[expected],
+		);
 	});
 
 	Headers('no headers', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, '-');
-		const parts = await meros(response);
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part('part', false),
+					closingDelimiter(),
+				),
+			]),
+		);
 
-		const collection = [];
-
-		pushValue([preamble, wrap, makePart('part', false), tail]);
-
-		for await (let { headers } of parts) {
-			collection.push(headers);
-		}
-
-		assert.equal(collection, [{}]);
+		assert.equal(
+			collection.map(({ headers }) => headers),
+			[{}],
+		);
 	});
 
 	Headers.run();

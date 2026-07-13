@@ -1,4 +1,4 @@
-import { type Meros, type Responder } from '../mocks';
+import type { TestContext } from '../utils';
 
 import { default as API } from './api';
 import { default as Boundary } from './boundary';
@@ -8,16 +8,16 @@ import { default as Body } from './body';
 import { default as Binary } from './binary';
 import { default as UseCases } from './use-cases';
 
-export default (meros: Meros, responder: Responder) => {
-	API(meros, responder);
-	Boundary(meros, responder);
+export default (test: TestContext) => {
+	API(test);
+	Boundary(test);
 
-	Chunking(meros, responder);
+	Chunking(test);
 
-	Headers(meros, responder);
-	Body(meros, responder);
+	Headers(test);
+	Body(test);
 
-	Binary(meros, responder);
+	Binary(test);
 
-	UseCases(meros, responder);
+	UseCases(test);
 };

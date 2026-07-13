@@ -1,31 +1,23 @@
-import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
-	type Meros,
-	type Responder,
-	splitString,
-	test_helper,
-	preamble,
-	wrap,
-	makePart,
-	tail,
 	bodies,
-} from '../mocks';
+	chunk,
+	closingDelimiter,
+	collect,
+	delimiter,
+	part,
+	preamble,
+	split,
+	type TestContext,
+} from '../utils';
 
-export default (meros: Meros, responder: Responder) => {
+export default ({ parse }: TestContext) => {
 	const Boundary = suite('boundary');
 
-	const make_test = async (
-		boundary: string,
-		with_preamble_boundary = true,
-	) => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, boundary);
-
-		const part = [
-			`${with_preamble_boundary ? '\r\n' : ''}--${boundary}\r\n`,
+	const testBoundary = async (boundary: string, withLeadingCrLf = true) => {
+		const multipart = [
+			`${withLeadingCrLf ? '\r\n' : ''}--${boundary}\r\n`,
 			'\n',
 			'one',
 			`\r\n--${boundary}\r\n`,
@@ -38,23 +30,14 @@ export default (meros: Meros, responder: Responder) => {
 			`\r\n--${boundary}--`,
 		];
 
-		const split_parts = splitString(part.join(''), 11);
+		const collection = await collect(
+			parse(split(multipart.join(''), 11), { boundary }),
+		);
 
-		const parts = await meros(response);
-		const collection = [];
-
-		for (const chunk of split_parts) {
-			pushValue([chunk]);
-		}
-
-		for await (let { body: part } of parts) {
-			collection.push(String(part));
-		}
-
-		assert.equal(collection, ['one', 'two', 'three']);
+		assert.equal(bodies(collection), ['one', 'two', 'three']);
 	};
 
-	for (let boundary of [
+	for (const boundary of [
 		'abc123',
 		'abcdefghijklmnopqrstuvwxyz_abcdefghijklmnopqrstuvwxyz',
 		'✨',
@@ -76,35 +59,40 @@ export default (meros: Meros, responder: Responder) => {
 		'=',
 		'?',
 	]) {
-		Boundary(boundary, make_test.bind(0, boundary, true));
-		Boundary(boundary, make_test.bind(0, boundary, false));
+		Boundary(`${boundary} with leading CRLF`, () =>
+			testBoundary(boundary, true),
+		);
+		Boundary(`${boundary} without leading CRLF`, () =>
+			testBoundary(boundary, false),
+		);
 	}
 
 	Boundary('RFC 1521 page 69', async () => {
-		const collection = await test_helper(
-			meros,
-			responder,
-			(push) => {
-				push([
-					preamble,
-					wrap,
-					makePart({ foo: 'bar' }),
-					wrap,
-					makePart({ bar: 'baz' }),
-					tail,
-				]);
-			},
-			'-',
-			{
-				'content-type': 'multipart/mixed;boundary="-";charset=utf-8',
-				'Content-Type': 'multipart/mixed;boundary="-";charset=utf-8',
-			},
+		const collection = await collect(
+			parse(
+				[
+					chunk(
+						preamble,
+						delimiter(),
+						part({ foo: 'bar' }),
+						delimiter(),
+						part({ bar: 'baz' }),
+						closingDelimiter(),
+					),
+				],
+				{
+					headers: {
+						'content-type':
+							'multipart/mixed;boundary="-";charset=utf-8',
+					},
+				},
+			),
 		);
 
 		assert.equal(bodies(collection), [{ foo: 'bar' }, { bar: 'baz' }]);
 	});
 
-	[
+	for (const type of [
 		'multipart/mixed',
 		'multipart/x-mixed-replace',
 		'multipart/alternative',
@@ -115,31 +103,31 @@ export default (meros: Meros, responder: Responder) => {
 		'multipart/signed',
 		'multipart/related',
 		'multipart/report',
-	].forEach((type) => {
-		Boundary('using x-mixed-replace', async () => {
-			const collection = await test_helper(
-				meros,
-				responder,
-				(push) => {
-					push([
-						preamble,
-						wrap,
-						makePart({ foo: 'bar' }),
-						wrap,
-						makePart({ bar: 'baz' }),
-						tail,
-					]);
-				},
-				'-',
-				{
-					'content-type': type + ';boundary="-";charset=utf-8',
-					'Content-Type': type + ';boundary="-";charset=utf-8',
-				},
+	]) {
+		Boundary(`using ${type}`, async () => {
+			const collection = await collect(
+				parse(
+					[
+						chunk(
+							preamble,
+							delimiter(),
+							part({ foo: 'bar' }),
+							delimiter(),
+							part({ bar: 'baz' }),
+							closingDelimiter(),
+						),
+					],
+					{
+						headers: {
+							'content-type': `${type};boundary="-";charset=utf-8`,
+						},
+					},
+				),
 			);
 
 			assert.equal(bodies(collection), [{ foo: 'bar' }, { bar: 'baz' }]);
 		});
-	});
+	}
 
 	Boundary.run();
 };

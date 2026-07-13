@@ -1,69 +1,76 @@
-import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
-
 import { randomBytes } from 'crypto';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
 	bodies,
-	makePart,
+	chunk,
+	closingDelimiter,
+	collect,
+	delimiter,
+	part,
 	preamble,
-	splitString,
-	tail,
-	wrap,
-	test_helper,
-	type Meros,
-	type Responder,
-} from '../mocks';
+	split,
+	type TestContext,
+} from '../utils';
 
-export default (meros: Meros, responder: Responder) => {
-	const make_test = test_helper.bind(0, meros, responder);
-
+export default ({ parse }: TestContext) => {
 	const Chunk = suite('chunking');
 
-	Chunk('single yield single chunk', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart({ foo: 'bar' }), tail]);
-		});
+	Chunk('single part in one chunk', async () => {
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part({ foo: 'bar' }),
+					closingDelimiter(),
+				),
+			]),
+		);
 
 		assert.equal(bodies(collection), [{ foo: 'bar' }]);
 	});
 
-	Chunk('single yield multi chunk', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap]);
-
-			push([makePart('one'), tail]);
-		});
+	Chunk('single part across chunks', async () => {
+		const collection = await collect(
+			parse([
+				chunk(preamble, delimiter()),
+				chunk(part('one'), closingDelimiter()),
+			]),
+		);
 
 		assert.equal(bodies(collection), ['one']);
 	});
 
-	Chunk('multiple yields single chunk', async () => {
-		const collection = await make_test((push) => {
-			push([
-				preamble,
-				wrap,
-				makePart('one'),
-				wrap,
-				makePart('two'),
-				tail,
-			]);
-		});
+	Chunk('multiple parts in one chunk', async () => {
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part('one'),
+					delimiter(),
+					part('two'),
+					closingDelimiter(),
+				),
+			]),
+		);
 
 		assert.equal(bodies(collection), ['one', 'two']);
 	});
 
-	Chunk('multiple yields multi chunk', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart('one')]);
-
-			push([wrap, makePart('two'), tail]);
-		});
+	Chunk('multiple parts across chunks', async () => {
+		const collection = await collect(
+			parse([
+				chunk(preamble, delimiter(), part('one')),
+				chunk(delimiter(), part('two'), closingDelimiter()),
+			]),
+		);
 
 		assert.equal(bodies(collection), ['one', 'two']);
 	});
 
-	Chunk('goes rambo', async () => {
+	Chunk('handles heavily fragmented payloads', async () => {
 		const result = [
 			randomBytes(2000).toString('base64'),
 			randomBytes(500).toString('utf8'),
@@ -72,18 +79,17 @@ export default (meros: Meros, responder: Responder) => {
 		];
 		const boundary = randomBytes(50).toString('hex');
 
-		const collection = await make_test((push) => {
-			push([wrap(boundary), makePart('one')]);
+		const chunks = [chunk(delimiter(boundary), part('one'))];
 
-			for (let payload of result) {
-				push([wrap(boundary)]);
-				for (let chunk of splitString(makePart(payload), 12)) {
-					push([chunk]);
-				}
-			}
+		for (const payload of result) {
+			chunks.push(delimiter(boundary), ...split(part(payload), 12));
+		}
 
-			push([wrap(boundary), makePart('two'), tail(boundary)]);
-		}, boundary);
+		chunks.push(
+			chunk(delimiter(boundary), part('two'), closingDelimiter(boundary)),
+		);
+
+		const collection = await collect(parse(chunks, { boundary }));
 
 		assert.equal(bodies(collection), ['one', ...result, 'two']);
 	});
@@ -92,15 +98,24 @@ export default (meros: Meros, responder: Responder) => {
 
 	const Multi = suite('chunking :: multi');
 
-	Multi('when true :: basic', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, '-');
-		const parts = await meros(response, { multiple: true });
+	Multi('groups parts by source chunk', async () => {
+		const parts = await parse(
+			[
+				chunk(preamble, delimiter(), part({ foo: 'bar' }), delimiter()),
+				chunk(
+					part({ bar: 'baz' }),
+					delimiter(),
+					part({ foo: 'blitz' }),
+					closingDelimiter(),
+				),
+			],
+			{ multiple: true },
+		);
 
-		pushValue([preamble, wrap, makePart({ foo: 'bar' }), wrap]);
-
-		let { value } = await parts.next();
+		let result = await parts.next();
+		assert.is(result.done, false);
+		if (result.done) throw new Error('Expected a parsed part batch');
+		let { value } = result;
 		assert.is(Array.isArray(value), true);
 		assert.equal(value, [
 			{
@@ -112,17 +127,13 @@ export default (meros: Meros, responder: Responder) => {
 			},
 		]);
 
-		pushValue([
-			makePart({ bar: 'baz' }),
-			wrap,
-			makePart({ foo: 'blitz' }),
-			tail,
-		]);
-
-		value = (await parts.next()).value;
+		result = await parts.next();
+		assert.is(result.done, false);
+		if (result.done) throw new Error('Expected a parsed part batch');
+		value = result.value;
 		assert.is(Array.isArray(value), true);
 		assert.equal(
-			value.map((i: any) => i.body),
+			value.map((part) => part.body),
 			[{ bar: 'baz' }, { foo: 'blitz' }],
 		);
 	});

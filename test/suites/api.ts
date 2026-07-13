@@ -1,45 +1,29 @@
-import { makePushPullAsyncIterableIterator } from '@n1ru4l/push-pull-async-iterable-iterator';
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import {
-	makePart,
-	preamble,
-	tail,
-	wrap,
-	type Meros,
-	type Responder,
-} from '../mocks';
+import { chunk, delimiter, part, preamble, type TestContext } from '../utils';
 
-export default (meros: Meros, responder: Responder) => {
+export default ({ implementation, parse }: TestContext) => {
 	const API = suite('api');
 
-	API('should export a function', () => {
-		assert.type(meros, 'function');
+	API('exports a function', () => {
+		assert.type(implementation, 'function');
 	});
 
-	API('should resolve to an AsyncGenerator', async () => {
-		const { asyncIterableIterator } = makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, '-');
-		const parts = await meros(response);
+	API('returns an AsyncGenerator', async () => {
+		const parts = await parse([]);
 
 		assert.type(parts[Symbol.asyncIterator], 'function');
 	});
 
-	API('should cleanup when `returns` fires', async () => {
-		const { asyncIterableIterator, pushValue } =
-			makePushPullAsyncIterableIterator();
-		const response = await responder(asyncIterableIterator, '-');
-		const parts = await meros(response);
-
-		pushValue([preamble, wrap, makePart('test'), wrap]);
+	API('finishes when the response stream closes', async () => {
+		const parts = await parse([
+			chunk(preamble, delimiter(), part('test'), delimiter()),
+		]);
 
 		let r = await parts.next();
 		assert.equal(r.done, false);
+		if (r.done) throw new Error('Expected a parsed part');
 		assert.equal(String(r.value.body), 'test');
-
-		await asyncIterableIterator.return();
-
-		pushValue([makePart('test'), tail]);
 
 		r = await parts.next();
 		assert.equal(r.done, true);

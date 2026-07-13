@@ -1,28 +1,26 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
-	type Meros,
-	type Responder,
 	bodies,
-	makePart,
+	chunk,
+	closingDelimiter,
+	collect,
+	delimiter,
+	part,
 	preamble,
-	splitString,
-	tail,
-	test_helper,
-	wrap,
-} from '../mocks';
+	split,
+	type TestContext,
+} from '../utils';
 
-export default (meros: Meros, responder: Responder) => {
-	const make_test = test_helper.bind(0, meros, responder);
-
+export default ({ parse }: TestContext) => {
 	const UseCase = suite('use-cases');
 
 	UseCase('graphql defer query', async () => {
-		const collection = await make_test((push) => {
-			push([
+		const chunks = [
+			chunk(
 				preamble,
-				wrap,
-				makePart({
+				delimiter(),
+				part({
 					data: {
 						user: {
 							id: 'VXNlcgpkN2FhNzFjMjctN2I0Yy00MzczLTkwZGItMzhjMjZlNjA4MzNh',
@@ -30,11 +28,10 @@ export default (meros: Meros, responder: Responder) => {
 					},
 					hasNext: true,
 				}),
-				wrap,
-			]);
-
-			for (let chunk of splitString(
-				makePart({
+				delimiter(),
+			),
+			...split(
+				part({
 					label: 'WelcomeQuery$defer$ProjectList_projects_1qwc77',
 					path: ['user'],
 					data: {
@@ -59,12 +56,11 @@ export default (meros: Meros, responder: Responder) => {
 					hasNext: false,
 				}),
 				11,
-			)) {
-				push([chunk]);
-			}
+			),
+			closingDelimiter(),
+		];
 
-			push([tail]);
-		});
+		const collection = await collect(parse(chunks));
 
 		assert.equal(bodies(collection), [
 			{
@@ -103,25 +99,17 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	UseCase('handles utf-8', async () => {
-		const stream = (async function* () {
-			const smiley = Buffer.from('🤔');
-			yield Buffer.from('\r\n---\r\n\r\n');
-			yield smiley.subarray(0, 2);
-			yield smiley.subarray(2);
-			yield Buffer.from('\r\n-----\r\n');
-		})();
+		const smiley = Buffer.from('🤔');
+		const collection = await collect(
+			parse([
+				Buffer.from('\r\n---\r\n\r\n'),
+				smiley.subarray(0, 2),
+				smiley.subarray(2),
+				Buffer.from('\r\n-----\r\n'),
+			]),
+		);
 
-		const response = await responder(stream, '-');
-
-		const chunks = await meros(response);
-		const collection = [];
-
-		for await (const chunk of chunks) {
-			// TODO: Node yields a buffer here
-			collection.push(String(chunk.body));
-		}
-
-		assert.equal(collection, ['🤔']);
+		assert.equal(bodies(collection), ['🤔']);
 	});
 
 	UseCase.run();

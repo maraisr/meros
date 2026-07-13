@@ -1,6 +1,6 @@
 import { meros } from '../src/node';
-import { mockResponseNode } from './mocks';
+import { createTestContext, nodeResponse } from './utils';
 
 import suites from './suites';
 
-suites(meros, mockResponseNode);
+suites(createTestContext(meros, nodeResponse));

@@ -2,24 +2,29 @@ import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import {
 	bodies,
-	makePart,
+	chunk,
+	closingDelimiter,
+	collect,
+	delimiter,
+	part,
 	preamble,
-	tail,
-	wrap,
-	test_helper,
-	type Meros,
-	type Responder,
-} from '../mocks';
+	type TestContext,
+} from '../utils';
 
-export default (meros: Meros, responder: Responder) => {
-	const make_test = test_helper.bind(0, meros, responder);
-
+export default ({ parse }: TestContext) => {
 	const Body = suite('body');
 
 	Body('json', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart({ foo: 'bar' }), tail]);
-		});
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part({ foo: 'bar' }),
+					closingDelimiter(),
+				),
+			]),
+		);
 
 		assert.equal(collection, [
 			{
@@ -33,9 +38,11 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Body('plain-text', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart('test'), tail]);
-		});
+		const collection = await collect(
+			parse([
+				chunk(preamble, delimiter(), part('test'), closingDelimiter()),
+			]),
+		);
 
 		assert.equal(collection.length, 1);
 		assert.equal(collection[0].json, false);
@@ -43,16 +50,18 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Body('mixed', async () => {
-		const collection = await make_test((push) => {
-			push([
-				preamble,
-				wrap,
-				makePart({ foo: 'bar' }),
-				wrap,
-				makePart('bar: baz'),
-				tail,
-			]);
-		});
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part({ foo: 'bar' }),
+					delimiter(),
+					part('bar: baz'),
+					closingDelimiter(),
+				),
+			]),
+		);
 
 		assert.equal(collection.length, 2);
 
@@ -63,29 +72,31 @@ export default (meros: Meros, responder: Responder) => {
 	});
 
 	Body('unicode body', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart('🚀')]);
-
-			push([wrap, makePart('😎'), tail]);
-		});
+		const collection = await collect(
+			parse([
+				chunk(preamble, delimiter(), part('🚀')),
+				chunk(delimiter(), part('😎'), closingDelimiter()),
+			]),
+		);
 
 		assert.equal(bodies(collection), ['🚀', '😎']);
 	});
 
 	Body('retain newlines', async () => {
-		const collection = await make_test((push) => {
-			push([
-				preamble,
-				wrap,
-				makePart(`foo
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part(`foo
 
 bar
 
 `),
-			]);
-
-			push([wrap, makePart('bar: baz\n'), tail]);
-		});
+				),
+				chunk(delimiter(), part('bar: baz\n'), closingDelimiter()),
+			]),
+		);
 
 		assert.equal(bodies(collection), [
 			`foo
@@ -98,36 +109,46 @@ bar
 		]);
 	});
 
-	// Doesnt mean --- can exist nakedly, multipart rules still apply.
-	Body('boundary in payload*', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart({ test: '---' }), tail]);
-		});
+	// Boundary-like text is valid when it is not on a delimiter line.
+	Body('boundary-like text in a payload', async () => {
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part({ test: '---' }),
+					closingDelimiter(),
+				),
+			]),
+		);
 
 		assert.equal(bodies(collection), [{ test: '---' }]);
 	});
 
-	Body('boundary exist in multi payload*', async () => {
-		const collection = await make_test((push) => {
-			push([
-				preamble,
-				wrap,
-				makePart({ one: '---' }),
-				wrap,
-				makePart({ two: '---' }),
-				tail,
-			]);
-		});
+	Body('boundary-like text in multiple parts in one chunk', async () => {
+		const collection = await collect(
+			parse([
+				chunk(
+					preamble,
+					delimiter(),
+					part({ one: '---' }),
+					delimiter(),
+					part({ two: '---' }),
+					closingDelimiter(),
+				),
+			]),
+		);
 
 		assert.equal(bodies(collection), [{ one: '---' }, { two: '---' }]);
 	});
 
-	Body('boundary exist in multi payloads*', async () => {
-		const collection = await make_test((push) => {
-			push([preamble, wrap, makePart({ one: '---' })]);
-
-			push([wrap, makePart({ two: '---' }), tail]);
-		});
+	Body('boundary-like text in multiple parts across chunks', async () => {
+		const collection = await collect(
+			parse([
+				chunk(preamble, delimiter(), part({ one: '---' })),
+				chunk(delimiter(), part({ two: '---' }), closingDelimiter()),
+			]),
+		);
 
 		assert.equal(bodies(collection), [{ one: '---' }, { two: '---' }]);
 	});

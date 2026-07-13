@@ -14,9 +14,6 @@ importers:
       '@marais/tsconfig':
         specifier: 0.0.4
         version: 0.0.4
-      '@n1ru4l/push-pull-async-iterable-iterator':
-        specifier: 3.2.0
-        version: 3.2.0
       '@types/node':
         specifier: 24.0.15
         version: 24.0.15
@@ -82,10 +79,6 @@ packages:
 
   '@marais/tsconfig@0.0.4':
     resolution: {integrity: sha512-b6KCal22xP6E8wgl52rxdf8MXuffI4oJ9aTosucX4aVb97yl01wU0PzGF67oMA/i9KdzLa0rjQ0zVdZ+1pvVAg==}
-
-  '@n1ru4l/push-pull-async-iterable-iterator@3.2.0':
-    resolution: {integrity: sha512-3fkKj25kEjsfObL6IlKPAlHYPq/oYwUkkQ03zsTTiDjD7vg/RxjdiLeCydqtxHZP0JgsXL3D/X5oAkMGzuUp/Q==}
-    engines: {node: '>=12'}
 
   '@types/node@24.0.15':
     resolution: {integrity: sha512-oaeTSbCef7U/z7rDeJA138xpG3NuKc64/rZ2qmUFkFJmnMsAPaluIifqyWd8hSSMxyP9oie3dLAqYPblag9KgA==}
@@ -451,8 +444,6 @@ snapshots:
   '@marais/prettier@0.0.4': {}
 
   '@marais/tsconfig@0.0.4': {}
-
-  '@n1ru4l/push-pull-async-iterable-iterator@3.2.0': {}
 
   '@types/node@24.0.15':
     dependencies:

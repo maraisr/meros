@@ -1,6 +1,6 @@
 import { meros } from '../src/browser';
-import { mockResponseBrowser } from './mocks';
+import { browserResponse, createTestContext } from './utils';
 
 import suites from './suites';
 
-suites(meros, mockResponseBrowser);
+suites(createTestContext(meros, browserResponse));
