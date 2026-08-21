@@ -10,22 +10,25 @@ import {
 	part,
 	preamble,
 	split,
-	type TestContext,
+	type Meros,
+	type Responder,
 } from '../utils';
 
-export default ({ parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const Chunk = suite('chunking');
 
 	Chunk('single part in one chunk', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part({ foo: 'bar' }),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part({ foo: 'bar' }),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), [{ foo: 'bar' }]);
@@ -33,10 +36,12 @@ export default ({ parse }: TestContext) => {
 
 	Chunk('single part across chunks', async () => {
 		const collection = await collect(
-			parse([
-				chunk(preamble, delimiter()),
-				chunk(part('one'), closingDelimiter()),
-			]),
+			meros(
+				responder([
+					chunk(preamble, delimiter()),
+					chunk(part('one'), closingDelimiter()),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), ['one']);
@@ -44,16 +49,18 @@ export default ({ parse }: TestContext) => {
 
 	Chunk('multiple parts in one chunk', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part('one'),
-					delimiter(),
-					part('two'),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part('one'),
+						delimiter(),
+						part('two'),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), ['one', 'two']);
@@ -61,10 +68,12 @@ export default ({ parse }: TestContext) => {
 
 	Chunk('multiple parts across chunks', async () => {
 		const collection = await collect(
-			parse([
-				chunk(preamble, delimiter(), part('one')),
-				chunk(delimiter(), part('two'), closingDelimiter()),
-			]),
+			meros(
+				responder([
+					chunk(preamble, delimiter(), part('one')),
+					chunk(delimiter(), part('two'), closingDelimiter()),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), ['one', 'two']);
@@ -89,7 +98,7 @@ export default ({ parse }: TestContext) => {
 			chunk(delimiter(boundary), part('two'), closingDelimiter(boundary)),
 		);
 
-		const collection = await collect(parse(chunks, { boundary }));
+		const collection = await collect(meros(responder(chunks, boundary)));
 
 		assert.equal(bodies(collection), ['one', ...result, 'two']);
 	});
@@ -99,44 +108,31 @@ export default ({ parse }: TestContext) => {
 	const Multi = suite('chunking :: multi');
 
 	Multi('groups parts by source chunk', async () => {
-		const parts = await parse(
-			[
-				chunk(preamble, delimiter(), part({ foo: 'bar' }), delimiter()),
-				chunk(
-					part({ bar: 'baz' }),
-					delimiter(),
-					part({ foo: 'blitz' }),
-					closingDelimiter(),
-				),
-			],
-			{ multiple: true },
+		const collection = await collect(
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part({ foo: 'bar' }),
+						delimiter(),
+					),
+					chunk(
+						part({ bar: 'baz' }),
+						delimiter(),
+						part({ foo: 'blitz' }),
+						closingDelimiter(),
+					),
+				]),
+				{ multiple: true },
+			),
 		);
 
-		let result = await parts.next();
-		assert.is(result.done, false);
-		if (result.done) throw new Error('Expected a parsed part batch');
-		let { value } = result;
-		assert.is(Array.isArray(value), true);
-		assert.equal(value, [
-			{
-				headers: {
-					'content-type': 'application/json; charset=utf-8',
-				},
-				body: { foo: 'bar' },
-				json: true,
-			},
-		]);
-
-		result = await parts.next();
-		assert.is(result.done, false);
-		if (result.done) throw new Error('Expected a parsed part batch');
-		value = result.value;
-		assert.is(Array.isArray(value), true);
 		assert.equal(
-			value.map((part) => part.body),
-			[{ bar: 'baz' }, { foo: 'blitz' }],
+			collection.map((parts) => bodies(parts)),
+			[[{ foo: 'bar' }], [{ bar: 'baz' }, { foo: 'blitz' }]],
 		);
 	});
 
 	Multi.run();
-};
+}

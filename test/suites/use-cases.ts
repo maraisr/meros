@@ -9,10 +9,11 @@ import {
 	part,
 	preamble,
 	split,
-	type TestContext,
+	type Meros,
+	type Responder,
 } from '../utils';
 
-export default ({ parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const UseCase = suite('use-cases');
 
 	UseCase('graphql defer query', async () => {
@@ -60,7 +61,7 @@ export default ({ parse }: TestContext) => {
 			closingDelimiter(),
 		];
 
-		const collection = await collect(parse(chunks));
+		const collection = await collect(meros(responder(chunks)));
 
 		assert.equal(bodies(collection), [
 			{
@@ -101,16 +102,18 @@ export default ({ parse }: TestContext) => {
 	UseCase('handles utf-8', async () => {
 		const smiley = Buffer.from('🤔');
 		const collection = await collect(
-			parse([
-				Buffer.from('\r\n---\r\n\r\n'),
-				smiley.subarray(0, 2),
-				smiley.subarray(2),
-				Buffer.from('\r\n-----\r\n'),
-			]),
+			meros(
+				responder([
+					Buffer.from('\r\n---\r\n\r\n'),
+					smiley.subarray(0, 2),
+					smiley.subarray(2),
+					Buffer.from('\r\n-----\r\n'),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), ['🤔']);
 	});
 
 	UseCase.run();
-};
+}

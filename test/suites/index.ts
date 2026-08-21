@@ -1,4 +1,4 @@
-import type { TestContext } from '../utils';
+import type { Meros, Responder } from '../utils';
 
 import { default as API } from './api';
 import { default as Boundary } from './boundary';
@@ -8,16 +8,16 @@ import { default as Body } from './body';
 import { default as Binary } from './binary';
 import { default as UseCases } from './use-cases';
 
-export default (test: TestContext) => {
-	API(test);
-	Boundary(test);
+export default function (meros: Meros, responder: Responder) {
+	API(meros, responder);
+	Boundary(meros, responder);
 
-	Chunking(test);
+	Chunking(meros, responder);
 
-	Headers(test);
-	Body(test);
+	Headers(meros, responder);
+	Body(meros, responder);
 
-	Binary(test);
+	Binary(meros, responder);
 
-	UseCases(test);
-};
+	UseCases(meros, responder);
+}

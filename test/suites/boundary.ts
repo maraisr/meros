@@ -9,10 +9,11 @@ import {
 	part,
 	preamble,
 	split,
-	type TestContext,
+	type Meros,
+	type Responder,
 } from '../utils';
 
-export default ({ parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const Boundary = suite('boundary');
 
 	const testBoundary = async (boundary: string, withLeadingCrLf = true) => {
@@ -31,7 +32,7 @@ export default ({ parse }: TestContext) => {
 		];
 
 		const collection = await collect(
-			parse(split(multipart.join(''), 11), { boundary }),
+			meros(responder(split(multipart.join(''), 11), boundary)),
 		);
 
 		assert.equal(bodies(collection), ['one', 'two', 'three']);
@@ -69,23 +70,24 @@ export default ({ parse }: TestContext) => {
 
 	Boundary('RFC 1521 page 69', async () => {
 		const collection = await collect(
-			parse(
-				[
-					chunk(
-						preamble,
-						delimiter(),
-						part({ foo: 'bar' }),
-						delimiter(),
-						part({ bar: 'baz' }),
-						closingDelimiter(),
-					),
-				],
-				{
-					headers: {
+			meros(
+				responder(
+					[
+						chunk(
+							preamble,
+							delimiter(),
+							part({ foo: 'bar' }),
+							delimiter(),
+							part({ bar: 'baz' }),
+							closingDelimiter(),
+						),
+					],
+					'-',
+					{
 						'content-type':
 							'multipart/mixed;boundary="-";charset=utf-8',
 					},
-				},
+				),
 			),
 		);
 
@@ -106,22 +108,23 @@ export default ({ parse }: TestContext) => {
 	]) {
 		Boundary(`using ${type}`, async () => {
 			const collection = await collect(
-				parse(
-					[
-						chunk(
-							preamble,
-							delimiter(),
-							part({ foo: 'bar' }),
-							delimiter(),
-							part({ bar: 'baz' }),
-							closingDelimiter(),
-						),
-					],
-					{
-						headers: {
+				meros(
+					responder(
+						[
+							chunk(
+								preamble,
+								delimiter(),
+								part({ foo: 'bar' }),
+								delimiter(),
+								part({ bar: 'baz' }),
+								closingDelimiter(),
+							),
+						],
+						'-',
+						{
 							'content-type': `${type};boundary="-";charset=utf-8`,
 						},
-					},
+					),
 				),
 			);
 
@@ -130,4 +133,4 @@ export default ({ parse }: TestContext) => {
 	}
 
 	Boundary.run();
-};
+}

@@ -8,10 +8,11 @@ import {
 	delimiter,
 	part,
 	preamble,
-	type TestContext,
+	type Meros,
+	type Responder,
 } from '../utils';
 
-export default ({ parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const Binary = suite('binary');
 
 	// 1x1 transparent GIF
@@ -25,18 +26,20 @@ export default ({ parse }: TestContext) => {
 	Binary('preserves a non-JSON body', async () => {
 		const image = new TextDecoder('utf8').decode(blob);
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part(image, ['content-type: image/gif']),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part(image, ['content-type: image/gif']),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), [image]);
 	});
 
 	Binary.run();
-};
+}

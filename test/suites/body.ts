@@ -8,22 +8,25 @@ import {
 	delimiter,
 	part,
 	preamble,
-	type TestContext,
+	type Meros,
+	type Responder,
 } from '../utils';
 
-export default ({ parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const Body = suite('body');
 
 	Body('json', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part({ foo: 'bar' }),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part({ foo: 'bar' }),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(collection, [
@@ -39,9 +42,16 @@ export default ({ parse }: TestContext) => {
 
 	Body('plain-text', async () => {
 		const collection = await collect(
-			parse([
-				chunk(preamble, delimiter(), part('test'), closingDelimiter()),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part('test'),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(collection.length, 1);
@@ -51,16 +61,18 @@ export default ({ parse }: TestContext) => {
 
 	Body('mixed', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part({ foo: 'bar' }),
-					delimiter(),
-					part('bar: baz'),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part({ foo: 'bar' }),
+						delimiter(),
+						part('bar: baz'),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(collection.length, 2);
@@ -73,10 +85,12 @@ export default ({ parse }: TestContext) => {
 
 	Body('unicode body', async () => {
 		const collection = await collect(
-			parse([
-				chunk(preamble, delimiter(), part('🚀')),
-				chunk(delimiter(), part('😎'), closingDelimiter()),
-			]),
+			meros(
+				responder([
+					chunk(preamble, delimiter(), part('🚀')),
+					chunk(delimiter(), part('😎'), closingDelimiter()),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), ['🚀', '😎']);
@@ -84,18 +98,20 @@ export default ({ parse }: TestContext) => {
 
 	Body('retain newlines', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part(`foo
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part(`foo
 
 bar
 
 `),
-				),
-				chunk(delimiter(), part('bar: baz\n'), closingDelimiter()),
-			]),
+					),
+					chunk(delimiter(), part('bar: baz\n'), closingDelimiter()),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), [
@@ -112,14 +128,16 @@ bar
 	// Boundary-like text is valid when it is not on a delimiter line.
 	Body('boundary-like text in a payload', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part({ test: '---' }),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part({ test: '---' }),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), [{ test: '---' }]);
@@ -127,16 +145,18 @@ bar
 
 	Body('boundary-like text in multiple parts in one chunk', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part({ one: '---' }),
-					delimiter(),
-					part({ two: '---' }),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part({ one: '---' }),
+						delimiter(),
+						part({ two: '---' }),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), [{ one: '---' }, { two: '---' }]);
@@ -144,14 +164,20 @@ bar
 
 	Body('boundary-like text in multiple parts across chunks', async () => {
 		const collection = await collect(
-			parse([
-				chunk(preamble, delimiter(), part({ one: '---' })),
-				chunk(delimiter(), part({ two: '---' }), closingDelimiter()),
-			]),
+			meros(
+				responder([
+					chunk(preamble, delimiter(), part({ one: '---' })),
+					chunk(
+						delimiter(),
+						part({ two: '---' }),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(bodies(collection), [{ one: '---' }, { two: '---' }]);
 	});
 
 	Body.run();
-};
+}

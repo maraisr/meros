@@ -8,10 +8,11 @@ import {
 	part,
 	preamble,
 	split,
-	type TestContext,
+	type Meros,
+	type Responder,
 } from '../utils';
 
-export default ({ parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const Headers = suite('headers');
 	const fixture = part({ foo: 'bar' }, [
 		'cache-control: public,max-age=30',
@@ -31,7 +32,11 @@ export default ({ parse }: TestContext) => {
 
 	Headers('parses headers', async () => {
 		const collection = await collect(
-			parse([chunk(preamble, delimiter(), fixture, closingDelimiter())]),
+			meros(
+				responder([
+					chunk(preamble, delimiter(), fixture, closingDelimiter()),
+				]),
+			),
 		);
 
 		assert.equal(
@@ -42,7 +47,13 @@ export default ({ parse }: TestContext) => {
 
 	Headers('crossing chunks', async () => {
 		const collection = await collect(
-			parse([delimiter(), ...split(fixture, 11), closingDelimiter()]),
+			meros(
+				responder([
+					delimiter(),
+					...split(fixture, 11),
+					closingDelimiter(),
+				]),
+			),
 		);
 
 		assert.equal(
@@ -53,14 +64,16 @@ export default ({ parse }: TestContext) => {
 
 	Headers('no headers', async () => {
 		const collection = await collect(
-			parse([
-				chunk(
-					preamble,
-					delimiter(),
-					part('part', false),
-					closingDelimiter(),
-				),
-			]),
+			meros(
+				responder([
+					chunk(
+						preamble,
+						delimiter(),
+						part('part', false),
+						closingDelimiter(),
+					),
+				]),
+			),
 		);
 
 		assert.equal(
@@ -70,4 +83,4 @@ export default ({ parse }: TestContext) => {
 	});
 
 	Headers.run();
-};
+}

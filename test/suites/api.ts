@@ -1,28 +1,36 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import { chunk, delimiter, part, preamble, type TestContext } from '../utils';
+import {
+	chunk,
+	delimiter,
+	part,
+	preamble,
+	type Meros,
+	type Responder,
+} from '../utils';
 
-export default ({ implementation, parse }: TestContext) => {
+export default function (meros: Meros, responder: Responder) {
 	const API = suite('api');
 
 	API('exports a function', () => {
-		assert.type(implementation, 'function');
+		assert.type(meros, 'function');
 	});
 
 	API('returns an AsyncGenerator', async () => {
-		const parts = await parse([]);
+		const parts = await meros(responder([]));
 
 		assert.type(parts[Symbol.asyncIterator], 'function');
 	});
 
 	API('finishes when the response stream closes', async () => {
-		const parts = await parse([
-			chunk(preamble, delimiter(), part('test'), delimiter()),
-		]);
+		const parts = await meros(
+			responder([
+				chunk(preamble, delimiter(), part('test'), delimiter()),
+			]),
+		);
 
 		let r = await parts.next();
 		assert.equal(r.done, false);
-		if (r.done) throw new Error('Expected a parsed part');
 		assert.equal(String(r.value.body), 'test');
 
 		r = await parts.next();
@@ -31,4 +39,4 @@ export default ({ implementation, parse }: TestContext) => {
 	});
 
 	API.run();
-};
+}
