@@ -31,7 +31,8 @@ export default function (meros: Meros, responder: Responder) {
 					chunk(
 						preamble,
 						delimiter(),
-						part(image, ['content-type: image/gif']),
+						'content-type: image/gif\r\n',
+						part(image),
 						closingDelimiter(),
 					),
 				]),

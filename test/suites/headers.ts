@@ -5,6 +5,7 @@ import {
 	closingDelimiter,
 	collect,
 	delimiter,
+	json,
 	part,
 	preamble,
 	split,
@@ -14,13 +15,14 @@ import {
 
 export default function (meros: Meros, responder: Responder) {
 	const Headers = suite('headers');
-	const fixture = part({ foo: 'bar' }, [
-		'cache-control: public,max-age=30',
-		'etag: test',
-		'x-test: test:test',
-		'x-test-2: test: test',
-		'x-valid: _ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%',
-	]);
+	const fixture = chunk(
+		'cache-control: public,max-age=30\r\n',
+		'etag: test\r\n',
+		'x-test: test:test\r\n',
+		'x-test-2: test: test\r\n',
+		'x-valid: _ :;.,/"\'?!(){}[]@<>=-+*#$&`|~^%\r\n',
+		json({ foo: 'bar' }),
+	);
 	const expected = {
 		'content-type': 'application/json; charset=utf-8',
 		'cache-control': 'public,max-age=30',
@@ -69,7 +71,7 @@ export default function (meros: Meros, responder: Responder) {
 					chunk(
 						preamble,
 						delimiter(),
-						part('part', false),
+						part('part'),
 						closingDelimiter(),
 					),
 				]),

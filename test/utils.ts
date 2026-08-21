@@ -25,23 +25,17 @@ export function chunk(...parts: string[]) {
 	return parts.join('');
 }
 
-export function part(payload: unknown, headers: string[] | false = []) {
-	if (headers === false) headers = [];
-	else if (!headers.some((header) => /^content-type\s*:/i.test(header))) {
-		headers = [
-			`content-type: ${
-				typeof payload === 'string'
-					? 'text/plain'
-					: 'application/json; charset=utf-8'
-			}`,
-			...headers,
-		];
-	}
+// a part is the blank line that ends the header block, then the body —
+// headers, when a test wants them, are written as literal lines before it
+export function part(body: string) {
+	return '\r\n' + body;
+}
 
-	const body =
-		typeof payload === 'string' ? payload : JSON.stringify(payload);
-
-	return [...headers, '', body].join('\r\n');
+export function json(payload: unknown) {
+	return (
+		'content-type: application/json; charset=utf-8\r\n' +
+		part(JSON.stringify(payload))
+	);
 }
 
 export function split(value: string, count: number) {

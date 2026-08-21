@@ -7,6 +7,7 @@ import {
 	closingDelimiter,
 	collect,
 	delimiter,
+	json,
 	part,
 	preamble,
 	split,
@@ -24,7 +25,7 @@ export default function (meros: Meros, responder: Responder) {
 					chunk(
 						preamble,
 						delimiter(),
-						part({ foo: 'bar' }),
+						json({ foo: 'bar' }),
 						closingDelimiter(),
 					),
 				]),
@@ -80,6 +81,8 @@ export default function (meros: Meros, responder: Responder) {
 	});
 
 	Chunk('utf-8 code points split across chunks', async () => {
+		// a part is `\r\n` + body — 2 bytes, then the 4 byte emoji, so
+		// subarray(4) splits mid way through its code point
 		const bytes = Buffer.from(part('🤔'));
 
 		const collection = await collect(
@@ -131,13 +134,13 @@ export default function (meros: Meros, responder: Responder) {
 					chunk(
 						preamble,
 						delimiter(),
-						part({ foo: 'bar' }),
+						json({ foo: 'bar' }),
 						delimiter(),
 					),
 					chunk(
-						part({ bar: 'baz' }),
+						json({ bar: 'baz' }),
 						delimiter(),
-						part({ foo: 'blitz' }),
+						json({ foo: 'blitz' }),
 						closingDelimiter(),
 					),
 				]),

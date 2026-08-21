@@ -6,6 +6,7 @@ import {
 	closingDelimiter,
 	collect,
 	delimiter,
+	json,
 	part,
 	preamble,
 	split,
@@ -23,7 +24,7 @@ export default function (meros: Meros, responder: Responder) {
 					chunk(
 						preamble,
 						delimiter(),
-						part({ foo: 'bar' }),
+						json({ foo: 'bar' }),
 						closingDelimiter(),
 					),
 				]),
@@ -67,7 +68,7 @@ export default function (meros: Meros, responder: Responder) {
 					chunk(
 						preamble,
 						delimiter(),
-						part({ foo: 'bar' }),
+						json({ foo: 'bar' }),
 						delimiter(),
 						part('bar: baz'),
 						closingDelimiter(),
@@ -109,7 +110,7 @@ export default function (meros: Meros, responder: Responder) {
 			meros(
 				responder([
 					chunk(preamble, delimiter()),
-					...split(part(payload), 111),
+					...split(json(payload), 111),
 					closingDelimiter(),
 				]),
 			),
@@ -155,7 +156,7 @@ bar
 					chunk(
 						preamble,
 						delimiter(),
-						part({ test: '---' }),
+						json({ test: '---' }),
 						closingDelimiter(),
 					),
 				]),
@@ -172,9 +173,9 @@ bar
 					chunk(
 						preamble,
 						delimiter(),
-						part({ one: '---' }),
+						json({ one: '---' }),
 						delimiter(),
-						part({ two: '---' }),
+						json({ two: '---' }),
 						closingDelimiter(),
 					),
 				]),
@@ -188,10 +189,10 @@ bar
 		const collection = await collect(
 			meros(
 				responder([
-					chunk(preamble, delimiter(), part({ one: '---' })),
+					chunk(preamble, delimiter(), json({ one: '---' })),
 					chunk(
 						delimiter(),
-						part({ two: '---' }),
+						json({ two: '---' }),
 						closingDelimiter(),
 					),
 				]),
