@@ -6,7 +6,6 @@ import { default as Chunking } from './chunking';
 import { default as Headers } from './headers';
 import { default as Body } from './body';
 import { default as Binary } from './binary';
-import { default as UseCases } from './use-cases';
 
 export default function (meros: Meros, responder: Responder) {
 	API(meros, responder);
@@ -18,6 +17,4 @@ export default function (meros: Meros, responder: Responder) {
 	Body(meros, responder);
 
 	Binary(meros, responder);
-
-	UseCases(meros, responder);
 }

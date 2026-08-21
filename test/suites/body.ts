@@ -8,6 +8,7 @@ import {
 	delimiter,
 	part,
 	preamble,
+	split,
 	type Meros,
 	type Responder,
 } from '../utils';
@@ -94,6 +95,27 @@ export default function (meros: Meros, responder: Responder) {
 		);
 
 		assert.equal(bodies(collection), ['🚀', '😎']);
+	});
+
+	Body('very large json body', async () => {
+		const payload = {
+			data: Array.from({ length: 10_000 }, (_, i) => ({
+				id: i,
+				name: `item-${i}`,
+			})),
+		};
+
+		const collection = await collect(
+			meros(
+				responder([
+					chunk(preamble, delimiter()),
+					...split(part(payload), 111),
+					closingDelimiter(),
+				]),
+			),
+		);
+
+		assert.equal(bodies(collection), [payload]);
 	});
 
 	Body('retain newlines', async () => {

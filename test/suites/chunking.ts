@@ -79,6 +79,23 @@ export default function (meros: Meros, responder: Responder) {
 		assert.equal(bodies(collection), ['one', 'two']);
 	});
 
+	Chunk('utf-8 code points split across chunks', async () => {
+		const bytes = Buffer.from(part('🤔'));
+
+		const collection = await collect(
+			meros(
+				responder([
+					delimiter(),
+					bytes.subarray(0, 4),
+					bytes.subarray(4),
+					closingDelimiter(),
+				]),
+			),
+		);
+
+		assert.equal(bodies(collection), ['🤔']);
+	});
+
 	Chunk('handles heavily fragmented payloads', async () => {
 		const result = [
 			randomBytes(2000).toString('base64'),
